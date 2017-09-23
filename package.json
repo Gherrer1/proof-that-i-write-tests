@@ -21,6 +21,7 @@
     "cookie-parser": "^1.4.3",
     "express": "^4.15.4",
     "mongoose": "^4.11.12",
+    "mongoose-type-email": "^1.0.5",
     "morgan": "^1.8.2"
   },
   "devDependencies": {

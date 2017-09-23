@@ -1,0 +1,5 @@
+1) Mongoose's unique option when defining schemas is NOT a validator
+   Its a convenient helper for building MongoDB unique indexes.
+   Furthermore, must wait for index to finish building before storing documents,
+   	otherwise documents with duplicate values for the unique field will be saved, and we dont want that.
+   Implicitly builds an index. Difference between index: true and unique: true is that the unique index will only allow unique values
