@@ -1,7 +1,7 @@
 const UserModel 		= require('../../models/User');
 const expect			= require('chai').expect;
 
-describe.only('UserModel', function() {
+describe('UserModel', function() {
 
 	let fields;
 
