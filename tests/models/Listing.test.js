@@ -1,5 +1,7 @@
 const Listing    = require('../../models/Listing');
 const expect          = require('chai').expect;
+const mongoose    = require('mongoose');
+// const ObjectID  = require()
 
 describe('Listing Model', function() {
 
@@ -20,7 +22,8 @@ describe('Listing Model', function() {
         description: 'XYZ',
         lang: 'PYTHON',
         budget: 1,
-        dueDate: tomorrow
+        dueDate: tomorrow,
+        owner_id: mongoose.Types.ObjectId('59c836e0459ef10a62e0665b')
       };
   });
 
@@ -241,6 +244,27 @@ describe('Listing Model', function() {
       expect(listing.status).to.equal('ACTIVE');
       let errors = listing.validateSync();
       expect(errors).to.be.undefined;
+    });
+  });
+  describe('owner_id field', function() {
+    it('should return a validation error if left empty', function() {
+      delete fields.owner_id;
+      let listing = new Listing(fields);
+      let error = listing.validateSync();
+      expect(error.errors.owner_id).to.exist;
+    });
+
+    it('should throw an error if you try to assign a non ObjectID to it', function() {
+      fields.owner_id = 123;
+      let listing = new Listing(fields);
+      let error = listing.validateSync();
+      expect(error.errors.owner_id.message).to.match(/Cast to ObjectID failed for value "123"/);
+    });
+
+    it('should throw no errors if you assign a perfectly ok ObjectID to it', function() {
+      let listing = new Listing(fields);
+      let error = listing.validateSync();
+      expect(error).to.be.undefined;
     });
   });
 

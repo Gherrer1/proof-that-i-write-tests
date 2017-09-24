@@ -16,7 +16,8 @@ const ListingSchema = new Schema({
   dueDate     : { type: Date, required: true, validate: validate },
   isOnline    : { type: Boolean, default: false },
   ninjaID     : { type: ObjectId, default: null },
-  status      : { type: String, enum: statusEnum, uppercase: true, default: 'ACTIVE' }
+  status      : { type: String, enum: statusEnum, uppercase: true, default: 'ACTIVE' },
+  owner_id    : { type: Schema.Types.ObjectId, ref: 'User', required: true }
 });
 
 const ListingModel = mongoose.model('Listing', ListingSchema);
