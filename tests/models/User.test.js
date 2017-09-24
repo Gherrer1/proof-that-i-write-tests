@@ -9,7 +9,8 @@ describe('UserModel', function() {
 		fields = {
 			fname: 'Jake',
 			username: 'jakerolf23',
-			email: 'jake@email.com'
+			email: 'jake@email.com',
+			password: 'abc123xyz4'
 		};
 	});
 
@@ -101,6 +102,40 @@ describe('UserModel', function() {
 			expect(user.isNinja).to.equal('PENDING');
 			let errors = user.validateSync();
 			expect(errors).to.be.undefined;
+		});
+	});
+
+	describe('password field', function() {
+		it('should be minimum 10 characters and maximum 20 characters', function() {
+			fields.password = '123456789'; // 9 characters
+			let user = new UserModel(fields);
+			let error = user.validateSync();
+			expect(error.errors.password).to.exist;
+			console.log(error);
+			fields.password = '111111111111111111111'; // 21 characters
+			user = new UserModel(fields);
+			error = user.validateSync();
+			expect(error.errors.password).to.exist;
+			fields.password = '1111111111'; // 10 chars
+			user = new UserModel(fields);
+			error = user.validateSync();
+			expect(error).to.be.undefined;
+			fields.password = '11111111111111111111'; // 20 chars
+			user = new UserModel(fields);
+			error = user.validateSync();
+			expect(error).to.be.undefined;
+		});
+		it('should return a validation error if left empty', function() {
+			delete fields.password;
+			let user = new UserModel(fields);
+			let error = user.validateSync();
+			expect(error.errors.password.message).to.match(/`password` is required/);
+		});
+		it('should be case sensitive', function() {
+			const expectedPassword = 'aBcDeFGhIjKlMn';
+			fields.password = expectedPassword;
+			let user = new UserModel(fields);
+			expect(user.password).to.equal(expectedPassword);
 		});
 	});
 });
