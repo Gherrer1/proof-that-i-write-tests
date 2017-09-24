@@ -111,11 +111,12 @@ describe('UserModel', function() {
 			let user = new UserModel(fields);
 			let error = user.validateSync();
 			expect(error.errors.password).to.exist;
-			console.log(error);
+			expect(error.errors.password.message).to.match(/is shorter than the minimum allowed length/);
 			fields.password = '111111111111111111111'; // 21 characters
 			user = new UserModel(fields);
 			error = user.validateSync();
 			expect(error.errors.password).to.exist;
+			expect(error.errors.password.message).to.match(/is longer than the maximum allowed length/);
 			fields.password = '1111111111'; // 10 chars
 			user = new UserModel(fields);
 			error = user.validateSync();

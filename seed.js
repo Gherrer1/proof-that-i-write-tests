@@ -29,5 +29,10 @@ function seed() {
   var fakeEmails = fakeUsers.map( userFName => userFName + '@email.com');
   const fakePassword = '1111111111';
 
+  var user1 = new User()
+  user1.save()
+    .then((msg) => console.log('Success message!: ', msg))
+    .catch(err => console.log(err));
+
   mongoose.connection.close();
 }
