@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>THE proof-that-I-write-tests</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+
+    <!-- Custom styles for this template -->
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-primary">
+      <a class="navbar-brand" href="/">Proof</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Link</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="#">Disabled</a>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav justify-content-end">
+          <li class="nav-item">
+            <a class="nav-link" href="/login">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/signup">Sign Up</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+		<ul class="signup-errors">
+			<% errors.forEach(function(err) { %>
+				<li><%= err %></li>
+			<% }) %>
+		</ul>
+		<form action="/signup" method="POST">
+			<div class="form-group">
+				<label>First Name: <input type="text" class="form-control form-control-sm" name="fname" required></label> <br>
+			</div>
+			<div class="form-group">
+				<label>Email: <input type="email" class="form-control form-control-sm" name="email" required=""></label>
+			</div>
+			<div class="form-group">
+				<label>Username: <input type="text" class="form-control form-control-sm" name="username" required></label>
+				<small id="usernameHelp" class="form-text text-muted">
+					<!-- Don't use anything that would give away your identity - we don't want x finding out! -->
+				</small>
+			</div>
+			<div class="form-group">
+				<label>Password: <input type="password" class="form-control form-control-sm" name="password" required></label>
+			</div>
+			<div class="form-group">
+				<label>Password (again): <input type="password" class="form-control form-control-sm" name="password2" required></label>
+			</div>
+			<!-- <input type="submit" name="submit" value="Submit"> -->
+			<button type="submit" class="btn btn-primary">Sign Up</button>
+		</form>
+    </div>
+
+
+ 	<!-- FOOTER -->
+  	<footer>
+    	<p class="float-right"><a href="#">Back to top</a></p>
+    	<p>&copy; 2017 Company, Inc. &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a></p>
+  	</footer>
+
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="../../../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="https://getbootstrap.com/assets/js/vendor/popper.min.js"></script>
+    <script src="https://getbootstrap.com/dist/js/bootstrap.min.js"></script>
+    <!-- Just to make our placeholder images work. Don't actually copy the next line! -->
+    <script src="https://getbootstrap.com/assets/js/vendor/holder.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="https://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
+</body>
+</html>
