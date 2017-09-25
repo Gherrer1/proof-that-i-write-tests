@@ -101,18 +101,55 @@ function addUsers() {
 function createListings(ids) {
   return new Promise(function(resolve, reject) {
     const fakeTypes = ['long_term', 'short_term', 'full_time'];
-    const fakeLangs = ['Python', 'Javascript', 'C++', 'elm', 'C', 'ruby', 'oG'];
+    const fakeLangs = ['Python', 'Javascript', 'C++', 'elm', 'C', 'ruby', 'gO'];
     const fakeTitlePostfixes = [' Website', ' Mobile App', ' Utility', ' Script'];
     const fakeDescriptions = ['Need experienced developer', 'Entry level devs welcome'];
 
     const numFakeListings = 67;
+    var today = new Date();
+    var tomorrow = today.setDate(today.getDate() + 1);
+    const fakeDueDate = tomorrow;
 
-    // TODO: pick up from here. First need to add owner field to Listings
+    let savePromises = [];
+
     let id_index = 0;
-    for(let i = 0; i < numFakeListings; i++) {
-      if(id_index >= ids.length) {
-        id_index = 0;
+    let fakeTypes_i = 0;
+    let fakeLangs_i = 0;
+    let fakeDesc_i = 0;
+    let fakeTitlePostfixes_i = 0;
+
+    for(let i = 0; i < numFakeListings; i++, id_index++, fakeTypes_i++, fakeLangs_i++, fakeDesc_i++, fakeTitlePostfixes_i++) {
+      // circle back if necessary
+      id_index = (id_index >= ids.length ? 0 : id_index);
+      fakeTypes_i = (fakeTypes_i >= fakeTypes.length ? 0 : fakeTypes_i);
+      fakeLangs_i = (fakeLangs_i >= fakeLangs.length ? 0 : fakeLangs_i);
+      fakeDesc_i = (fakeDesc_i >= fakeDescriptions.length ? 0 : fakeDesc_i);
+      fakeTitlePostfixes_i = (fakeTitlePostfixes_i >= fakeTitlePostfixes.length ? 0 : fakeTitlePostfixes_i);
+
+      const fields = {
+        title: fakeLangs[fakeLangs_i] + fakeTitlePostfixes[fakeTitlePostfixes_i],
+        type: fakeTypes[fakeTypes_i],
+        description: fakeDescriptions[fakeDesc_i],
+        lang: fakeLangs[fakeLangs_i],
+        dueDate: getXDaysFromToday(Math.ceil(Math.random() * 30)),
+        owner_id: ids[id_index]
+      };
+      if(Math.random() < .5) {
+        fields.budget = Math.ceil(Math.random() * 2000);
       }
+      const listing = new Listing(fields);
+      savePromises.push(listing.save());
     }
+    Promise.all(savePromises)
+      .then(res => { console.log(`Created ${res.length} listings`); resolve(res); })
+      .catch(err => reject(err));
   });
 }
+
+// helpers
+/* int --> Date */
+function getXDaysFromToday(x) {
+    let today = new Date();
+    today.setDate(today.getDate() + x);
+    return today;
+  }

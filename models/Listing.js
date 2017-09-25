@@ -3,7 +3,7 @@ const mongoose          = require('mongoose'),
       ObjectId          = Schema.ObjectId;
 mongoose.Promise = global.Promise;
 
-const languageEnum = ['PYTHON', 'JAVASCRIPT', 'C++', 'JAVA', 'RUBY', 'GO'];
+const languageEnum = ['PYTHON', 'JAVASCRIPT', 'C++', 'JAVA', 'ELM', 'C', 'RUBY', 'GO'];
 const typeEnum = ['LONG_TERM', 'SHORT_TERM', 'FULL_TIME'];
 const statusEnum = ['ACTIVE', 'LOCKED', 'COMPLETED'];
 
