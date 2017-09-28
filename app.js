@@ -1,10 +1,11 @@
-const express						= require('express');
-const bodyParser 				= require('body-parser');
-const logger						= require('morgan');
-const mongoose					= require('mongoose');
-const config						= require('./config'),
-	  DB_URL							= config.DB_URL;
-const userController 		= require('./controllers/user');
+const express							= require('express');
+const bodyParser 					= require('body-parser');
+const logger							= require('morgan');
+const mongoose						= require('mongoose');
+const config							= require('./config');
+const DB_URL							= config.DB_URL;
+const {signupValidators}	= require('./validators');
+const userController 			= require('./controllers/user');
 const app = express();
 
 mongoose.Promise = global.Promise;
@@ -36,7 +37,8 @@ app.get('/signup', function(req, res) {
 	// TODO: if not signed in
 	res.render('signup', { errors: [] })
 });
-app.post('/signup', userController.createUser);
+
+app.post('/signup', signupValidators, userController.createUser);
 
 // app.get('/login', function(req, res) {
 // 	// TODO: check if authorized first - no need for logged in user to go through TSA
