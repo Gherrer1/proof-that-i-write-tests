@@ -1,11 +1,13 @@
-const express							= require('express');
-const bodyParser 					= require('body-parser');
-const logger							= require('morgan');
-const mongoose						= require('mongoose');
-const config							= require('./config');
-const DB_URL							= config.DB_URL;
-const {signupValidators}	= require('./validators');
-const userController 			= require('./controllers/user');
+const express								= require('express');
+const bodyParser 						= require('body-parser');
+const logger								= require('morgan');
+const mongoose							= require('mongoose');
+const config								= require('./config');
+const DB_URL								= config.DB_URL;
+const { signupValidators }	= require('./validators');
+const { matchedData } 			= require('express-validator/filter');
+const { validationResult } 	= require('express-validator/check');
+const userController 				= require('./controllers/user');
 const app = express();
 
 mongoose.Promise = global.Promise;
@@ -38,7 +40,13 @@ app.get('/signup', function(req, res) {
 	res.render('signup', { errors: [] })
 });
 
-app.post('/signup', signupValidators, userController.createUser);
+// app.post('/signup', signupValidators, userController.createUser);
+app.post('/signup', signupValidators, function(req, res) {
+	// dependency injection
+	const errors = validationResult(req);
+	const validData = matchedData(req);
+	userController.createUser(req, res, errors, validData);
+});
 
 // app.get('/login', function(req, res) {
 // 	// TODO: check if authorized first - no need for logged in user to go through TSA
