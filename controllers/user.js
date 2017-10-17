@@ -7,10 +7,12 @@ function createUser(validData, requiredFields, uniquenessVerifiers, passwordHash
     if(dataMissing)
       return reject(new Error('Some fields missing, cannot create user'));
 
-    const uniquenessPromises = uniquenessVerifiers.map(func => func());
-    Promise.all(uniquenessPromises)
+    uniquenessVerifiers({ email: validData.email, username: validData.username })
+      .then(function hashPassword() {
+        return passwordHasher(validData.password)
+      })
       .then()
-      .catch(err => reject(new Error('email or username wasnt unique')));
+      .catch(err => reject(err));
   });
 }
 

@@ -40,12 +40,28 @@ app.get('/signup', function(req, res) {
 	res.render('signup', { errors: [] })
 });
 
-// app.post('/signup', signupValidators, userController.createUser);
+
 app.post('/signup', signupValidators, function(req, res) {
-	// dependency injection
 	const errors = validationResult(req);
 	const validData = matchedData(req);
-	userController.createUser(req, res, errors, validData);
+	const errorsToString = { haveErrors: !errors.isEmpty(), errors: errors.mapped(), validData };
+	if(!errors.isEmpty()) {
+		// rerender /signup with error message and with prefilled elements
+		errorsToString.msg = 'fail lol';
+		return res.json(errorsToString);
+	}
+	
+	const requiredFields = require('../helpers/requiredFields').createUser;
+	// const uniquenessVerifier = require()
+	// const passwordHasher = require(bcrypt)
+	userController.createUser(validData, requiredFields)
+		.then(user => res.send(user))
+		.catch(err => {
+			errorsToString.haveErrors = true;
+			errorsToString.errors = [err];
+			errorsToString.msg = err.message;
+			res.json(errorsToString);
+		});
 });
 
 // app.get('/login', function(req, res) {
