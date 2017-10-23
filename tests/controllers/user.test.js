@@ -3,7 +3,7 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 const assert = chai.assert;
-const should = chai.should;
+const should = chai.should();
 const sinon = require('sinon');
 
 describe.only('UserController', function() {
@@ -18,7 +18,7 @@ describe.only('UserController', function() {
   });
 
   afterEach(function() {
-    // delete userController.model;
+    delete userController.model;
   });
 
   describe('ensureEmailAndUsernameUnique', function() {
@@ -26,7 +26,7 @@ describe.only('UserController', function() {
     const username = 'me';
     // just unit tests, we'll test the actual db query later
     afterEach(function() {
-      // userController.model = undefined;
+      delete userController.model;
     });
 
     it('should return a promise', function() {
@@ -71,7 +71,7 @@ describe.only('UserController', function() {
       // now make sure it rejects with 2 users found too
       fakeUsersFound.push({ fname: 'U2' });
       var promise2 = userController.ensureEmailAndUsernameUnique(email, username);
-      // return expect(promise).to.eventually.be.rejected && expect(promise2).to.eventually.be.fulfilled;
+      // how to test multiple promises
       return Promise.all([
         expect(promise).to.eventually.be.rejected,
         expect(promise2).to.eventually.be.rejected
@@ -84,6 +84,75 @@ describe.only('UserController', function() {
       userController.setModel(mockedModel);
       var promise = userController.ensureEmailAndUsernameUnique(email, username);
       return expect(promise).to.eventually.be.fulfilled;
+    });
+  });
+
+  describe.only('createUser', function() {
+    let validData;
+    let fakeHasher;
+    let fakeModel;
+    let fakeInstance;
+
+    beforeEach(function() {
+      validData = { fname: 'Joey', email: 'joey@email.com', username: 'joeywheeler', password: 'joeyjoeyjoey', passwordConf: 'joeyjoeyjoey' };
+      fakeHasher = { hash() { return Promise.resolve() } };
+      let fakeModel = {
+        save() {
+          return new Promise(function(resolve, reject) {
+            delete validData.passwordConf;
+            validData.password = 'hashed ;)';
+            resolve(validData);
+          })
+        }
+      };
+    });
+
+    it('should return a promise', function() {
+      userController.setModel(fakeModel);
+      const promise = userController.createUser(validData, fakeHasher)
+      expect(promise.then).to.exist;
+      expect(promise.catch).to.exist;
+    });
+    it('should call passwordHasher once with the password field of the validData object passed in', function(done) {
+      const stub = sinon.stub(fakeHasher, 'hash');
+      stub.resolves('hashed ;)');
+      userController.setModel(fakeModel);
+      userController.createUser(validData, fakeHasher)
+      .then(user => {
+        assert(stub.calledOnce, 'fakeHasher.hash was not called once');
+        assert(stub.calledWith(validData.password));
+      })
+      .catch(err => {
+        assert(stub.calledOnce, 'fakeHasher.hash was not called once');
+        assert(stub.calledWith(validData.password));
+        throw err;
+      })
+      .then(done, done);
+    });
+    it('should reject if passwordHasher rejects', function() {
+      const stub = sinon.stub(fakeHasher, 'hash');
+      const errorMessage = 'custom fakeHasher error message :)';
+      stub.rejects(new Error(errorMessage));
+      userController.setModel(fakeModel);
+      var promise = userController.createUser(validData, fakeHasher);
+      return promise.should.be.rejectedWith(Error); //expect(promise).to.eventually.rejectWith(Error, errorMessage);
+    });
+    it('should call the model as a constructor once with the validData fields and the newly hashed password if hashing goes well', function() {
+      throw new Error('red-green refactor');
+    });
+    it('should call save() on a new User object with the validData fields and the newly hashed password if hashing goes well', function() {
+      let { fname, username, email } = validData;
+      let hashedPassword = 'hashed ;)';
+      let fakeUserInstance = { fname, username, email, password: hashedPassword };
+      fakeUserInstance.save = function() { return Promise.resolve({ fname, username, email, hashedPassword }) };
+
+      throw new Error('red-green refactor');
+    });
+    it('should reject if save() throws an error', function() {
+      throw new Error('red-green refactor');
+    });
+    it('should resolve with a user object if all goes well', function() {
+      throw new Error('red-green refactor');
     });
   });
 });

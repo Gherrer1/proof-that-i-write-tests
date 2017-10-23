@@ -1,7 +1,10 @@
 /* Have as little dependencies as possible here to make it testable */
 function createUser(validData, passwordHasher) {
   return new Promise(function(resolve, reject) {
-
+    passwordHasher.hash(validData.password)
+    // resolve();
+    .then(hash => resolve(hash))
+    .catch(err => reject(err));
   });
 }
 
@@ -26,5 +29,6 @@ function ensureEmailAndUsernameUnique(email, username) {
 
 module.exports = {
   setModel,
+  createUser,
   ensureEmailAndUsernameUnique
 };
