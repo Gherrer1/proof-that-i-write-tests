@@ -35,14 +35,6 @@ describe.only('UserController', function() {
       expect(promise.then).to.exist;
       expect(promise.catch).to.exist;
     });
-    it('mock play', function() {
-      var myAPI = { method10: function() {} };
-      var mock = sinon.mock(myAPI);
-      mock.expects('method10').twice().withArgs(1, 2);
-      myAPI.method10(1, 2);
-      myAPI.method10(1, 2);
-      mock.verify();
-    });
     it('should call model.find on the parameters passed into it', function(done) {
       const model = {
         find: function(email, username) { return new Promise(function(resolve, reject) { resolve(); }); }
@@ -87,7 +79,7 @@ describe.only('UserController', function() {
     });
   });
 
-  describe.only('createUser', function() {
+  describe('createUser', function() {
     let validData;
     let fakeHasher;
     let fakeModel;
@@ -119,10 +111,12 @@ describe.only('UserController', function() {
       userController.setModel(fakeModel);
       userController.createUser(validData, fakeHasher)
       .then(user => {
+        stub.restore();
         assert(stub.calledOnce, 'fakeHasher.hash was not called once');
         assert(stub.calledWith(validData.password));
       })
       .catch(err => {
+        stub.restore();
         assert(stub.calledOnce, 'fakeHasher.hash was not called once');
         assert(stub.calledWith(validData.password));
         throw err;
