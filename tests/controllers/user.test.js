@@ -11,7 +11,7 @@ describe.only('UserController', function() {
 
   it('should not have a this.model set until calling setModel on it', function() {
     expect(userController.model).to.be.undefined;
-    var fakeModel = { haha: 'lol' };
+    var fakeModel = function() {};
     userController.setModel(fakeModel);
     expect(userController.model).to.equal(fakeModel);
     delete userController.model;
@@ -81,22 +81,15 @@ describe.only('UserController', function() {
 
   describe('createUser', function() {
     let validData;
+    let fakeHash = 'hashed ;)';
     let fakeHasher;
     let fakeModel;
     let fakeInstance;
 
     beforeEach(function() {
       validData = { fname: 'Joey', email: 'joey@email.com', username: 'joeywheeler', password: 'joeyjoeyjoey', passwordConf: 'joeyjoeyjoey' };
-      fakeHasher = { hash() { return Promise.resolve() } };
-      let fakeModel = {
-        save() {
-          return new Promise(function(resolve, reject) {
-            delete validData.passwordConf;
-            validData.password = 'hashed ;)';
-            resolve(validData);
-          })
-        }
-      };
+      fakeHasher = { hash(password) { return Promise.resolve(fakeHash) } };
+      fakeModel = function(obj) { return obj };
     });
 
     it('should return a promise', function() {
@@ -108,17 +101,22 @@ describe.only('UserController', function() {
     it('should call passwordHasher once with the password field of the validData object passed in', function(done) {
       const stub = sinon.stub(fakeHasher, 'hash');
       stub.resolves('hashed ;)');
+      const expectedParamForHasher = validData.password;
       userController.setModel(fakeModel);
       userController.createUser(validData, fakeHasher)
       .then(user => {
         stub.restore();
         assert(stub.calledOnce, 'fakeHasher.hash was not called once');
-        assert(stub.calledWith(validData.password));
+        assert(stub.calledWith(expectedParamForHasher), `hasher expected to be called with ${expectedParamForHasher} but was called with ${stub.args}`);
       })
       .catch(err => {
+
+        throw err;
+        console.log(err);
         stub.restore();
+        console.log(expectedParamForHasher);
         assert(stub.calledOnce, 'fakeHasher.hash was not called once');
-        assert(stub.calledWith(validData.password));
+        assert(stub.calledWith(validData.password), `hasher expected to be called with ${validData.password} but was called with ${stub.args}`);
         throw err;
       })
       .then(done, done);
@@ -131,8 +129,23 @@ describe.only('UserController', function() {
       var promise = userController.createUser(validData, fakeHasher);
       return promise.should.be.rejectedWith(Error); //expect(promise).to.eventually.rejectWith(Error, errorMessage);
     });
-    it('should call the model as a constructor once with the validData fields and the newly hashed password if hashing goes well', function() {
-      throw new Error('red-green refactor');
+    it('should call the model as a constructor once with the validData fields and the newly hashed password if hashing goes well', function(done) {
+      const stubModel = sinon.stub().returns(validData);
+      userController.setModel(stubModel);
+      userController.createUser(validData, fakeHasher)
+      .then(user => {
+        assert(stubModel.calledOnce, 'model was not called once');
+        assert(stubModel.calledWithNew(), 'model function was not called with new');
+        let passwordFieldOfArg = stubModel.args[0][0].password;
+        assert.equal(passwordFieldOfArg, fakeHash);
+      })
+      .catch(err => {
+        assert(stubModel.calledOnce, 'model was not called once');
+        assert(stubModel.calledWithNew(), 'model function was not called with new');
+        let passwordFieldOfArg = stubModel.args[0][0].password;
+        assert.equal(passwordFieldOfArg, fakeHash);
+      })
+      .then(done, done);
     });
     it('should call save() on a new User object with the validData fields and the newly hashed password if hashing goes well', function() {
       let { fname, username, email } = validData;

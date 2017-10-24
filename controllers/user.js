@@ -1,9 +1,13 @@
 /* Have as little dependencies as possible here to make it testable */
 function createUser(validData, passwordHasher) {
+  var model = this.model;
   return new Promise(function(resolve, reject) {
     passwordHasher.hash(validData.password)
-    // resolve();
-    .then(hash => resolve(hash))
+    .then(hash => {
+      validData.password = hash;
+      var user = new model(validData);
+      return resolve(user);
+    })
     .catch(err => reject(err));
   });
 }
