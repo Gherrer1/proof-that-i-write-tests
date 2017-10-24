@@ -89,7 +89,10 @@ describe.only('UserController', function() {
     beforeEach(function() {
       validData = { fname: 'Joey', email: 'joey@email.com', username: 'joeywheeler', password: 'joeyjoeyjoey', passwordConf: 'joeyjoeyjoey' };
       fakeHasher = { hash(password) { return Promise.resolve(fakeHash) } };
-      fakeModel = function(obj) { return obj };
+      fakeModel = function(obj) {
+        obj.save = function() {};
+        return obj
+      };
     });
 
     it('should return a promise', function() {
@@ -147,19 +150,57 @@ describe.only('UserController', function() {
       })
       .then(done, done);
     });
-    it('should call save() on a new User object with the validData fields and the newly hashed password if hashing goes well', function() {
-      let { fname, username, email } = validData;
-      let hashedPassword = 'hashed ;)';
-      let fakeUserInstance = { fname, username, email, password: hashedPassword };
-      fakeUserInstance.save = function() { return Promise.resolve({ fname, username, email, hashedPassword }) };
+    it('should call save() on a new User object', function(done) {
+      let { fname, email, username, password } = validData;
+      let modelInstance = { fname, email, username, password: fakeHash };
+      modelInstance.save = function() {
+        return Promise.resolve({ fname, email, username, password });
+      }
 
-      throw new Error('red-green refactor');
+      let spy = sinon.spy(modelInstance, 'save');
+      fakeModel = function(data) {
+        return modelInstance;
+      }
+
+      userController.setModel(fakeModel);
+      userController.createUser(validData, fakeHasher)
+      .then(user => {
+        assert(spy.calledOnce, 'modelInstance.save() was not called once, it was called ' + spy.callCount + ' times');
+      })
+      .catch(err => {
+        throw err;
+      })
+      .then(done, done);
     });
     it('should reject if save() throws an error', function() {
-      throw new Error('red-green refactor');
+      let { fname, username, email, password } = validData;
+      let modelInstance = { fname, username, email, password: fakeHash };
+      let saveErrorMessage = 'Could not save to DB';
+      modelInstance.save = function() {
+        throw new Error(saveErrorMessage);
+      }
+      fakeModel = function(data) {
+        return modelInstance;
+      }
+
+      userController.setModel(fakeModel);
+      let promise = userController.createUser(validData, fakeHasher);
+      return promise.should.be.rejectedWith(saveErrorMessage);
     });
     it('should resolve with a user object if all goes well', function() {
-      throw new Error('red-green refactor');
+      let { fname, username, email, password } = validData;
+      let modelInstance = { fname, username, email, password: fakeHash };
+      let expectedResolve = { fname, username, email, password: fakeHash };
+      modelInstance.save = function() {
+        return Promise.resolve(expectedResolve);
+      }
+      fakeModel = function(data) {
+        return modelInstance;
+      }
+      userController.setModel(fakeModel);
+      let promise = userController.createUser(validData, fakeHasher);
+      return promise.should.eventually.deep.equal(expectedResolve);
+      // throw new Error('red-green refactor');
     });
   });
 });

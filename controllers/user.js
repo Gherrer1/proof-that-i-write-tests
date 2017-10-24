@@ -6,7 +6,10 @@ function createUser(validData, passwordHasher) {
     .then(hash => {
       validData.password = hash;
       var user = new model(validData);
-      return resolve(user);
+      return user.save();
+    })
+    .then(user => {
+      resolve(user);
     })
     .catch(err => reject(err));
   });
