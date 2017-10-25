@@ -38,7 +38,7 @@ app.use(function cookiePrinter(req, res, next) {
 });
 
 app.get('/', function(req, res) {
-	res.send('hey');
+	res.render('splash', { title: 'titties', blah: 'hehe' });
 });
 
 app.get('/login', function(req, res) {
