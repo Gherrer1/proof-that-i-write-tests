@@ -4,7 +4,7 @@
   "description": "ME_N app with unit and integration testes with mocha, chai, and supertest",
   "main": "index.js",
   "scripts": {
-    "test": "mocha tests/*",
+    "test": "mocha test/*",
     "start": "nodemon server.js"
   },
   "repository": {

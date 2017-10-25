@@ -6,7 +6,7 @@ const assert = chai.assert;
 const should = chai.should();
 const sinon = require('sinon');
 
-describe.only('UserController', function() {
+describe('UserController', function() {
   const userController = require('../../controllers/user');
 
   it('should not have a this.model set until calling setModel on it', function() {
