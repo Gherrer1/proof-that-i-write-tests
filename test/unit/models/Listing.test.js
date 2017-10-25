@@ -1,4 +1,4 @@
-const Listing    = require('../../models/Listing');
+const Listing    = require('../../../models/Listing');
 const expect          = require('chai').expect;
 const mongoose    = require('mongoose');
 // const ObjectID  = require()

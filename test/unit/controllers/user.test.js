@@ -7,7 +7,7 @@ const should = chai.should();
 const sinon = require('sinon');
 
 describe('UserController', function() {
-  const userController = require('../../controllers/user');
+  const userController = require('../../../controllers/user');
 
   it('should not have a this.model set until calling setModel on it', function() {
     expect(userController.model).to.be.undefined;
