@@ -24,16 +24,16 @@ const User = require('./models/User');
 
 module.exports = {
   seed,
-  connect(cb) {
-    mongoose.connect(DB_URL, { useMongoClient: true })
-    .then(() => cb())
-    .catch(err => { throw err });
-  },
-  disconnect(cb) {
-    mongoose.disconnect()
-    .then(() => cb())
-    .catch(err => { throw err });
-  }
+  // connect(cb) {
+  //   mongoose.connect(DB_URL, { useMongoClient: true })
+  //   .then(() => cb())
+  //   .catch(err => { throw err });
+  // },
+  // disconnect(cb) {
+  //   mongoose.disconnect()
+  //   .then(() => cb())
+  //   .catch(err => { throw err });
+  // }
 }
 
 // tear down listings
