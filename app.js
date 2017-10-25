@@ -1,9 +1,10 @@
 const express								= require('express');
 const bodyParser 						= require('body-parser');
+const cookieParser					= require('cookie-parser');
 const logger								= require('morgan');
 const mongoose							= require('mongoose');
 const config								= require('./config');
-const DB_URL								= config.DB_URL;
+const { DB_URL, COOKIE_NAME }							= config;
 const { signupValidators }	= require('./validators');
 const { matchedData } 			= require('express-validator/filter');
 const { validationResult } 	= require('express-validator/check');
@@ -29,15 +30,27 @@ app.use(express.static('public'));
 // Middleware
 app.use(logger('dev'));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
+app.use(function cookiePrinter(req, res, next) {
+	console.log('Cookies:', req.cookies);
+	next();
+});
 
 app.get('/', function(req, res) {
 	res.send('hey');
 });
 
+app.get('/login', function(req, res) {
+	res.render('login', { errors: [] });
+});
+
 app.get('/signup', function(req, res) {
-	// TODO: if not signed in
+	// if request has session cookie, redirect to /dashboard. On the way, it'll encounter authorization middleware
+	if(req.cookies[COOKIE_NAME])
+		return res.redirect('/dashboard');
 	res.render('signup', { errors: [] })
+	// res.send('pong');
 });
 
 
@@ -48,9 +61,10 @@ app.post('/signup', signupValidators, function(req, res) {
 	if(!errors.isEmpty()) {
 		// rerender /signup with error message and with prefilled elements
 		errorsToString.msg = 'fail lol';
-		return res.json(errorsToString);
+		// return res.status(400).json(errorsToString);
+		return res.redirect('/signup');
 	}
-	
+
 	const requiredFields = require('../helpers/requiredFields').createUser;
 	// const uniquenessVerifier = require()
 	// const passwordHasher = require(bcrypt)
@@ -64,6 +78,9 @@ app.post('/signup', signupValidators, function(req, res) {
 		});
 });
 
+app.get('/dashboard', function(req, res) {
+	res.sendStatus(200);
+});
 // app.get('/login', function(req, res) {
 // 	// TODO: check if authorized first - no need for logged in user to go through TSA
 //

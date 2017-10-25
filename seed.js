@@ -4,6 +4,8 @@ const { DB_URL } = require('./config');
 const Listing = require('./models/Listing');
 const User = require('./models/User');
 
+const env = process.env.NODE_ENV || 'test';
+
 // mongoose.connect(DB_URL, { useMongoClient: true })
 //   .then(
 //     /* Success */ () => {
@@ -56,7 +58,8 @@ function clearListings() {
   return new Promise(function(resolve, reject) {
     Listing.deleteMany({})
       .then(msg => {
-        console.log(`deleted ${msg.result.n} listings`);
+        if(env !== 'test')
+          console.log(`deleted ${msg.result.n} listings`);
         return resolve();
       })
       .catch(err => reject(err));
@@ -67,7 +70,8 @@ function clearUsers() {
   return new Promise(function(resolve, reject) {
     User.deleteMany({})
       .then(msg => {
-        console.log(`deleted ${msg.result.n} users`);
+        if(env !== 'test')
+          console.log(`deleted ${msg.result.n} users`);
         return resolve();
       })
       .catch(err => reject(err));
@@ -105,7 +109,8 @@ function addUsers() {
     Promise.all(savePromises)
       .then(res => {
         var ids = res.map(user => user._id);
-        console.log(`created ${ids.length} users`);
+        if(env !== 'test')
+          console.log(`created ${ids.length} users`);
         return resolve(ids);
       })
       .catch(err => {
@@ -157,7 +162,10 @@ function createListings(ids) {
       savePromises.push(listing.save());
     }
     Promise.all(savePromises)
-      .then(res => { console.log(`Created ${res.length} listings`); resolve(res); })
+      .then(res => { 
+        if(env !== 'test')
+          console.log(`Created ${res.length} listings`); 
+        resolve(res); })
       .catch(err => reject(err));
   });
 }

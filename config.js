@@ -4,7 +4,10 @@ if(!DB_URL) {
 	process.exit(1);
 }
 
-// export config values
+const COOKIE_NAME = 's.id'
+
+
 module.exports = {
-	DB_URL
+	DB_URL,
+	COOKIE_NAME
 };
