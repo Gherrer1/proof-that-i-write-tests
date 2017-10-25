@@ -4,36 +4,52 @@ const { DB_URL } = require('./config');
 const Listing = require('./models/Listing');
 const User = require('./models/User');
 
-mongoose.connect(DB_URL, { useMongoClient: true })
-  .then(
-    /* Success */ () => {
-      console.log(`Connected to ${DB_URL}`);
-      seed();
-    },
-    /* Fail */ (err) => {
-      console.log('Failed to connect:\n', err);
-      process.exit(1);
-    }
-  )
-  .catch(
-    (err) => {
-      console.log(err);
-      process.exit(1);
-    }
-  );
+// mongoose.connect(DB_URL, { useMongoClient: true })
+//   .then(
+//     /* Success */ () => {
+//       console.log(`Connected to ${DB_URL}`);
+//       seed();
+//     },
+//     /* Fail */ (err) => {
+//       console.log('Failed to connect:\n', err);
+//       process.exit(1);
+//     }
+//   )
+//   .catch(
+//     (err) => {
+//       console.log(err);
+//       process.exit(1);
+//     }
+//   );
+
+module.exports = {
+  seed,
+  connect(cb) {
+    mongoose.connect(DB_URL, { useMongoClient: true })
+    .then(() => cb())
+    .catch(err => { throw err });
+  },
+  disconnect(cb) {
+    mongoose.disconnect()
+    .then(() => cb())
+    .catch(err => { throw err });
+  }
+}
 
 // tear down listings
 // tear down users
 // add new users
 // add new listings
 function seed() {
-  Promise.resolve()
-  .then(clearListings)
-  .then(clearUsers)
-  .then(addUsers)
-  .then(ids => createListings(ids))
-  .then(() => mongoose.connection.close())
-  .catch(err => console.log(err));
+  return new Promise(function(resolve, reject) {
+    Promise.resolve()
+    .then(clearListings)
+    .then(clearUsers)
+    .then(addUsers)
+    .then(ids => createListings(ids))
+    .then(() => resolve())
+    .catch(err => reject(err));
+  });
 }
 
 function clearListings() {
