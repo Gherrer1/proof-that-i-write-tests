@@ -9,6 +9,7 @@ const { signupValidators }	= require('./validators');
 const { matchedData } 			= require('express-validator/filter');
 const { validationResult } 	= require('express-validator/check');
 const userController 				= require('./controllers/user');
+userController.setModel( require('./models/User') );
 const app = express();
 
 mongoose.Promise = global.Promise;
@@ -33,23 +34,23 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use(function cookiePrinter(req, res, next) {
-	console.log('Cookies:', req.cookies);
+	// console.log('Cookies:', req.cookies);
 	next();
 });
 
 app.get('/', function(req, res) {
-	res.render('splash', { title: 'titties', blah: 'hehe' });
+	res.render('splash', { title: 'LMN' });
 });
 
 app.get('/login', function(req, res) {
-	res.render('login', { errors: [] });
+	res.render('login', { title: 'LMN | Login', errors: [] });
 });
 
 app.get('/signup', function(req, res) {
 	// if request has session cookie, redirect to /dashboard. On the way, it'll encounter authorization middleware
 	if(req.cookies[COOKIE_NAME])
 		return res.redirect('/dashboard');
-	res.render('signup', { errors: [] })
+	res.render('signup', { title: 'LMN | Sign Up', errors: [] })
 	// res.send('pong');
 });
 
@@ -57,25 +58,18 @@ app.get('/signup', function(req, res) {
 app.post('/signup', signupValidators, function(req, res) {
 	const errors = validationResult(req);
 	const validData = matchedData(req);
-	const errorsToString = { haveErrors: !errors.isEmpty(), errors: errors.mapped(), validData };
 	if(!errors.isEmpty()) {
-		// rerender /signup with error message and with prefilled elements
-		errorsToString.msg = 'fail lol';
-		// return res.status(400).json(errorsToString);
-		return res.redirect('/signup');
+		// want to redirect with flash message or query string to carry errors
+		return res.send(errors.mapped());
 	}
 
-	const requiredFields = require('../helpers/requiredFields').createUser;
-	// const uniquenessVerifier = require()
-	// const passwordHasher = require(bcrypt)
-	userController.createUser(validData, requiredFields)
+	userController.ensureEmailAndUsernameUnique(validData.email, validData.username)
+		.then(() => {
+			const passwordHasher = require('bcrypt');
+			return userController.createUser(validData, passwordHasher);
+		})
 		.then(user => res.send(user))
-		.catch(err => {
-			errorsToString.haveErrors = true;
-			errorsToString.errors = [err];
-			errorsToString.msg = err.message;
-			res.json(errorsToString);
-		});
+		.catch(err => res.send(err.message));
 });
 
 app.get('/dashboard', function(req, res) {
