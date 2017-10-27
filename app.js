@@ -38,43 +38,43 @@ app.use(function cookiePrinter(req, res, next) {
 	next();
 });
 
-app.get('/', function(req, res) {
-	res.render('splash', { title: 'LMN' });
-});
-
-app.get('/login', function(req, res) {
-	res.render('login', { title: 'LMN | Login', errors: [] });
-});
-
-app.get('/signup', function(req, res) {
-	// if request has session cookie, redirect to /dashboard. On the way, it'll encounter authorization middleware
-	if(req.cookies[COOKIE_NAME])
-		return res.redirect('/dashboard');
-	res.render('signup', { title: 'LMN | Sign Up', errors: [] })
-	// res.send('pong');
-});
-
-
-app.post('/signup', signupValidators, function(req, res) {
-	const errors = validationResult(req);
-	const validData = matchedData(req);
-	if(!errors.isEmpty()) {
-		// want to redirect with flash message or query string to carry errors
-		return res.send(errors.mapped());
-	}
-
-	userController.ensureEmailAndUsernameUnique(validData.email, validData.username)
-		.then(() => {
-			const passwordHasher = require('bcrypt');
-			return userController.createUser(validData, passwordHasher);
-		})
-		.then(user => res.send(user))
-		.catch(err => res.send(err.message));
-});
-
-app.get('/dashboard', function(req, res) {
-	res.sendStatus(200);
-});
+// app.get('/', function(req, res) {
+// 	res.render('splash', { title: 'LMN' });
+// });
+//
+// app.get('/login', function(req, res) {
+// 	res.render('login', { title: 'LMN | Login', errors: [] });
+// });
+//
+// app.get('/signup', function(req, res) {
+// 	// if request has session cookie, redirect to /dashboard. On the way, it'll encounter authorization middleware
+// 	if(req.cookies[COOKIE_NAME])
+// 		return res.redirect('/dashboard');
+// 	res.render('signup', { title: 'LMN | Sign Up', errors: [] })
+// 	// res.send('pong');
+// });
+//
+//
+// app.post('/signup', signupValidators, function(req, res) {
+// 	const errors = validationResult(req);
+// 	const validData = matchedData(req);
+// 	if(!errors.isEmpty()) {
+// 		// want to redirect with flash message or query string to carry errors
+// 		return res.send(errors.mapped());
+// 	}
+//
+// 	userController.ensureEmailAndUsernameUnique(validData.email, validData.username)
+// 		.then(() => {
+// 			const passwordHasher = require('bcrypt');
+// 			return userController.createUser(validData, passwordHasher);
+// 		})
+// 		.then(user => res.send(user))
+// 		.catch(err => res.send(err.message));
+// });
+//
+// app.get('/dashboard', function(req, res) {
+// 	res.sendStatus(200);
+// });
 // app.get('/login', function(req, res) {
 // 	// TODO: check if authorized first - no need for logged in user to go through TSA
 //
