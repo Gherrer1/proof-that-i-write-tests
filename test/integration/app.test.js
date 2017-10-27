@@ -8,7 +8,7 @@ const seed = require('../../seed');
 // const config = require('../../config');
 const {COOKIE_NAME} = require('../../config');
 
-describe('Authentication Routes', function() {
+describe('#Authentication Routes', function() {
 
   beforeEach(function(done) {
     console.log(':)');
@@ -21,7 +21,7 @@ describe('Authentication Routes', function() {
     done();
   });
 
-  describe('GET /signup', function() {
+  describe('#GET /signup', function() {
     it('should redirect to /dashboard if request has a session cookie', function(done){
       // dont worry, itll run into authentication middleware to validate the cookie
       console.log('running test');
@@ -46,13 +46,17 @@ describe('Authentication Routes', function() {
     });
   });
 
-  describe('GET /login', function() {
+  describe('#GET /login', function() {
     it('should redirect to /dashboard if request has a session cookie', function(done) {
       console.log('running test');
       request(app).get('/signup')
         .set('Cookie', [`${COOKIE_NAME}=1234`])
         .expect(302)
         .expect('Location', '/dashboard', done);
+    });
+    it('should show a client error message if request has a client-error-flash-message cookie', function(done) {
+      console.log('running test');
+      done();
     });
     it('should show a success message if request has a success-flash-message cookie', function(done) {
       console.log('running test');
@@ -69,7 +73,7 @@ describe('Authentication Routes', function() {
     });
   });
 
-  describe('POST /signup', function() {
+  describe('#POST /signup', function() {
     it('should redirect to /dashboard if request has a session cookie', function(done) {
       console.log('running test');
       request(app).post('/signup')
@@ -125,6 +129,43 @@ describe('Authentication Routes', function() {
         });
     });
     it('should redirect to /signup with error message via cookie (something went wrong) for server errors (*1)');
+  });
+
+  describe('#POST /login', function() {
+    it('should redirect to /dashboard if request has a session cookie', function(done) {
+      console.log('running test');
+      request(app).post('/login')
+        .set('Cookie', [`${COOKIE_NAME}=1234`])
+        .expect(302)
+        .expect('Location', '/dashboard', done);
+    });
+    it('should redirect to /login with invalid-params cookie and tried-username cookie if data is invalid - as in simply doesnt fit the requirements used for signup', function(done) {
+      console.log('running test');
+      request(app).post('/login')
+        .send({ email: 'a', password: '1' })
+        .expect(302)
+        .expect('Location', '/login')
+        .end(function(err, res) {
+          if(err)
+            return done(err);
+          // TODO: make sure invalid-params cookie sent
+          done();
+        });
+    });
+    it('should redirect to /login with server-error cookie/flash message if there are server errors'); // find out how to mock this
+    it('if no session cookie, valid params, no server errors, should give session cookie and redirect to /dashboard', function(done) {
+      request(app).post('/login')
+        .send({ email: 'sato@email.com', password: '1111111111'})
+        .expect(302)
+        .expect('Location', '/dashboard')
+        .end(function(err, res) {
+          if(err) {
+            return done(err);
+          }
+          // todo: inspect cookies and make sure there's a session cookie
+          done();
+        });
+    });
   });
 });
 
