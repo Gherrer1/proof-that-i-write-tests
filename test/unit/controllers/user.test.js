@@ -6,7 +6,7 @@ const assert = chai.assert;
 const should = chai.should();
 const sinon = require('sinon');
 
-describe('UserController', function() {
+describe('#UserController', function() {
   const userController = require('../../../controllers/user');
 
   it('should not have a this.model set until calling setModel on it', function() {
@@ -21,7 +21,7 @@ describe('UserController', function() {
     delete userController.model;
   });
 
-  describe('ensureEmailAndUsernameUnique', function() {
+  describe('#ensureEmailAndUsernameUnique', function() {
     const email = 'me@email.com';
     const username = 'me';
     // just unit tests, we'll test the actual db query later
@@ -53,33 +53,38 @@ describe('UserController', function() {
       .then(done, done);
     });
     it('tbh not sure what happens if undefined parameters passed in');
-    it('should reject that promise if 1 or more users found (via model.find) with username or password', function() {
+    it('should resolve the promise with the users found who have that username or email', function() {
       const fakeUsersFound = [{ fname: 'U1' }];
       var mockedModel = {
         find() { return Promise.resolve(fakeUsersFound); }
       };
       userController.setModel(mockedModel);
       var promise = userController.ensureEmailAndUsernameUnique(email, username);
-      // now make sure it rejects with 2 users found too
-      fakeUsersFound.push({ fname: 'U2' });
+
+      const fakeUsers2Found = [{ fname: 'U1' }, { fname: 'U2' }];
+      mockedModel = {
+        find() { return Promise.resolve(fakeUsers2Found); }
+      };
+      userController.setModel(mockedModel)
       var promise2 = userController.ensureEmailAndUsernameUnique(email, username);
-      // how to test multiple promises
+
       return Promise.all([
-        expect(promise).to.eventually.be.rejected,
-        expect(promise2).to.eventually.be.rejected
+        expect(promise).to.eventually.become(fakeUsersFound),
+        expect(promise2).to.eventually.become(fakeUsers2Found)
       ]);
     });
-    it('should resolve the promise if 0 users found (via model.find) with username or password', function() {
+    it('should resolve the promise with empty array if 0 users found (via model.find) with username or password', function() {
+      var foundUsers = [];
       const mockedModel = {
-        find() { return Promise.resolve([]); }
+        find() { return Promise.resolve(foundUsers); }
       };
       userController.setModel(mockedModel);
       var promise = userController.ensureEmailAndUsernameUnique(email, username);
-      return expect(promise).to.eventually.be.fulfilled;
+      return expect(promise).to.eventually.become(foundUsers);
     });
   });
 
-  describe('createUser', function() {
+  describe('#createUser', function() {
     let validData;
     let fakeHash = 'hashed ;)';
     let fakeHasher;

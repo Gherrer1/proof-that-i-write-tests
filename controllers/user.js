@@ -19,17 +19,14 @@ function setModel(model) {
   this.model = model;
 }
 
+/**
+ * (email, username) -> Promise (user/null or error)
+ */
 function ensureEmailAndUsernameUnique(email, username) {
   var model = this.model;
   return new Promise(function(resolve, reject) {
-    // model.find(email, username)
     model.find(email, username)
-    .then(users => {
-      if(users.length >= 1) {
-        return reject();
-      }
-      return resolve();
-    })
+    .then(users => resolve(users))
     .catch(reject);
   });
 }
