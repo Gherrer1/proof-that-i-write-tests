@@ -63,11 +63,19 @@ describe.only('#Signup route handlers', function() {
       expect(userController.ensureEmailAndUsernameUnique.calledOnce).to.be.true;
       expect(userController.ensureEmailAndUsernameUnique.calledWith(expectedEmailParam, expectedUsernameParam)).to.be.true;
     });
-    it('should return res.redirect(\'/signup\') with server-error flash message if ensureEmailAndUs..Unique resovles to an error', function() {
+    it('should return res.redirect(\'/signup\') with server-error flash message if ensureEmailAndUs..Unique resolves to an error', function() {
       throw new Error('red-green refactor');
     });
-    it('should return res.redirect(\'/signup\') if username or email isnt unique', function() {
-      throw new Error('red-green refactor');
+    it('should call res.redirect(\'/signup\') if username or email isnt unique', function(done) {
+      userController.ensureEmailAndUsernameUnique = function() { return Promise.resolve([{}, {}]); };
+      res.redirect = sinon.stub();
+
+      signupRouteHandler.postSignup(req, res, errz, validData, userController)
+      setTimeout(() => {
+        expect(res.redirect.calledOnce).to.be.true;
+        expect(res.redirect.calledWith('/signup')).to.be.true;
+        done();
+      }, 0);
     });
     it('should call hasher.hash() if no session cookie, no validation errors, and username/email are unique', function() {
       throw new Error('red-green refactor');
