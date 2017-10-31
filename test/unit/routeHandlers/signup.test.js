@@ -21,8 +21,13 @@ describe.only('#Signup route handlers', function() {
       errz = {
         isEmpty() { return true; }
       };
-      validData = {};
-      userController = {};
+      validData = {
+        username: 'midoriya',
+        email: 'midoriya@email.com'
+      };
+      userController = {
+        ensureEmailAndUsernameUnique() { return Promise.resolve([]); }
+      };
     });
 
     it('should return res.redirect(\'/dashboard\') if there is a session cookie in the req object', function() {
@@ -48,7 +53,15 @@ describe.only('#Signup route handlers', function() {
       expect(res.redirect.calledWith('/signup')).to.be.true;
     });
     it('should call userController.ensureEmailAndUsernameUnique() if no session cookie and no validation errors', function() {
-      throw new Error('red-green refactor');
+      var expectedEnsureUniquePromisedValue = [];
+      userController.ensureEmailAndUsernameUnique = sinon.stub();
+      userController.ensureEmailAndUsernameUnique.resolves(expectedEnsureUniquePromisedValue);
+      const expectedEmailParam = validData.email;
+      const expectedUsernameParam = validData.username;
+
+      signupRouteHandler.postSignup(req, res, errz, validData, userController);
+      expect(userController.ensureEmailAndUsernameUnique.calledOnce).to.be.true;
+      expect(userController.ensureEmailAndUsernameUnique.calledWith(expectedEmailParam, expectedUsernameParam)).to.be.true;
     });
     it('should return res.redirect(\'/signup\') with server-error flash message if ensureEmailAndUs..Unique resovles to an error', function() {
       throw new Error('red-green refactor');
