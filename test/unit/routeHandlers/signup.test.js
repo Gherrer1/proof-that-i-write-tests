@@ -22,12 +22,14 @@ describe.only('#Signup route handlers', function() {
         isEmpty() { return true; }
       };
       validData = {
+        fname: 'Midoriya',
         username: 'midoriya',
         email: 'midoriya@email.com',
         password: '1111111111'
       };
       userController = {
-        ensureEmailAndUsernameUnique() { return Promise.resolve([]); }
+        ensureEmailAndUsernameUnique() { return Promise.resolve([]); },
+        createUser(validData) { return Promise.resolve({}); }
       };
       hasher = {
         hash() { return Promise.resolve('hashed ;)'); }
@@ -107,17 +109,45 @@ describe.only('#Signup route handlers', function() {
         done();
       }, 0);
     });
-    it('should return res.redirect(\'/signup\') w/ server-error flash message if hasher.hash() resolves to an error', function() {
-      throw new Error('red-green refactor');
+    it('should call res.redirect(\'/signup\') w/ server-error flash message if hasher.hash() rejects with an error', function(done) {
+      hasher.hash = sinon.stub();
+      hasher.hash.rejects(new Error('hasher.hash threw an error'));
+
+      res.redirect = sinon.spy();
+
+      signupRouteHandler.postSignup(req, res, errz, validData, userController, hasher);
+      setTimeout(() => {
+        // TODO: figure out how flash messages work so we can assert that we've set flash message as well
+        //       My guess is that it uses cookies
+        expect(res.redirect.calledOnce).to.be.true;
+        expect(res.redirect.calledWith('/signup')).to.be.true;
+        done();
+      }, 0);
     });
-    it('should call userController.createUser() if no session cookie, no validation errors, and username/email are unique', function() {
-      throw new Error('red-green refactor');
+    it('should call userController.createUser() with validData including hashed password if no session cookie, no validation errors, and username/email are unique, and password hashing goes well', function(done) {
+      userController.createUser = sinon.spy();
+      var expectedCreateUserParam = {
+        fname: validData.fname,
+        username: validData.username,
+        email: validData.email,
+        password: 'hashed ;)',
+      }
+      signupRouteHandler.postSignup(req, res, errz, validData, userController, hasher);
+      setTimeout(() => {
+        expect(userController.createUser.calledOnce, `userController.createUser was called ${userController.createUser.callCount} times, not once`).to.be.true;
+        expect(userController.createUser.args[0][0]).to.deep.equal(expectedCreateUserParam);
+        // expect(userController.createUser.calledWith(expectedCreateUserParam), `userController was not called with ${expectedCreateUserParam}`).to.be.true;
+        done();
+      }, 0);
+      // throw new Error('red-green refactor');
     });
     it('should return res.redirect(\'/login\') w/ signup-success flash message if userController.createUser() returns smoothly', function() {
       throw new Error('red-green refactor');
     });
-    it('should return res.redirect(\'/signup\') if userController.createUser() resolves to an error', function() {
-      throw new Error('red-green refactor');
+    it('should return res.redirect(\'/signup\') if userController.createUser() rejects with an error', function() {
+      userController.createUser = sinon.stub();
+      userController.createUser.rejects
+      // throw new Error('red-green refactor');
     });
   });
 });
