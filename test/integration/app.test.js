@@ -3,10 +3,10 @@ const expect = chai.expect;
 const should = chai.should();
 const sinon = require('sinon');
 const request = require('supertest');
-const app = require('../../app');
+const app = require('../../src/app');
 const seed = require('../../seed');
 // const config = require('../../config');
-const {COOKIE_NAME} = require('../../config');
+const {COOKIE_NAME} = require('../../src/config');
 
 describe('#Authentication Routes', function() {
 

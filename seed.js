@@ -1,8 +1,8 @@
 const mongoose  = require('mongoose');
 mongoose.Promise = global.Promise;
-const { DB_URL } = require('./config');
-const Listing = require('./models/Listing');
-const User = require('./models/User');
+const { DB_URL } = require('./src/config');
+const Listing = require('./src/models/Listing');
+const User = require('./src/models/User');
 
 const env = process.env.NODE_ENV || 'test';
 
@@ -162,9 +162,9 @@ function createListings(ids) {
       savePromises.push(listing.save());
     }
     Promise.all(savePromises)
-      .then(res => { 
+      .then(res => {
         if(env !== 'test')
-          console.log(`Created ${res.length} listings`); 
+          console.log(`Created ${res.length} listings`);
         resolve(res); })
       .catch(err => reject(err));
   });
