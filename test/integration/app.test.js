@@ -54,10 +54,7 @@ describe('#Authentication Routes', function() {
         .expect(302)
         .expect('Location', '/dashboard', done);
     });
-    it('should show a client error message if request has a client-error-flash-message cookie', function(done) {
-      console.log('running test');
-      done();
-    });
+    it('should show a client error message if request has a client-error-flash-message cookie');
     it('should show a success message if request has a success-flash-message cookie', function(done) {
       console.log('running test');
       request(app).get('/login')
