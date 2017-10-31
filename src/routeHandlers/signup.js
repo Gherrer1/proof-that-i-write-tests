@@ -3,7 +3,7 @@ const { validationResult } = require('express-validator/check');
 const { SESSION_COOKIE_NAME } = require('../config');
 
 // POST /signup
-const postSignup = function(req, res, errors, validData, userController) {
+const postSignup = function(req, res, errors, validData, userController, hasher) {
   if(req.cookies[SESSION_COOKIE_NAME])
     return res.redirect('/dashboard');
   if(!errors.isEmpty())
@@ -17,7 +17,7 @@ const postSignup = function(req, res, errors, validData, userController) {
       res.send(users);
     })
     .catch(err => {
-      console.log(`err: ${err} (if undefined, probably means user is using a bot)`);
+      console.log(`err: ${err} (if undefined, probably means user is using a bot aka not the browser)`);
       if(!err)
         return; // if promise chain ends early and we dont have an error to throw, its handled here
     });

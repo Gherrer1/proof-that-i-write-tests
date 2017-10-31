@@ -6,7 +6,7 @@ const { SESSION_COOKIE_NAME } = require('../../../src/config');
 
 describe.only('#Signup route handlers', function() {
 
-  // postSignup(req, res, errors, validData, userController)
+  // postSignup(req, res, errors, validData, userController, hasher)
   describe('#postSignup', function() {
     let req, res, errz, validData, userController;
 
@@ -27,6 +27,9 @@ describe.only('#Signup route handlers', function() {
       };
       userController = {
         ensureEmailAndUsernameUnique() { return Promise.resolve([]); }
+      };
+      hasher = {
+        hash() { return Promise.resolve('hashed ;)'); }
       };
     });
 
