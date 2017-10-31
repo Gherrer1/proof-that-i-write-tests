@@ -18,7 +18,9 @@ describe.only('#Signup route handlers', function() {
         send(){},
         redirect(){}
       };
-      errz = {};
+      errz = {
+        isEmpty() { return true; }
+      };
       validData = {};
       userController = {};
     });
@@ -35,7 +37,15 @@ describe.only('#Signup route handlers', function() {
       expect(retVal).to.equal(redirectReturnValue);
     });
     it('should return res.redirect(\'/signup\') if there are validation errors', function() {
-      throw new Error('red-green refactor');
+      errz.isEmpty = function() { return false; }
+      const redirectReturnValue = 'batz';
+      res.redirect = sinon.stub();
+      res.redirect.returns(redirectReturnValue);
+
+      let retVal = signupRouteHandler.postSignup(req, res, errz, validData, userController);
+      expect(retVal).to.equal(redirectReturnValue);
+      expect(res.redirect.calledOnce).to.be.true;
+      expect(res.redirect.calledWith('/signup')).to.be.true;
     });
     it('should call userController.ensureEmailAndUsernameUnique() if no session cookie and no validation errors', function() {
       throw new Error('red-green refactor');

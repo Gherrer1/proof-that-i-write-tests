@@ -6,6 +6,8 @@ const { SESSION_COOKIE_NAME } = require('../config');
 const postSignup = function(req, res, errors, validData) {
   if(req.cookies[SESSION_COOKIE_NAME])
     return res.redirect('/dashboard');
+  if(!errors.isEmpty())
+    return res.redirect('/signup');
 };
 
 module.exports = {
