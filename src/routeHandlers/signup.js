@@ -14,12 +14,17 @@ const postSignup = function(req, res, errors, validData, userController, hasher)
         res.redirect('/signup');
         return Promise.reject();
       }
-      res.send(users);
+      return hasher.hash(validData.password);
+    })
+    .then(hashedPassword => {
+      res.send(hashedPassword);
     })
     .catch(err => {
+      // if theres an error, that means we need to redirect somewhere. If no error, we've already invoked response object to handle it.
       console.log(`err: ${err} (if undefined, probably means user is using a bot aka not the browser)`);
       if(!err)
         return; // if promise chain ends early and we dont have an error to throw, its handled here
+      res.redirect('/signup');
     });
 };
 
