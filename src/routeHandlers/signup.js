@@ -20,7 +20,7 @@ const postSignup = function(req, res, errors, validData, userController, hasher)
       validData.password = hashedPassword;
       return userController.createUser(validData);
     })
-    .then(user => res.send(user))
+    .then(user => res.redirect('/login'))
     .catch(err => {
       // if theres an error, that means we need to redirect somewhere. If no error, we've already invoked response object to handle it.
       console.log(`err: ${err} (if undefined, probably means user is using a bot aka not the browser)`);

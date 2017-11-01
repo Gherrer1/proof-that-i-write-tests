@@ -4,8 +4,7 @@ const expect = chai.expect;
 const signupRouteHandler = require('../../../src/routeHandlers/signup');
 const { SESSION_COOKIE_NAME } = require('../../../src/config');
 
-describe.only('#Signup route handlers', function() {
-
+describe('#Signup route handlers', function() {
   // postSignup(req, res, errors, validData, userController, hasher)
   describe('#postSignup', function() {
     let req, res, errz, validData, userController, hasher;
@@ -136,18 +135,35 @@ describe.only('#Signup route handlers', function() {
       setTimeout(() => {
         expect(userController.createUser.calledOnce, `userController.createUser was called ${userController.createUser.callCount} times, not once`).to.be.true;
         expect(userController.createUser.args[0][0]).to.deep.equal(expectedCreateUserParam);
-        // expect(userController.createUser.calledWith(expectedCreateUserParam), `userController was not called with ${expectedCreateUserParam}`).to.be.true;
         done();
       }, 0);
-      // throw new Error('red-green refactor');
     });
-    it('should return res.redirect(\'/login\') w/ signup-success flash message if userController.createUser() returns smoothly', function() {
-      throw new Error('red-green refactor');
+    it('should return res.redirect(\'/login\') w/ signup-success flash message if userController.createUser() returns smoothly', function(done) {
+      res.redirect = sinon.spy();
+
+      signupRouteHandler.postSignup(req, res, errz, validData, userController, hasher);
+      setTimeout(() => {
+        // TODO: figure out how flash messages work so we can assert that we've set flash message as well
+        //       My guess is that it uses cookies
+        expect(res.redirect.calledOnce, `res.redirect called ${res.redirect.callCount} times, not once`).to.be.true;
+        expect(res.redirect.calledWith('/login'), `res.redirect called with ${res.redirect.args[0][0]} not with /login`).to.be.true;
+        done();
+      }, 0);
     });
-    it('should return res.redirect(\'/signup\') if userController.createUser() rejects with an error', function() {
+    it('should call res.redirect(\'/signup\') w/ flash message if userController.createUser() rejects with an error', function(done) {
       userController.createUser = sinon.stub();
-      userController.createUser.rejects
-      // throw new Error('red-green refactor');
+      userController.createUser.rejects(new Error('userController.createUser() threw an error'));
+
+      res.redirect = sinon.spy();
+
+      signupRouteHandler.postSignup(req, res, errz, validData, userController, hasher)
+      setTimeout(() => {
+        // TODO: figure out how flash messages work so we can assert that we've set flash message as well
+        //       My guess is that it uses cookies
+        expect(res.redirect.calledOnce).to.be.true;
+        expect(res.redirect.calledWith('/signup'), 'res.redirect not called with /signup but with ' + res.redirect.args[0][0]).to.be.true;
+        done();
+      });
     });
   });
 });
