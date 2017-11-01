@@ -10,6 +10,7 @@ const { matchedData } 			= require('express-validator/filter');
 const { validationResult } 	= require('express-validator/check');
 const userController 				= require('./controllers/user');
 userController.setModel( require('./models/User') );
+const signupRouteHandlers 	= require('./routeHandlers/signup');
 const app = express();
 
 mongoose.Promise = global.Promise;
@@ -55,6 +56,12 @@ app.use(function cookiePrinter(req, res, next) {
 // });
 //
 //
+
+app.post('/signup', signupValidators, function(req, res) {
+	const errors = validationResult(req);
+	const validData = matchedData(req);
+	signupRouteHandlers.postSignup(req, res, errors, validData, userController, require('bcrypt'));
+});
 // app.post('/signup', signupValidators, function(req, res) {
 // 	const errors = validationResult(req);
 // 	const validData = matchedData(req);
