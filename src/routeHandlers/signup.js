@@ -1,6 +1,7 @@
 const { matchedData } = require('express-validator/filter');
 const { validationResult } = require('express-validator/check');
 const { SESSION_COOKIE_NAME } = require('../config');
+const debug = require('debug')('routeHandlers:signup');
 
 // POST /signup
 const postSignup = function(req, res, errors, validData, userController, hasher) {
@@ -23,7 +24,7 @@ const postSignup = function(req, res, errors, validData, userController, hasher)
     .then(user => res.redirect('/login'))
     .catch(err => {
       // if theres an error, that means we need to redirect somewhere. If no error, we've already invoked response object to handle it.
-      console.log(`err: ${err} (if undefined, probably means user is using a bot aka not the browser)`);
+      debug(`err: ${err} (if undefined, probably means user is using a bot aka not the browser)`);
       if(!err)
         return; // if promise chain ends early and we dont have an error to throw, its handled here
       res.redirect('/signup');
