@@ -2,12 +2,9 @@
 function createUser(validData, passwordHasher) {
   var model = this.model;
   return new Promise(function(resolve, reject) {
-    passwordHasher.hash(validData.password)
-    .then(hash => {
-      validData.password = hash;
-      var user = new model(validData);
-      return user.save();
-    })
+    var user = new model(validData);
+
+    user.save()
     .then(user => {
       resolve(user);
     })

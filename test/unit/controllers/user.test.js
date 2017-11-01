@@ -87,14 +87,11 @@ describe('#UserController', function() {
 
   describe('#createUser', function() {
     let validData;
-    let fakeHash = 'hashed ;)';
-    let fakeHasher;
     let fakeModel;
     let fakeInstance;
 
     beforeEach(function() {
       validData = { fname: 'Joey', email: 'joey@email.com', username: 'joeywheeler', password: 'joeyjoeyjoey', passwordConf: 'joeyjoeyjoey' };
-      fakeHasher = { hash(password) { return Promise.resolve(fakeHash) } };
       fakeModel = function(obj) {
         obj.save = function() {};
         return obj
@@ -103,62 +100,27 @@ describe('#UserController', function() {
 
     it('should return a promise', function() {
       userController.setModel(fakeModel);
-      const promise = userController.createUser(validData, fakeHasher)
+      const promise = userController.createUser(validData)
       expect(promise.then).to.exist;
       expect(promise.catch).to.exist;
     });
-    it('should call passwordHasher once with the password field of the validData object passed in', function(done) {
-      const stub = sinon.stub(fakeHasher, 'hash');
-      stub.resolves('hashed ;)');
-      const expectedParamForHasher = validData.password;
-      userController.setModel(fakeModel);
-      userController.createUser(validData, fakeHasher)
-      .then(user => {
-        stub.restore();
-        assert(stub.calledOnce, 'fakeHasher.hash was not called once');
-        assert(stub.calledWith(expectedParamForHasher), `hasher expected to be called with ${expectedParamForHasher} but was called with ${stub.args}`);
-      })
-      .catch(err => {
-
-        throw err;
-        console.log(err);
-        stub.restore();
-        console.log(expectedParamForHasher);
-        assert(stub.calledOnce, 'fakeHasher.hash was not called once');
-        assert(stub.calledWith(validData.password), `hasher expected to be called with ${validData.password} but was called with ${stub.args}`);
-        throw err;
-      })
-      .then(done, done);
-    });
-    it('should reject if passwordHasher rejects', function() {
-      const stub = sinon.stub(fakeHasher, 'hash');
-      const errorMessage = 'custom fakeHasher error message :)';
-      stub.rejects(new Error(errorMessage));
-      userController.setModel(fakeModel);
-      var promise = userController.createUser(validData, fakeHasher);
-      return promise.should.be.rejectedWith(Error); //expect(promise).to.eventually.rejectWith(Error, errorMessage);
-    });
-    it('should call the model as a constructor once with the validData fields and the newly hashed password if hashing goes well', function(done) {
+    it('should call the model as a constructor once with the validData fields', function(done) {
       const stubModel = sinon.stub().returns(validData);
       userController.setModel(stubModel);
-      userController.createUser(validData, fakeHasher)
+      userController.createUser(validData)
       .then(user => {
         assert(stubModel.calledOnce, 'model was not called once');
         assert(stubModel.calledWithNew(), 'model function was not called with new');
-        let passwordFieldOfArg = stubModel.args[0][0].password;
-        assert.equal(passwordFieldOfArg, fakeHash);
       })
       .catch(err => {
         assert(stubModel.calledOnce, 'model was not called once');
         assert(stubModel.calledWithNew(), 'model function was not called with new');
-        let passwordFieldOfArg = stubModel.args[0][0].password;
-        assert.equal(passwordFieldOfArg, fakeHash);
       })
       .then(done, done);
     });
     it('should call save() on a new User object', function(done) {
       let { fname, email, username, password } = validData;
-      let modelInstance = { fname, email, username, password: fakeHash };
+      let modelInstance = { fname, email, username, password };
       modelInstance.save = function() {
         return Promise.resolve({ fname, email, username, password });
       }
@@ -169,7 +131,7 @@ describe('#UserController', function() {
       }
 
       userController.setModel(fakeModel);
-      userController.createUser(validData, fakeHasher)
+      userController.createUser(validData)
       .then(user => {
         assert(spy.calledOnce, 'modelInstance.save() was not called once, it was called ' + spy.callCount + ' times');
       })
@@ -180,7 +142,7 @@ describe('#UserController', function() {
     });
     it('should reject if save() throws an error', function() {
       let { fname, username, email, password } = validData;
-      let modelInstance = { fname, username, email, password: fakeHash };
+      let modelInstance = { fname, username, email, password };
       let saveErrorMessage = 'Could not save to DB';
       modelInstance.save = function() {
         throw new Error(saveErrorMessage);
@@ -190,13 +152,13 @@ describe('#UserController', function() {
       }
 
       userController.setModel(fakeModel);
-      let promise = userController.createUser(validData, fakeHasher);
+      let promise = userController.createUser(validData);
       return promise.should.be.rejectedWith(saveErrorMessage);
     });
     it('should resolve with a user object if all goes well', function() {
       let { fname, username, email, password } = validData;
-      let modelInstance = { fname, username, email, password: fakeHash };
-      let expectedResolve = { fname, username, email, password: fakeHash };
+      let modelInstance = { fname, username, email, password };
+      let expectedResolve = { fname, username, email, password };
       modelInstance.save = function() {
         return Promise.resolve(expectedResolve);
       }
@@ -204,7 +166,7 @@ describe('#UserController', function() {
         return modelInstance;
       }
       userController.setModel(fakeModel);
-      let promise = userController.createUser(validData, fakeHasher);
+      let promise = userController.createUser(validData);
       return promise.should.eventually.deep.equal(expectedResolve);
       // throw new Error('red-green refactor');
     });
