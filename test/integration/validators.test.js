@@ -6,6 +6,7 @@ const request                 = require('supertest');
 const { signupValidators }    = require('../../src/validators');
 const { validationResult }    = require('express-validator/check');
 const { matchedData }         = require('express-validator/filter');
+const vConstants              = require('../../src/validators/validatorConstants');
 const debug                   = require('debug')('validator-integration-tests');
 
 // Automate testing that the validators work
