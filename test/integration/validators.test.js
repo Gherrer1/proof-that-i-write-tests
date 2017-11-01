@@ -78,7 +78,9 @@ describe.only('#Signup Validators', function() {
 
   describe('#Validation', function() {
     describe('#Required Fields', function() {
-      it('should contain fname, username, email, password, or passwordConfirmation in errors if ANY of those fields are 0 characters long');
+      it('should contain fname, username, email, password, or passwordConfirmation in errors if ANY of those fields are 0 characters long', function(done) {
+        done(new Error('red-green refactor'));
+      });
 
       it('should contain fname, username, email, password, or passwordConfirmation in errors if ANY of those fields are missing', function(done) {
         request(app).post('/signupTest')
@@ -104,25 +106,41 @@ describe.only('#Signup Validators', function() {
 
     describe('#Length Mins/Maxs', function() {
 
-      it('should include fname in errors with message \n\t    "First name cannot be greater than 20 characters" \n\t    if it is greater than 20 characters long');
+      it('should include fname in errors with message \n\t    "First name cannot be greater than 20 characters" \n\t    if it is greater than 20 characters long', function(done) {
+        done(new Error('red-green refactor'));
+      });
 
-      it('should include username in errors with message \n\t    "Username must be between 5 and 12 characters" \n\t    if it isnt between 5 <= chars <= 12 characters long');
+      it('should include username in errors with message \n\t    "Username must be between 5 and 12 characters" \n\t    if it isnt between 5 <= chars <= 12 characters long', function(done) {
+        done(new Error('red-green refactor'));
+      });
 
-      it('should include email in errors with message \n\t    "Email cannot be greater than 40 characters" \n\t     if its greater than 40 characters long');
+      it('should include email in errors with message \n\t    "Email cannot be greater than 40 characters" \n\t     if its greater than 40 characters long', function(done) {
+        done(new Error('red-green refactor'));
+      });
 
-      it('should include password/confirmation in errors with message \n\t    "Password/confirmation must be between 8 and 100 characters" \n\t     if its not between 8 <= chars <= 100');
+      it('should include password/confirmation in errors with message \n\t    "Password/confirmation must be between 8 and 100 characters" \n\t     if its not between 8 <= chars <= 100', function(done) {
+        done(new Error('red-green refactor'));
+      });
     });
 
     describe('#Regex', function() {
-      it('should include fname in errors with message \n\t    "Name cannot contain a number or anomolous symbols" \n\t    if it contains a number or any of these characters: !@#$%^&*?/\\[]{}()<>+=;:');
+      it('should include fname in errors with message \n\t    "Name cannot contain a number or anomolous symbols" \n\t    if it contains a number or any of these characters: !@#$%^&*?/\\[]{}()<>+=;:', function(done) {
+        done(new Error('red-green refactor'));
+      });
 
-      it('should include username in errors if it isnt strictly alphanumeric with message \n\t    "Username must begin with letter and can only contain letters numbers and periods" \n\t    with the exception of periods (.)');
+      it('should include username in errors if it isnt strictly alphanumeric with message \n\t    "Username must begin with letter and can only contain letters numbers and periods" \n\t    with the exception of periods (.)', function(done) {
+        done(new Error('red-green refactor'));
+      });
     });
 
     describe('#Misc', function() {
-      it('should include passwordConfirmation in errors with message "Password confirmation does not match password" if it doesnt equal password');
+      it('should include passwordConfirmation in errors with message "Password confirmation does not match password" if it doesnt equal password', function(done) {
+        done(new Error('red-green refactor'));
+      });
 
-      it('should include email in errors with message "Invalid email" if it isnt an email');
+      it('should include email in errors with message "Invalid email" if it isnt an email', function(done) {
+        done(new Error('red-green refactor'));
+      });
     });
   });
 });
