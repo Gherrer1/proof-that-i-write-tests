@@ -4,10 +4,12 @@ if(!DB_URL) {
 	process.exit(1);
 }
 
-const SESSION_COOKIE_NAME = 's.id'
+const SESSION_COOKIE_NAME = 's.id';
+const SALT_ROUNDS = 10;
 
 
 module.exports = {
 	DB_URL,
-	SESSION_COOKIE_NAME
+	SESSION_COOKIE_NAME,
+	SALT_ROUNDS
 };
