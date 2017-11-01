@@ -25,7 +25,7 @@ function setModel(model) {
 function ensureEmailAndUsernameUnique(email, username) {
   var model = this.model;
   return new Promise(function(resolve, reject) {
-    model.find(email, username)
+    model.find({ $or: [{ email }, { username }] })
     .then(users => resolve(users))
     .catch(reject);
   });

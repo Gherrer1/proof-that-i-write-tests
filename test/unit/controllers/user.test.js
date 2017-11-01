@@ -39,13 +39,14 @@ describe('#UserController', function() {
       const model = {
         find: function(email, username) { return new Promise(function(resolve, reject) { resolve(); }); }
       };
+      const expectedFindParam = { $or: [{ email }, { username }] };
       const stub = sinon.stub(model, 'find');
       stub.resolves([]);
       userController.setModel(model);
       userController.ensureEmailAndUsernameUnique(email, username)
       .then(function() {
         assert(stub.calledOnce, 'stub not called once');
-        assert(stub.calledWith(email, username), `stub not called with Email:${email} and Username:${username}`);
+        expect(stub.args[0][0], `stub not called with ${expectedFindParam}`).to.deep.equal(expectedFindParam);
       })
       .catch(err => {
         throw err;
