@@ -18,7 +18,8 @@ describe('#Signup route handlers', function() {
         redirect(){}
       };
       errz = {
-        isEmpty() { return true; }
+        isEmpty() { return true; },
+        mapped() {}
       };
       validData = {
         fname: 'Midoriya',
