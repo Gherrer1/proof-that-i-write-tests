@@ -6,7 +6,7 @@ const request = require('supertest');
 const app = require('../../src/app');
 const seed = require('../../seed');
 // const config = require('../../config');
-const {COOKIE_NAME} = require('../../src/config');
+const {SESSION_COOKIE_NAME} = require('../../src/config');
 
 describe('#Authentication Routes', function() {
 
@@ -26,7 +26,7 @@ describe('#Authentication Routes', function() {
       // dont worry, itll run into authentication middleware to validate the cookie
       console.log('running test');
       request(app).get('/signup')
-        .set('Cookie', [`${COOKIE_NAME}=1234`])
+        .set('Cookie', [`${SESSION_COOKIE_NAME}=1234`])
         .expect(302)
         .expect('Location', '/dashboard', done);
     });
@@ -50,7 +50,7 @@ describe('#Authentication Routes', function() {
     it('should redirect to /dashboard if request has a session cookie', function(done) {
       console.log('running test');
       request(app).get('/signup')
-        .set('Cookie', [`${COOKIE_NAME}=1234`])
+        .set('Cookie', [`${SESSION_COOKIE_NAME}=1234`])
         .expect(302)
         .expect('Location', '/dashboard', done);
     });
@@ -74,7 +74,7 @@ describe('#Authentication Routes', function() {
     it('should redirect to /dashboard if request has a session cookie', function(done) {
       console.log('running test');
       request(app).post('/signup')
-        .set('Cookie', [`${COOKIE_NAME}=1234`])
+        .set('Cookie', [`${SESSION_COOKIE_NAME}=1234`])
         .expect(302)
         .expect('Location', '/dashboard', done);
     });
@@ -132,7 +132,7 @@ describe('#Authentication Routes', function() {
     it('should redirect to /dashboard if request has a session cookie', function(done) {
       console.log('running test');
       request(app).post('/login')
-        .set('Cookie', [`${COOKIE_NAME}=1234`])
+        .set('Cookie', [`${SESSION_COOKIE_NAME}=1234`])
         .expect(302)
         .expect('Location', '/dashboard', done);
     });
