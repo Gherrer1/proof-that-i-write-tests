@@ -3,3 +3,6 @@
    Furthermore, must wait for index to finish building before storing documents,
    	otherwise documents with duplicate values for the unique field will be saved, and we dont want that.
    Implicitly builds an index. Difference between index: true and unique: true is that the unique index will only allow unique values
+
+2) Many sites allow spaces in their passwords, even at the start and end. So dont trim the
+	password field that comes in request bodies during signup.
