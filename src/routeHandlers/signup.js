@@ -1,6 +1,6 @@
 const { matchedData } = require('express-validator/filter');
 const { validationResult } = require('express-validator/check');
-const { SESSION_COOKIE_NAME } = require('../config');
+const { SESSION_COOKIE_NAME, SALT_ROUNDS } = require('../config');
 const debug = require('debug')('routeHandlers:signup');
 
 // POST /signup
@@ -15,7 +15,7 @@ const postSignup = function(req, res, errors, validData, userController, hasher)
         res.redirect('/signup');
         return Promise.reject();
       }
-      return hasher.hash(validData.password);
+      return hasher.hash(validData.password, SALT_ROUNDS);
     })
     .then(hashedPassword => {
       validData.password = hashedPassword;
