@@ -7,12 +7,15 @@ var signupValidators = [
   check('fname', 'First name missing')
     .exists()
     .isLength({ min: 1 }) // max currently 20
-    .isLength({ max: vConstants.signup.fname.max }).withMessage(`First name cannot be greater than ${vConstants.signup.fname.max} characters`),
+    .isLength({ max: vConstants.signup.fname.max }).withMessage(`First name cannot be greater than ${vConstants.signup.fname.max} characters`)
+    .trim(),
   check('username', 'Username missing')
     .exists() // min, max currently 5, 12
-    .isLength({ min: vConstants.signup.username.min, max: vConstants.signup.username.max }).withMessage(`Username must be between ${vConstants.signup.username.min} and ${vConstants.signup.username.max} characters long`),
+    .isLength({ min: vConstants.signup.username.min, max: vConstants.signup.username.max }).withMessage(`Username must be between ${vConstants.signup.username.min} and ${vConstants.signup.username.max} characters long`)
+    .trim(),
   check('email', 'Email missing')
     .exists()
+    .trim()
     .isLength({ min: 1 }) // has a natural max by virtue of checking for isEmail()
     .isEmail().withMessage('Invalid email')
     .normalizeEmail(),

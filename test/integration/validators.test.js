@@ -62,11 +62,7 @@ describe.only('#Signup Validators', function() {
     });
 
     it('fname, username, and email (automatically) should be trimmed. Password/Confirmation should not', function(done) {
-      data.fname = '   jerry   ';
-      data.username = '    jerry    ';
-      data.email = '  email@email.com   ';
-      data.password = '   mypassword   ';
-      data.passwordConfirmation = '   mypassword   ';
+      data = { fname: '   jerry   ', username: '   jerry   ', email: '   email@email.com   ', password: '   mypassword   ', passwordConfirmation: '   mypassword   ' };
       const expectedValidData = {
         fname: 'jerry', username: 'jerry', email: 'email@email.com', password: data.password, passwordConfirmation: data.passwordConfirmation
       }
@@ -77,6 +73,7 @@ describe.only('#Signup Validators', function() {
             return done(err);
           }
 
+          expect(res.body.errors).to.be.undefined;
           expect(res.body.validData).to.deep.equal(expectedValidData);
           done();
         });
