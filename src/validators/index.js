@@ -20,7 +20,8 @@ var signupValidators = [
     .isLength({ min: vConstants.signup.password.min, max: vConstants.signup.password.max }).withMessage(`Password must be between ${vConstants.signup.password.min} and ${vConstants.signup.password.max} characters long`),
   check('passwordConfirmation', 'Password confirmation missing')
     .exists()
-    .isLength({ min: 1 })
+    .isLength({ min: 1 }) // not saved so we DGAF about how long
+    .custom( (value, { req }) => value === req.body.password ).withMessage('Password confirmation does not match password')
   // check('fname', /*message=*/'first name missing') // manually tested
   //   .exists()
   //   .trim(),
@@ -32,11 +33,6 @@ var signupValidators = [
   //   .isEmail()
   //   .trim()
   //   .normalizeEmail(),
-  // check('password')
-  //   .exists().withMessage('missing password'),
-  // check('passwordConfirmation', /*message=*/'password confirmation must match password')
-  //   .exists().withMessage('missing password confirmation')
-  //   .custom((value, { req }) => value === req.body.password)
 ];
 
 module.exports = {

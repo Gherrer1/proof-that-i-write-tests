@@ -215,7 +215,17 @@ describe.only('#Signup Validators', function() {
 
     describe('#Misc', function() {
       it('should include passwordConfirmation in errors with message "Password confirmation does not match password" if it doesnt equal password', function(done) {
-        done(new Error('red-green refactor'));
+        data.password = 'something once';
+        data.passwordConfirmation = 'somethingTwice';
+        request(app).post('/signupTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors.passwordConfirmation).to.exist;
+            expect(res.body.errors.passwordConfirmation.msg).to.equal('Password confirmation does not match password');
+            done();
+          });
       });
 
       it('should include email in errors with message "Invalid email" if it isnt an email', function(done) {
