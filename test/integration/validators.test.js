@@ -97,7 +97,7 @@ describe.only('#Signup Validators', function() {
             expect(res.body.errors.email).to.exist;
             expect(res.body.errors.email.msg).to.equal('Email missing');
             expect(res.body.errors.password).to.exist;
-            expect(res.body.errors.password.msg).to.equal('Password missing');
+            // expect(res.body.errors.password.msg).to.equal('Password missing'); no longer applicable
             expect(res.body.errors.passwordConfirmation).to.exist;
             expect(res.body.errors.passwordConfirmation.msg).to.equal('Password confirmation missing');
             done();
@@ -141,7 +141,6 @@ describe.only('#Signup Validators', function() {
             done();
           });
       });
-
       it(`should include username in errors with message \n\t    "Username must be between ${vConstants.signup.username.min} and ${vConstants.signup.username.max} characters long" \n\t    if its less than 5 chars long`, function(done) {
         data.username = 'four';
         request(app).post('/signupTest')
@@ -166,7 +165,6 @@ describe.only('#Signup Validators', function() {
             done();
           });
       });
-
       it(`should include email in errors with message \n\t    "Invalid email" \n\t     if its greater than 64 characters long`, function(done) {
         data.email = 'dkjsgkdfhgkdfkjxhkjdfghjfkjhfgkljbkjfnbkfjgjdfghkjgfklhfccccccccc@email.com';
         request(app).post('/signupTest')
@@ -179,9 +177,29 @@ describe.only('#Signup Validators', function() {
             done();
           });
       });
+      it(`should include password in errors with message \n\t    "Password must be between ${vConstants.signup.password.min} and  ${vConstants.signup.password.max} characters long" \n\t     if its not between ${vConstants.signup.password.min} <= chars <=  ${vConstants.signup.password.max}`, function(done) {
+        // test1
+        data.password = 'seven77';
+        request(app).post('/signupTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors.password).to.exist;
+            expect(res.body.errors.password.msg).to.equal(`Password must be between ${vConstants.signup.password.min} and ${vConstants.signup.password.max} characters long`);
 
-      it('should include password/confirmation in errors with message \n\t    "Password/confirmation must be between 8 and 100 characters" \n\t     if its not between 8 <= chars <= 100', function(done) {
-        done(new Error('red-green refactor'));
+            // test2
+            data.password = 'djfghkldhgdjfghkldhgdjfghkldhgdjfghkldhgdjfghkldhgdjfghkldhgdjfghkldhgdjfghkldhgdjfghkldhgdjfghkldhgs';
+            request(app).post('/signupTest')
+              .send(data)
+              .end(function(err, res) {
+                if(err)
+                  return done(err);
+                expect(res.body.errors.password).to.exist;
+                expect(res.body.errors.password.msg).to.equal(`Password must be between ${vConstants.signup.password.min} and ${vConstants.signup.password.max} characters long`);
+                done();
+              });
+          });
       });
     });
 
