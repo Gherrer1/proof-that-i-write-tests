@@ -38,20 +38,37 @@ describe.only('UserModel', function() {
 			let user = new UserModel(fields);
 			let error = user.validateSync();
 			expect(error.errors.fname).to.exist;
+			expect(error.errors.fname.kind).to.equal('maxlength');
 			expect(error.errors.fname.message).to.match(/is longer than the maximum allowed length/);
 		});
 		it('should throw a validation error if fname present but 0 characters long', function() {
 			fields.fname = '';
 			let user = new UserModel(fields);
 			let error = user.validateSync();
+			expect(error.errors.fname.kind).to.equal('required');
 			expect(error.errors.fname.message).to.match(/`fname` is required/);
 		});
 		it('should not throw a validation error if fname does conform to regex', function() {
-			// const fnameRegex = constants.user.fname.regex;
-			throw new Error('red-green refactor');
+			var validNames = ['jerry withspaces', 'jerry with\'neil', 'j. erry', 'look ma two  spaces', 'kareem-abdul jabbar'];
+			var users = validNames.map(name => {
+				return { fname: name, username: fields.username, email: fields.email, password: fields.password };
+			}).map(fieldsObj => new UserModel(fieldsObj));
+			users.forEach(user => {
+				let error = user.validateSync();
+				expect(error).to.be.undefined;
+			});
 		});
 		it('should throw a validation error if fname does not conform to regex', function() {
-			throw new Error('red-green refactor');
+			var invalidNames = ['jerry1', 'Verylegit1Name', 'jerry!', 'j@rry', '?erry', 'j{}rry', 'j+rry', 'je#y', 'je:;y'];
+			var users = invalidNames.map(name => {
+				return { fname: name, username: fields.username, email: fields.email, password: fields.password };
+			}).map(fieldsObj => new UserModel(fieldsObj));
+			users.forEach(user => {
+				let error = user.validateSync();
+				expect(error.errors.fname).to.exist;
+				expect(error.errors.fname.message).to.match(/is invalid/);
+				expect(error.errors.fname.kind).to.equal('regexp');
+			});
 		});
 	});
 
