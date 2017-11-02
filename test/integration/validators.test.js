@@ -18,7 +18,6 @@ describe.only('#Signup Validators', function() {
     const errors = validationResult(req);
     const validData = matchedData(req);
     const sentData = req.body;
-    // console.log(`sentData:`, sentData);
 
     const json = { validData, sentData };
     if(!errors.isEmpty()) {
@@ -69,8 +68,7 @@ describe.only('#Signup Validators', function() {
           if(err) {
             return done(err);
           }
-          // console.log(res.body);
-          // expect(res.body.validData.fname).to.equal('hehe');
+
           expect(res.body.validData).to.deep.equal(expectedValidData);
           done();
         });
@@ -104,7 +102,6 @@ describe.only('#Signup Validators', function() {
             expect(res.body.errors.passwordConfirmation.msg).to.equal('Password confirmation missing');
             done();
           });
-        // done(new Error('red-green refactor'));
       });
 
       it('should contain fname, username, email, password, or passwordConfirmation in errors if ANY of those fields are missing', function(done) {
