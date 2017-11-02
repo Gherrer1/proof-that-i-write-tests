@@ -6,7 +6,8 @@ let vConstants                  = require('./validatorConstants');
 var signupValidators = [
   check('fname', 'First name missing')
     .exists()
-    .isLength({ min: 1 }),
+    .isLength({ min: 1 }) // max currently 20
+    .isLength({ max: vConstants.signup.fname.max }).withMessage(`First name cannot be greater than ${vConstants.signup.fname.max} characters`),
   check('username', 'Username missing')
     .exists()
     .isLength({ min: 1 }),

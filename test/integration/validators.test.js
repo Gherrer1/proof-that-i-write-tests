@@ -132,8 +132,17 @@ describe.only('#Signup Validators', function() {
 
     describe('#Length Mins/Maxs', function() {
 
-      it('should include fname in errors with message \n\t    "First name cannot be greater than 20 characters" \n\t    if it is greater than 20 characters long', function(done) {
-        done(new Error('red-green refactor'));
+      it(`should include fname in errors with message \n\t    "First name cannot be greater than ${vConstants.signup.fname.max} characters" \n\t    if it is greater than ${vConstants.signup.fname.max} characters long`, function(done) {
+        data.fname = 'veryclearlygreaterthantwentycharacterslong';
+        request(app).post('/signupTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors.fname).to.exist;
+            expect(res.body.errors.fname.msg).to.equal(`First name cannot be greater than ${vConstants.signup.fname.max} characters`);
+            done();
+          });
       });
 
       it('should include username in errors with message \n\t    "Username must be between 5 and 12 characters" \n\t    if it isnt between 5 <= chars <= 12 characters long', function(done) {
