@@ -10,7 +10,7 @@ const vConstants              = require('../../src/validators/validatorConstants
 const debug                   = require('debug')('validator-integration-tests');
 
 // Automate testing that the validators work
-describe('#Signup Validators', function() {
+describe.only('#Signup Validators', function() {
   // create a fake app
   let app = express();
   app.use(bodyParser.json());
@@ -155,7 +155,7 @@ describe('#Signup Validators', function() {
     });
 
     describe('#Length Mins/Maxs', function() {
-      it(`should include fname in errors with message \n\t    "First name cannot be greater than ${vConstants.signup.fname.max} characters" \n\t    if it is greater than ${vConstants.signup.fname.max} characters long`, function(done) {
+      it(`should include fname in errors with message \n\t    "First name cannot be greater than ${vConstants.user.fname.max} characters" \n\t    if it is greater than ${vConstants.user.fname.max} characters long`, function(done) {
         data.fname = 'veryclearlygreaterthantwentycharacterslong';
         request(app).post('/signupTest')
           .send(data)
@@ -163,11 +163,11 @@ describe('#Signup Validators', function() {
             if(err)
               return done(err);
             expect(res.body.errors.fname).to.exist;
-            expect(res.body.errors.fname.msg).to.equal(`First name cannot be greater than ${vConstants.signup.fname.max} characters`);
+            expect(res.body.errors.fname.msg).to.equal(`First name cannot be greater than ${vConstants.user.fname.max} characters`);
             done();
           });
       });
-      it(`should include username in errors with message \n\t    "Username must be between ${vConstants.signup.username.min} and ${vConstants.signup.username.max} characters long" \n\t    if its less than 5 chars long`, function(done) {
+      it(`should include username in errors with message \n\t    "Username must be between ${vConstants.user.username.min} and ${vConstants.user.username.max} characters long" \n\t    if its less than 5 chars long`, function(done) {
         data.username = 'four';
         request(app).post('/signupTest')
           .send(data)
@@ -175,11 +175,11 @@ describe('#Signup Validators', function() {
             if(err)
               return done(err);
             expect(res.body.errors.username).to.exist;
-            expect(res.body.errors.username.msg).to.equal(`Username must be between ${vConstants.signup.username.min} and ${vConstants.signup.username.max} characters long`);
+            expect(res.body.errors.username.msg).to.equal(`Username must be between ${vConstants.user.username.min} and ${vConstants.user.username.max} characters long`);
             done();
           });
       });
-      it(`should include username in errors with message \n\t    "Username must be between ${vConstants.signup.username.min} and ${vConstants.signup.username.max} characters long" \n\t    if its greater than 12 characters long`, function(done) {
+      it(`should include username in errors with message \n\t    "Username must be between ${vConstants.user.username.min} and ${vConstants.user.username.max} characters long" \n\t    if its greater than 12 characters long`, function(done) {
         data.username = 'thirteenthirt';
         request(app).post('/signupTest')
           .send(data)
@@ -187,7 +187,7 @@ describe('#Signup Validators', function() {
             if(err)
               return done(err);
             expect(res.body.errors.username).to.exist;
-            expect(res.body.errors.username.msg).to.equal(`Username must be between ${vConstants.signup.username.min} and ${vConstants.signup.username.max} characters long`);
+            expect(res.body.errors.username.msg).to.equal(`Username must be between ${vConstants.user.username.min} and ${vConstants.user.username.max} characters long`);
             done();
           });
       });
@@ -203,7 +203,7 @@ describe('#Signup Validators', function() {
             done();
           });
       });
-      it(`should include password in errors with message \n\t    "Password must be between ${vConstants.signup.password.min} and  ${vConstants.signup.password.max} characters long" \n\t     if its not between ${vConstants.signup.password.min} <= chars <=  ${vConstants.signup.password.max}`, function(done) {
+      it(`should include password in errors with message \n\t    "Password must be between ${vConstants.user.password.signup.min} and  ${vConstants.user.password.signup.max} characters long" \n\t     if its not between ${vConstants.user.password.signup.min} <= chars <=  ${vConstants.user.password.signup.max}`, function(done) {
         // test1
         data.password = 'seven77';
         request(app).post('/signupTest')
@@ -212,7 +212,7 @@ describe('#Signup Validators', function() {
             if(err)
               return done(err);
             expect(res.body.errors.password).to.exist;
-            expect(res.body.errors.password.msg).to.equal(`Password must be between ${vConstants.signup.password.min} and ${vConstants.signup.password.max} characters long`);
+            expect(res.body.errors.password.msg).to.equal(`Password must be between ${vConstants.user.password.signup.min} and ${vConstants.user.password.signup.max} characters long`);
 
             // test2
             data.password = 'djfghkldhgdjfghkldhgdjfghkldhgdjfghkldhgdjfghkldhgdjfghkldhgdjfghkldhgdjfghkldhgdjfghkldhgdjfghkldhgs';
@@ -222,7 +222,7 @@ describe('#Signup Validators', function() {
                 if(err)
                   return done(err);
                 expect(res.body.errors.password).to.exist;
-                expect(res.body.errors.password.msg).to.equal(`Password must be between ${vConstants.signup.password.min} and ${vConstants.signup.password.max} characters long`);
+                expect(res.body.errors.password.msg).to.equal(`Password must be between ${vConstants.user.password.signup.min} and ${vConstants.user.password.signup.max} characters long`);
                 done();
               });
           });

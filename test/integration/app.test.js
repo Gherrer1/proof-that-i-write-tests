@@ -9,7 +9,7 @@ const seed = require('../../seed');
 const {SESSION_COOKIE_NAME} = require('../../src/config');
 const debug = require('debug')('test-order');
 
-describe.only('#Authentication Routes', function() {
+describe('#Authentication Routes', function() {
 
   beforeEach(function(done) {
     debug(':)');
