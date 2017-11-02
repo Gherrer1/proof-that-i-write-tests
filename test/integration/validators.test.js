@@ -80,11 +80,31 @@ describe.only('#Signup Validators', function() {
   describe('#Validation', function() {
     describe('#Required Fields', function() {
       it('should contain fname, username, email, password, or passwordConfirmation in errors if ANY of those fields are 0 characters long', function(done) {
-        done(new Error('red-green refactor'));
+        data = {
+          fname: '',
+          username: '',
+          email: '',
+          password: '',
+          passwordConfirmation: ''
+        };
+        request(app).post('/signupTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors.fname).to.exist;
+            expect(res.body.errors.username).to.exist;
+            expect(res.body.errors.email).to.exist;
+            expect(res.body.errors.password).to.exist;
+            expect(res.body.errors.passwordConfirmation).to.exist;
+            done();
+          });
+        // done(new Error('red-green refactor'));
       });
 
       it('should contain fname, username, email, password, or passwordConfirmation in errors if ANY of those fields are missing', function(done) {
         request(app).post('/signupTest')
+        // dont send any data
           .end(function(err, res) {
             if(err)
               return done(err);
@@ -140,7 +160,16 @@ describe.only('#Signup Validators', function() {
       });
 
       it('should include email in errors with message "Invalid email" if it isnt an email', function(done) {
-        done(new Error('red-green refactor'));
+        data.email = 'jerry';
+        request(app).post('/signupTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors.email).to.exist;
+            expect(res.body.errors.email.msg).to.equal('Invalid email');
+            done();
+          });
       });
     });
   });
