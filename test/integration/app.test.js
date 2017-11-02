@@ -9,7 +9,7 @@ const seed = require('../../seed');
 const {SESSION_COOKIE_NAME} = require('../../src/config');
 const debug = require('debug')('test-order');
 
-describe('#Authentication Routes', function() {
+describe.only('#Authentication Routes', function() {
 
   beforeEach(function(done) {
     debug(':)');
@@ -96,7 +96,7 @@ describe('#Authentication Routes', function() {
           done();
         });
     });
-    it('should redirect to /signup if username or email in request body are not unique without error messages to discourage bots - clientside will check for uniqueness before allowing client to submit form', function(done) {
+    it('should redirect to /signup if username or email in request body are not unique without error \n\tmessages to discourage bots - clientside will check for uniqueness before allowing client to submit form', function(done) {
       debug('running test');
       request(app).post('/signup')
         .send({ fname: 'Otherkirishima', email: 'kirishima@email.com', password: '1111111111', username: 'kirishima', passwordConfirmation: '1111111111' })

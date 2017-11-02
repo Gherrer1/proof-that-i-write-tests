@@ -22,17 +22,32 @@ describe.only('UserModel', function() {
 			let error = user.validateSync();
 			expect(error.errors.fname.message).to.match(/`fname` is required/);
 		});
-
 		it('should not have a validation error if fname is anywhere between 1 and 20 characters long', function() {
-			throw new Error('red-green refactor');
+			var validLengthdNames = ['a', 'aa', 'aba', 'a aa', 'abcdg', /* ... */ 'eighteen chars wee', 'nineteen chars nine', 'twentycharstwentycha'];
+			var fieldsObjects = validLengthdNames.map(name => {
+				return { fname: name, username: fields.username, email: fields.email, password: fields.password };
+			});
+			var users = fieldsObjects.map(fields => new UserModel(fields));
+			users.forEach(user => {
+				let error = user.validateSync();
+				expect(error).to.be.undefined;
+			});
 		});
 		it(`should throw a validation error if fname is more than ${constants.user.fname.max} characters long`, function() {
-			throw new Error('red-green refactor');
+			fields.fname = 'abcdefghijklmnopqrstu'; // 21 chars long
+			let user = new UserModel(fields);
+			let error = user.validateSync();
+			expect(error.errors.fname).to.exist;
+			expect(error.errors.fname.message).to.match(/is longer than the maximum allowed length/);
 		});
 		it('should throw a validation error if fname present but 0 characters long', function() {
-			throw new Error('red-green refactor');
+			fields.fname = '';
+			let user = new UserModel(fields);
+			let error = user.validateSync();
+			expect(error.errors.fname.message).to.match(/`fname` is required/);
 		});
 		it('should not throw a validation error if fname does conform to regex', function() {
+			// const fnameRegex = constants.user.fname.regex;
 			throw new Error('red-green refactor');
 		});
 		it('should throw a validation error if fname does not conform to regex', function() {
