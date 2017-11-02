@@ -1,7 +1,8 @@
 const UserModel 		= require('../../../src/models/User');
-const expect			= require('chai').expect;
+const constants 		= require('../../../src/validators/validatorConstants');
+const expect				= require('chai').expect;
 
-describe('UserModel', function() {
+describe.only('UserModel', function() {
 
 	let fields;
 
@@ -15,29 +16,36 @@ describe('UserModel', function() {
 	});
 
 	describe('fname field', function() {
-		it('should throw a validation error if fname left empty', function() {
+		it('should throw a validation error if fname missing', function() {
 			delete fields.fname;
 			let user = new UserModel(fields);
 			let error = user.validateSync();
 			expect(error.errors.fname.message).to.match(/`fname` is required/);
 		});
+
+		it('should not have a validation error if fname is anywhere between 1 and 20 characters long');
+		it(`should throw a validation error if fname is more than ${constants.user.fname.max} characters long`);
+		it('should throw a validation error if fname present but 0 characters long');
+		it('should not throw a validation error if fname does conform to regex');
+		it('should throw a validation error if fname does not conform to regex');
 	});
 
 	describe('username field', function() {
-		it('should return a validation error if left empty', function() {
+		it('should return a validation error if username missing', function() {
 			delete fields.username;
 			let user = new UserModel(fields);
 			let error = user.validateSync();
 			expect(error.errors.username.message).to.match(/`username` is required/);
 		});
-		it.skip('should throw validation error if it doesnt conform to our username regex');
+		it('should throw validation error if it doesnt conform to our username regex');
+		it('should not throw a validation error if it does conform to our username regex');
 		it('should save the username as all lowercase letters', function() {
 			fields.username = 'FuNhOuSe';
 			let expectedUsername = fields.username.toLowerCase();
 			let user = new UserModel(fields);
 			expect(user.username).to.equal(expectedUsername);
 		});
-		it('should return a validation error if username is less than 7 characters or greater than 15 characters', function() {
+		it(`should return a validation error if username is less than ${constants.user.username.min} characters or greater than ${constants.user.username.max} characters`, function() {
 			fields.username = 'aaaaaa'; // 6 chars
 			let user = new UserModel(fields);
 			let error = user.validateSync();
@@ -47,17 +55,16 @@ describe('UserModel', function() {
 			error = user.validateSync();
 			expect(error.errors.username).to.exist;
 		});
-		it('should return no validation error if username is 7 to 15 characters long, inclusive', function() {
+		it(`should return no validation error if username is ${constants.user.username.min} to ${constants.user.username.max} characters long, inclusive`, function() {
 			fields.username = 'aaaaaaaaaa'; // 10 chars
 			let user = new UserModel(fields);
 			let error = user.validateSync();
 			expect(error).to.be.undefined;
 		});
-		it('should be unique but idk how to test this yet');
 	});
 
 	describe('email field', function() {
-		it('should return a validation error if left empty', function() {
+		it('should return a validation error if email missing', function() {
 			delete fields.email;
 			let user = new UserModel(fields);
 			let error = user.validateSync();
@@ -75,7 +82,7 @@ describe('UserModel', function() {
 			let error = user.validateSync();
 			expect(error).to.be.undefined;
 		});
-		it.skip('should be unique but idk how to test that yet');
+		it('should maybe? return a validation error if email is too long? maybe? like express-validator does?');
 		it('should be saved as all lowercase when object instantiated', function() {
 			fields.email = 'JAKE@EMAIL.COM';
 			let expectedEmail = fields.email.toLowerCase();
@@ -106,7 +113,15 @@ describe('UserModel', function() {
 	});
 
 	describe('password field', function() {
-		it('should be minimum 10 characters and maximum 20 characters', function() {
+		it('should return a validation error if password missing', function() {
+			delete fields.password;
+			let user = new UserModel(fields);
+			let error = user.validateSync();
+			expect(error.errors.password.message).to.match(/`password` is required/);
+		});
+		it('should return a validation error if password is present but is 0 chars long');
+		it(`should not be over ${constants.user.password.model.max} characters long \n\t(every bcrypt password is 60 chars long, but maybe one day Ill use a diff hasher)`);
+		it.skip('should be minimum 10 characters and maximum 20 characters', function() { // might not be applicable anymore
 			fields.password = '123456789'; // 9 characters
 			let user = new UserModel(fields);
 			let error = user.validateSync();
@@ -125,12 +140,6 @@ describe('UserModel', function() {
 			user = new UserModel(fields);
 			error = user.validateSync();
 			expect(error).to.be.undefined;
-		});
-		it('should return a validation error if left empty', function() {
-			delete fields.password;
-			let user = new UserModel(fields);
-			let error = user.validateSync();
-			expect(error.errors.password.message).to.match(/`password` is required/);
 		});
 		it('should be case sensitive', function() {
 			const expectedPassword = 'aBcDeFGhIjKlMn';
