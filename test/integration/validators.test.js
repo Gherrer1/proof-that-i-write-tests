@@ -130,10 +130,31 @@ describe.only('#Signup Validators', function() {
             done();
           });
       });
+
+      it('should contain fname, email, password, or passwordConfirmation in errors if ANY of those fields are just spaces but meet min required chars', function(done) {
+        data.fname = '  ';
+        // username obviously wouldnt meet regex - for that matter neither would fname
+        data.email = '   '; // will fail bc its an email
+        data.password = '              ';
+        data.passwordConfirmation = '              ';
+        request(app).post('/signupTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors.fname).to.exist;
+            expect(res.body.errors.fname.msg).to.equal('First name missing');
+            expect(res.body.errors.email).to.exist;
+            expect(res.body.errors.email.msg).to.equal('Invalid email');
+            // TODO: implement validation to make sure password isnt too weak
+            // expect(res.body.errors.password).to.exist; TODO
+            // expect(res.body.errors.passwordConfirmation).to.exist; dont really need todo, password should be enough and passwordConfirmation matching should be enough
+            done();
+          });
+      });
     });
 
     describe('#Length Mins/Maxs', function() {
-
       it(`should include fname in errors with message \n\t    "First name cannot be greater than ${vConstants.signup.fname.max} characters" \n\t    if it is greater than ${vConstants.signup.fname.max} characters long`, function(done) {
         data.fname = 'veryclearlygreaterthantwentycharacterslong';
         request(app).post('/signupTest')
