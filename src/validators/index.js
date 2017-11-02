@@ -9,8 +9,8 @@ var signupValidators = [
     .isLength({ min: 1 }) // max currently 20
     .isLength({ max: vConstants.signup.fname.max }).withMessage(`First name cannot be greater than ${vConstants.signup.fname.max} characters`),
   check('username', 'Username missing')
-    .exists()
-    .isLength({ min: 1 }),
+    .exists() // min, max currently 5, 12
+    .isLength({ min: vConstants.signup.username.min, max: vConstants.signup.username.max }).withMessage(`Username must be between ${vConstants.signup.username.min} and ${vConstants.signup.username.max} characters long`),
   check('email', 'Email missing')
     .exists()
     .isLength({ min: 1 })

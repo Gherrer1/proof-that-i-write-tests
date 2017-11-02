@@ -95,7 +95,7 @@ describe.only('#Signup Validators', function() {
             expect(res.body.errors.fname).to.exist;
             expect(res.body.errors.fname.msg).to.equal('First name missing');
             expect(res.body.errors.username).to.exist;
-            expect(res.body.errors.username.msg).to.equal('Username missing');
+            // expect(res.body.errors.username.msg).to.equal('Username missing'); no longer applicable
             expect(res.body.errors.email).to.exist;
             expect(res.body.errors.email.msg).to.equal('Email missing');
             expect(res.body.errors.password).to.exist;
@@ -145,8 +145,29 @@ describe.only('#Signup Validators', function() {
           });
       });
 
-      it('should include username in errors with message \n\t    "Username must be between 5 and 12 characters" \n\t    if it isnt between 5 <= chars <= 12 characters long', function(done) {
-        done(new Error('red-green refactor'));
+      it(`should include username in errors with message \n\t    "Username must be between ${vConstants.signup.username.min} and ${vConstants.signup.username.max} characters long" \n\t    if its less than 5 chars long`, function(done) {
+        data.username = 'four';
+        request(app).post('/signupTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors.username).to.exist;
+            expect(res.body.errors.username.msg).to.equal(`Username must be between ${vConstants.signup.username.min} and ${vConstants.signup.username.max} characters long`);
+            done();
+          });
+      });
+      it(`should include username in errors with message \n\t    "Username must be between ${vConstants.signup.username.min} and ${vConstants.signup.username.max} characters long" \n\t    if its greater than 12 characters long`, function(done) {
+        data.username = 'thirteenthirt';
+        request(app).post('/signupTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors.username).to.exist;
+            expect(res.body.errors.username.msg).to.equal(`Username must be between ${vConstants.signup.username.min} and ${vConstants.signup.username.max} characters long`);
+            done();
+          });
       });
 
       it('should include email in errors with message \n\t    "Email cannot be greater than 40 characters" \n\t     if its greater than 40 characters long', function(done) {
