@@ -50,7 +50,15 @@ describe.only('#Signup Validators', function() {
       data = { fname: 'JERRY', username: 'JERRY', email: 'EMAIL@EMAIL.COM', password: '   MYPASSWORD   ', passwordConfirmation: '   MYPASSWORD   ' };
       const expectedValidData = { fname: data.fname, username: 'jerry', email: 'email@email.com', password: data.password, passwordConfirmation: data.passwordConfirmation };
 
-      done(new Error('red-green refactor'));
+      request(app).post('/signupTest')
+        .send(data)
+        .end(function(err, res) {
+          if(err)
+            return done(err);
+          // expect(res.body.validData.username).to.equal(expectedValidData.username); not necessary anymore - model handles this when we save
+          expect(res.body.validData.email).to.equal(expectedValidData.email);
+          done();
+        });
     });
 
     it('fname, username, and email (automatically) should be trimmed. Password/Confirmation should not', function(done) {
@@ -95,7 +103,7 @@ describe.only('#Signup Validators', function() {
             expect(res.body.errors.username).to.exist;
             // expect(res.body.errors.username.msg).to.equal('Username missing'); no longer applicable
             expect(res.body.errors.email).to.exist;
-            expect(res.body.errors.email.msg).to.equal('Email missing');
+            // expect(res.body.errors.email.msg).to.equal('Email missing'); no longer applicable
             expect(res.body.errors.password).to.exist;
             // expect(res.body.errors.password.msg).to.equal('Password missing'); no longer applicable
             expect(res.body.errors.passwordConfirmation).to.exist;
