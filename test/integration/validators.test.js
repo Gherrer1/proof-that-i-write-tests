@@ -93,10 +93,15 @@ describe.only('#Signup Validators', function() {
             if(err)
               return done(err);
             expect(res.body.errors.fname).to.exist;
+            expect(res.body.errors.fname.msg).to.equal('First name missing');
             expect(res.body.errors.username).to.exist;
+            expect(res.body.errors.username.msg).to.equal('Username missing');
             expect(res.body.errors.email).to.exist;
+            expect(res.body.errors.email.msg).to.equal('Email missing');
             expect(res.body.errors.password).to.exist;
+            expect(res.body.errors.password.msg).to.equal('Password missing');
             expect(res.body.errors.passwordConfirmation).to.exist;
+            expect(res.body.errors.passwordConfirmation.msg).to.equal('Password confirmation missing');
             done();
           });
         // done(new Error('red-green refactor'));

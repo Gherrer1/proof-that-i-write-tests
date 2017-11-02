@@ -2,21 +2,23 @@ let { check, validationResult } = require('express-validator/check');
 let { matchedData }             = require('express-validator/filter');
 let vConstants                  = require('./validatorConstants');
 
+// the way these work: unless message is explicitly listed, default message inluded with check() is the message used
 var signupValidators = [
-  check('fname')
-    .exists().withMessage('First name missing')
+  check('fname', 'First name missing')
+    .exists()
     .isLength({ min: 1 }),
-  check('username')
-    .exists().withMessage('Username missing')
+  check('username', 'Username missing')
+    .exists()
     .isLength({ min: 1 }),
-  check('email')
-    .exists().withMessage('Email missing')
+  check('email', 'Email missing')
+    .exists()
+    .isLength({ min: 1 })
     .isEmail().withMessage('Invalid email'),
-  check('password')
-    .exists().withMessage('Password missing')
+  check('password', 'Password missing')
+    .exists()
     .isLength({ min: 1 }),
-  check('passwordConfirmation')
-    .exists().withMessage('Password confirmation missing')
+  check('passwordConfirmation', 'Password confirmation missing')
+    .exists()
     .isLength({ min: 1 })
   // check('fname', /*message=*/'first name missing') // manually tested
   //   .exists()
