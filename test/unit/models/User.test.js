@@ -23,11 +23,21 @@ describe.only('UserModel', function() {
 			expect(error.errors.fname.message).to.match(/`fname` is required/);
 		});
 
-		it('should not have a validation error if fname is anywhere between 1 and 20 characters long');
-		it(`should throw a validation error if fname is more than ${constants.user.fname.max} characters long`);
-		it('should throw a validation error if fname present but 0 characters long');
-		it('should not throw a validation error if fname does conform to regex');
-		it('should throw a validation error if fname does not conform to regex');
+		it('should not have a validation error if fname is anywhere between 1 and 20 characters long', function() {
+			throw new Error('red-green refactor');
+		});
+		it(`should throw a validation error if fname is more than ${constants.user.fname.max} characters long`, function() {
+			throw new Error('red-green refactor');
+		});
+		it('should throw a validation error if fname present but 0 characters long', function() {
+			throw new Error('red-green refactor');
+		});
+		it('should not throw a validation error if fname does conform to regex', function() {
+			throw new Error('red-green refactor');
+		});
+		it('should throw a validation error if fname does not conform to regex', function() {
+			throw new Error('red-green refactor');
+		});
 	});
 
 	describe('username field', function() {
@@ -37,8 +47,12 @@ describe.only('UserModel', function() {
 			let error = user.validateSync();
 			expect(error.errors.username.message).to.match(/`username` is required/);
 		});
-		it('should throw validation error if it doesnt conform to our username regex');
-		it('should not throw a validation error if it does conform to our username regex');
+		it('should throw validation error if it doesnt conform to our username regex', function() {
+			throw new Error('red-green refactor');
+		});
+		it('should not throw a validation error if it does conform to our username regex', function() {
+			throw new Error('red-green refactor');
+		});
 		it('should save the username as all lowercase letters', function() {
 			fields.username = 'FuNhOuSe';
 			let expectedUsername = fields.username.toLowerCase();
@@ -82,7 +96,9 @@ describe.only('UserModel', function() {
 			let error = user.validateSync();
 			expect(error).to.be.undefined;
 		});
-		it('should maybe? return a validation error if email is too long? maybe? like express-validator does?');
+		it('should maybe? return a validation error if email is too long? maybe? like express-validator does?', function() {
+			throw new Error('red-green refactor');
+		});
 		it('should be saved as all lowercase when object instantiated', function() {
 			fields.email = 'JAKE@EMAIL.COM';
 			let expectedEmail = fields.email.toLowerCase();
@@ -119,8 +135,12 @@ describe.only('UserModel', function() {
 			let error = user.validateSync();
 			expect(error.errors.password.message).to.match(/`password` is required/);
 		});
-		it('should return a validation error if password is present but is 0 chars long');
-		it(`should not be over ${constants.user.password.model.max} characters long \n\t(every bcrypt password is 60 chars long, but maybe one day Ill use a diff hasher)`);
+		it('should return a validation error if password is present but is 0 chars long', function() {
+			throw new Error('red-green refactor');
+		});
+		it(`should not be over ${constants.user.password.model.max} characters long \n\t(every bcrypt password is 60 chars long, but maybe one day Ill use a diff hasher)`, function() {
+			throw new Error('red-green refactor');
+		});
 		it.skip('should be minimum 10 characters and maximum 20 characters', function() { // might not be applicable anymore
 			fields.password = '123456789'; // 9 characters
 			let user = new UserModel(fields);
