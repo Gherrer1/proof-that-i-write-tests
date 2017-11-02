@@ -167,8 +167,17 @@ describe.only('#Signup Validators', function() {
           });
       });
 
-      it('should include email in errors with message \n\t    "Email cannot be greater than 40 characters" \n\t     if its greater than 40 characters long', function(done) {
-        done(new Error('red-green refactor'));
+      it(`should include email in errors with message \n\t    "Invalid email" \n\t     if its greater than 64 characters long`, function(done) {
+        data.email = 'dkjsgkdfhgkdfkjxhkjdfghjfkjhfgkljbkjfnbkfjgjdfghkjgfklhfccccccccc@email.com';
+        request(app).post('/signupTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors.email).to.exist;
+            expect(res.body.errors.email.msg).to.equal('Invalid email');
+            done();
+          });
       });
 
       it('should include password/confirmation in errors with message \n\t    "Password/confirmation must be between 8 and 100 characters" \n\t     if its not between 8 <= chars <= 100', function(done) {

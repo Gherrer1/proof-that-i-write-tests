@@ -13,7 +13,7 @@ var signupValidators = [
     .isLength({ min: vConstants.signup.username.min, max: vConstants.signup.username.max }).withMessage(`Username must be between ${vConstants.signup.username.min} and ${vConstants.signup.username.max} characters long`),
   check('email', 'Email missing')
     .exists()
-    .isLength({ min: 1 })
+    .isLength({ min: 1 }) // has a natural max by virtue of checking for isEmail()
     .isEmail().withMessage('Invalid email'),
   check('password', 'Password missing')
     .exists()
