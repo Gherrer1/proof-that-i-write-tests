@@ -273,6 +273,7 @@ describe.only('#Signup Validators', function() {
         Promise.all(promises).then(results => {
           results.forEach(resObj => {
             expect(resObj.res.body.errors).to.be.undefined;
+            expect(resObj.res.body.validData.fname).to.exist;
           });
         })
         .then(err => done(err))
@@ -280,7 +281,52 @@ describe.only('#Signup Validators', function() {
       });
 
       it('should include username in errors if it isnt strictly alphanumeric with message \n\t    "Username must begin with letter and can only contain letters numbers and periods" \n\t    with the exception of periods (.)', function(done) {
-        done(new Error('red-green refactor'));
+        var invalidUsernames = ['w space', 'W SPACE', 'symbols!', 'SYMBOLS!', 'symbols1#', 'SYMBOLS1#', 'symbols$', 'SYMBOLS$', '5ymbols', '5YMBOLS', '.aberrr', '.ABERRR', 'a.berr?', 'A.BERR?', '000pss', '000PSS', 'Ape head', 'APE HEAD'];
+        var promises = invalidUsernames.map(invalidUsername => {
+          return { fname: data.fname, username: invalidUsername, email: data.email, password: data.password, passwordConfirmation: data.passwordConfirmation };
+        })
+        .map(data => new Promise(function(resolve, reject) {
+          request(app).post('/signupTest')
+            .send(data)
+            .end(function(err, res) {
+              resolve({ err, res });
+            });
+        }));
+        Promise.all(promises)
+        .then(results => {
+          results.forEach(resObj => {
+            expect(resObj.res.body.errors.username).to.exist;
+            expect(resObj.res.body.errors.username.msg).to.equal('Username must begin with a letter and can only contain letters, numbers, and periods');
+          });
+        })
+        .then(err => done(err))
+        .catch(err => done(err));
+      });
+
+      it('should consider a username with only alphanumeric and periods as valid and pass it onto validData', function(done) {
+        var validUsernames = ['a2345', 'A2345', 'a....', 'A....', 'a..55', 'A..55', 'a1.2.3.4.5', 'A1.2.3.4.5'];
+        var promises = validUsernames.map(validUsername => {
+          return { fname: data.fname, username: validUsername, email: data.email, password: data.password, passwordConfirmation: data.passwordConfirmation };
+        })
+        .map(data => new Promise(function(resolve, reject) {
+          request(app).post('/signupTest')
+            .send(data)
+            .end(function(err, res) {
+              resolve({ err, res });
+            });
+        }));
+        Promise.all(promises)
+        .then(results => {
+          results.forEach(resObj => {
+            // expect(resObj.res.body.errors.usernaem).to.exist;
+            expect(resObj.res.body.errors).to.be.undefined;
+            // expect(resObj.res.body.validData).to.exist;
+            expect(resObj.res.body.validData.username).to.exist;
+            // expect(resObj.res.body.validData.username).to.be.undefined;
+          });
+        })
+        .then(err => done(err))
+        .catch(err => done(err));
       });
     });
 

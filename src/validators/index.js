@@ -13,6 +13,7 @@ var signupValidators = [
   check('username', 'Username missing')
     .exists() // min, max currently 5, 12
     .isLength({ min: vConstants.signup.username.min, max: vConstants.signup.username.max }).withMessage(`Username must be between ${vConstants.signup.username.min} and ${vConstants.signup.username.max} characters long`)
+    .matches(vConstants.signup.username.regex).withMessage('Username must begin with a letter and can only contain letters, numbers, and periods')
     .trim(),
   check('email', 'Email missing')
     .exists()
