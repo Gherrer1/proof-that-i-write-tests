@@ -1,6 +1,7 @@
 const UserModel 		= require('../../../src/models/User');
 const constants 		= require('../../../src/validators/validatorConstants');
 const expect				= require('chai').expect;
+const assert				= require('chai').assert;
 
 describe.only('UserModel', function() {
 
@@ -80,10 +81,25 @@ describe.only('UserModel', function() {
 			expect(error.errors.username.message).to.match(/`username` is required/);
 		});
 		it('should throw validation error if it doesnt conform to our username regex', function() {
-			throw new Error('red-green refactor');
+			var invalidUsernames = ['w space', 'W SPACE', 'symbols!', 'SYMBOLS!', 'symbols1#', 'SYMBOLS1#', 'symbols$', 'SYMBOLS$', '5ymbols', '5YMBOLS', '.aberrr', '.ABERRR', 'a.berr?', 'A.BERR?', '000pss', '000PSS', 'Ape head', 'APE HEAD'];
+			var users = invalidUsernames.map(invalidUsername => { return { fname: fields.fname, username: invalidUsername, email: fields.email, password: fields.password }; })
+																	.map(fieldsObj => new UserModel(fieldsObj));
+			users.forEach(user => {
+				let error = user.validateSync();
+				expect(error, 'There are no errors gleaned from validateSync()').to.exist;
+				assert.exists(error.errors.username, 'there are no errors with username contrary to what we expect');
+				expect(error.errors.username.message).to.match(/is invalid/);
+				expect(error.errors.username.kind).to.equal('regexp');
+			});
 		});
 		it('should not throw a validation error if it does conform to our username regex', function() {
-			throw new Error('red-green refactor');
+			var validUsernames = ['a2345', 'A2345', 'a....', 'A....', 'a..55', 'A..55', 'a1.2.3.4.5', 'A1.2.3.4.5'];
+			var users = validUsernames.map(validUsername => { return { fname: fields.fname, username: validUsername, email: fields.email, password: fields.password }; })
+																	.map(fieldsObj => new UserModel(fieldsObj));
+			users.forEach(user => {
+				let error = user.validateSync();
+				expect(error, 'There are errors though there shouldnt be').to.be.undefined;
+			});
 		});
 		it('should save the username as all lowercase letters', function() {
 			fields.username = 'FuNhOuSe';
@@ -92,20 +108,27 @@ describe.only('UserModel', function() {
 			expect(user.username).to.equal(expectedUsername);
 		});
 		it(`should return a validation error if username is less than ${constants.user.username.min} characters or greater than ${constants.user.username.max} characters`, function() {
-			fields.username = 'aaaaaa'; // 6 chars
+			fields.username = 'four'; // 4 chars
 			let user = new UserModel(fields);
 			let error = user.validateSync();
+			expect(error, 'No errors found but there should have been').to.exist;
 			expect(error.errors.username).to.exist;
-			fields.username = 'aaaaaaaaaaaaaaaa'; // 16 chars
+			expect(error.errors.username.kind).to.equal('minlength');
+			fields.username = 'thirteenbih13'; // 13 chars
 			user = new UserModel(fields);
 			error = user.validateSync();
+			expect(error, 'No errors found but there should have been').to.exist;
 			expect(error.errors.username).to.exist;
+			expect(error.errors.username.kind).to.equal('maxlength');
 		});
 		it(`should return no validation error if username is ${constants.user.username.min} to ${constants.user.username.max} characters long, inclusive`, function() {
-			fields.username = 'aaaaaaaaaa'; // 10 chars
-			let user = new UserModel(fields);
-			let error = user.validateSync();
-			expect(error).to.be.undefined;
+			const validLengthdUsernames = ['five5', 'sixsix', 'seven77', /* ... */ 'tententen.', 'e11leven.11', 'twelvetwelve'];
+			const users = validLengthdUsernames.map(validUsername => { return { fname: fields.fname, username: validUsername, email: fields.email, password: fields.password }; })
+																				 .map(fieldsObj => new UserModel(fieldsObj));
+			users.forEach(user => {
+				const error = user.validateSync();
+				expect(error, 'error existed, it shouldnt have').to.be.undefined;
+			});
 		});
 	});
 

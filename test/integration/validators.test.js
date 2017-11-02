@@ -10,7 +10,7 @@ const vConstants              = require('../../src/validators/validatorConstants
 const debug                   = require('debug')('validator-integration-tests');
 
 // Automate testing that the validators work
-describe.only('#Signup Validators', function() {
+describe('#Signup Validators', function() {
   // create a fake app
   let app = express();
   app.use(bodyParser.json());
