@@ -55,7 +55,7 @@ describe.only('#Signup Validators', function() {
         .end(function(err, res) {
           if(err)
             return done(err);
-          // expect(res.body.validData.username).to.equal(expectedValidData.username); not necessary anymore - model handles this when we save
+          // expect(res.body.validData.username).to.equal(expectedValidData.username); not necessary anymore - model handles lowercasing when we save
           expect(res.body.validData.email).to.equal(expectedValidData.email);
           done();
         });
@@ -98,11 +98,11 @@ describe.only('#Signup Validators', function() {
             expect(res.body.errors.fname).to.exist;
             expect(res.body.errors.fname.msg).to.equal('First name missing');
             expect(res.body.errors.username).to.exist;
-            // expect(res.body.errors.username.msg).to.equal('Username missing'); no longer applicable
+            // expect(res.body.errors.username.msg).to.equal('Username missing'); no longer applicable - will just tell you minimum
             expect(res.body.errors.email).to.exist;
-            // expect(res.body.errors.email.msg).to.equal('Email missing'); no longer applicable
+            // expect(res.body.errors.email.msg).to.equal('Email missing'); no longer applicable - will tell you invalid email
             expect(res.body.errors.password).to.exist;
-            // expect(res.body.errors.password.msg).to.equal('Password missing'); no longer applicable
+            // expect(res.body.errors.password.msg).to.equal('Password missing'); no longer applicable - will just tell you minimum
             expect(res.body.errors.passwordConfirmation).to.exist;
             expect(res.body.errors.passwordConfirmation.msg).to.equal('Password confirmation missing');
             done();
@@ -232,8 +232,8 @@ describe.only('#Signup Validators', function() {
     describe('#Regex', function() {
       it('should include fname in errors with message \n\t    "Name cannot contain numbers or anomolous symbols" \n\t    if it contains a number or any of these characters: !@#$%^&*?/\\[]{}()<>+=;:', function(done) {
         // lets get fancy
-        var promises = ['jerry1', 'Verylegit1Name', 'jerry!', 'j@rry', '?erry', 'j{}rry', 'j+rry', 'je#y', 'je:;y']
-        .map(faultyName => {
+        var invalidNames = ['jerry1', 'Verylegit1Name', 'jerry!', 'j@rry', '?erry', 'j{}rry', 'j+rry', 'je#y', 'je:;y']
+        var promises = invalidNames.map(faultyName => {
           return { fname: faultyName, email: data.email, username: data.username, password: data.password, passwordConfirmation: data.passwordConfirmation }
         })
         .map(data => new Promise(function(resolve, reject) {
@@ -245,11 +245,10 @@ describe.only('#Signup Validators', function() {
         }));
         Promise.all(promises)
           .then(results => {
-            results.forEach(resObj =>
-              {
+            results.forEach(resObj => {
                 expect(resObj.res.body.errors.fname).to.exist;
                 expect(resObj.res.body.errors.fname.msg).to.equal('First name cannot contain numbers or anomolous symbols');
-              });
+            });
           })
           .then((err) => {
             done(err);
@@ -257,6 +256,27 @@ describe.only('#Signup Validators', function() {
           .catch(err => {
             done(err);
           });
+      });
+
+      it('should consider a name with spaces but without numbers of anomolous symbols valid and pass it onto validData', function(done) {
+        var validNames = ['jerry withspaces', 'jerry with\'neil', 'j. erry', 'look ma two  spaces', 'kareem-abdul jabbar'];
+        var promises = validNames.map(name => {
+          return { fname: name, email: data.email, username: data.username, password: data.password, passwordConfirmation: data.passwordConfirmation };
+        })
+        .map(data => new Promise(function(resolve, reject) {
+          request(app).post('/signupTest')
+            .send(data)
+            .end(function(err, res) {
+              resolve({ err, res });
+            });
+        }));
+        Promise.all(promises).then(results => {
+          results.forEach(resObj => {
+            expect(resObj.res.body.errors).to.be.undefined;
+          });
+        })
+        .then(err => done(err))
+        .catch(err => done(err));
       });
 
       it('should include username in errors if it isnt strictly alphanumeric with message \n\t    "Username must begin with letter and can only contain letters numbers and periods" \n\t    with the exception of periods (.)', function(done) {
