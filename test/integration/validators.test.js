@@ -230,8 +230,33 @@ describe.only('#Signup Validators', function() {
     });
 
     describe('#Regex', function() {
-      it('should include fname in errors with message \n\t    "Name cannot contain a number or anomolous symbols" \n\t    if it contains a number or any of these characters: !@#$%^&*?/\\[]{}()<>+=;:', function(done) {
-        done(new Error('red-green refactor'));
+      it('should include fname in errors with message \n\t    "Name cannot contain numbers or anomolous symbols" \n\t    if it contains a number or any of these characters: !@#$%^&*?/\\[]{}()<>+=;:', function(done) {
+        // lets get fancy
+        var promises = ['jerry1', 'Verylegit1Name', 'jerry!', 'j@rry', '?erry', 'j{}rry', 'j+rry', 'je#y', 'je:;y']
+        .map(faultyName => {
+          return { fname: faultyName, email: data.email, username: data.username, password: data.password, passwordConfirmation: data.passwordConfirmation }
+        })
+        .map(data => new Promise(function(resolve, reject) {
+          request(app).post('/signupTest')
+            .send(data)
+            .end(function(err, res) {
+              resolve({ err, res });
+            });
+        }));
+        Promise.all(promises)
+          .then(results => {
+            results.forEach(resObj =>
+              {
+                expect(resObj.res.body.errors.fname).to.exist;
+                expect(resObj.res.body.errors.fname.msg).to.equal('First name cannot contain numbers or anomolous symbols');
+              });
+          })
+          .then((err) => {
+            done(err);
+          })
+          .catch(err => {
+            done(err);
+          });
       });
 
       it('should include username in errors if it isnt strictly alphanumeric with message \n\t    "Username must begin with letter and can only contain letters numbers and periods" \n\t    with the exception of periods (.)', function(done) {

@@ -8,6 +8,7 @@ var signupValidators = [
     .exists()
     .isLength({ min: 1 }) // max currently 20
     .isLength({ max: vConstants.signup.fname.max }).withMessage(`First name cannot be greater than ${vConstants.signup.fname.max} characters`)
+    .custom(value => !vConstants.signup.fname.regex.test(value)).withMessage('First name cannot contain numbers or anomolous symbols')
     .trim(),
   check('username', 'Username missing')
     .exists() // min, max currently 5, 12
