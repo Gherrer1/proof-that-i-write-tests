@@ -197,36 +197,43 @@ describe.only('UserModel', function() {
 			expect(error.errors.password.message).to.match(/`password` is required/);
 		});
 		it('should return a validation error if password is present but is 0 chars long', function() {
-			throw new Error('red-green refactor');
-		});
-		it(`should not be over ${constants.user.password.model.max} characters long \n\t(every bcrypt password is 60 chars long, but maybe one day Ill use a diff hasher)`, function() {
-			throw new Error('red-green refactor');
-		});
-		it.skip('should be minimum 10 characters and maximum 20 characters', function() { // might not be applicable anymore
-			fields.password = '123456789'; // 9 characters
+			fields.password = '';
 			let user = new UserModel(fields);
 			let error = user.validateSync();
+			expect(error, 'We expected validation errors, didnt get any').to.exist;
 			expect(error.errors.password).to.exist;
-			expect(error.errors.password.message).to.match(/is shorter than the minimum allowed length/);
-			fields.password = '111111111111111111111'; // 21 characters
-			user = new UserModel(fields);
-			error = user.validateSync();
+			expect(error.errors.password.message).to.match(/is required/);
+			expect(error.errors.password.kind).to.equal('required');
+		});
+		/* These next 2 tests are just so we dont store something too big in our DB - there are malicious people out there */
+		it(`should not be over ${constants.user.password.model.max} characters long \n\t(every bcrypt password is 60 chars long, but maybe one day Ill use a diff hasher)`, function() {
+			fields.password = 'reallygatdamnlongpasswordholymolymaccaroniiwishmarzwasstillalivehahadamnhowlongis this thing? thats w'; // 101 chars
+			let user = new UserModel(fields);
+			let error = user.validateSync();
+			expect(error, 'We should have gotten a validation error for too long password').to.exist;
 			expect(error.errors.password).to.exist;
 			expect(error.errors.password.message).to.match(/is longer than the maximum allowed length/);
-			fields.password = '1111111111'; // 10 chars
-			user = new UserModel(fields);
-			error = user.validateSync();
-			expect(error).to.be.undefined;
-			fields.password = '11111111111111111111'; // 20 chars
-			user = new UserModel(fields);
-			error = user.validateSync();
-			expect(error).to.be.undefined;
+			expect(error.errors.password.kind).to.equal('maxlength');
+		});
+		it('should not have a validation error if password length is lte ${constants.user.password.model.max} chars long \n\t(even though bcrypt passwords will be  60 chars long)', function() {
+			fields.password = 'reallygatdamnlongpasswordholymolymaccaroniiwishmarzwasstillalivehahadamnhowlongis this thing? that w'; // 100 chars
+			let user = new UserModel(fields);
+			let error = user.validateSync();
+			expect(error, 'We should not have gotten an error due to password length').to.be.undefined;
 		});
 		it('should be case sensitive', function() {
 			const expectedPassword = 'aBcDeFGhIjKlMn';
 			fields.password = expectedPassword;
 			let user = new UserModel(fields);
 			expect(user.password).to.equal(expectedPassword);
+		});
+		it('should maintain spaces in the values, even at the front and back of the password', function() {
+			const expectedPassword = '   mypassword   ';
+			fields.password = expectedPassword;
+			let user = new UserModel(fields);
+			expect(user.password).to.equal(expectedPassword);
+			let error = user.validateSync();
+			expect(error, 'There should not have been validation errors').to.be.undefined;
 		});
 	});
 });

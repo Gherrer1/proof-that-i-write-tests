@@ -15,7 +15,7 @@ const UserSchema = new Schema({
 				unique: true, match: constants.user.username.regex },// unique?
 	email: { type: mongoose.SchemaTypes.Email, required: true, unique: true, maxlength: constants.user.email.max }, // unique? //SchemaTypes.Email must automatically lowercase it for you
 	isNinja: { type: String, default: 'NO', enum: isNinjaEnum, uppercase: true },
-	password: { type: String, required: true, minlength: 10, maxlength: 20 }
+	password: { type: String, required: true, maxlength: constants.user.password.model.max }
 	// isNinja: string, enum, default: non
 	//
 });
