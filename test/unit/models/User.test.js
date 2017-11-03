@@ -81,7 +81,7 @@ describe.only('UserModel', function() {
 			expect(error.errors.username.message).to.match(/`username` is required/);
 		});
 		it('should throw validation error if it doesnt conform to our username regex', function() {
-			var invalidUsernames = ['w space', 'W SPACE', 'symbols!', 'SYMBOLS!', 'symbols1#', 'SYMBOLS1#', 'symbols$', 'SYMBOLS$', '5ymbols', '5YMBOLS', '.aberrr', '.ABERRR', 'a.berr?', 'A.BERR?', '000pss', '000PSS', 'Ape head', 'APE HEAD'];
+			var invalidUsernames = ['w space', 'a47593_be.e', 'A47593_BE.E', 'a....', 'A....', 'a..55', 'A..55', 'a1.2.3.4.5', 'A1.2.3.4.5', 'W SPACE', 'symbols!', 'SYMBOLS!', 'symbols1#', 'SYMBOLS1#', 'symbols$', 'SYMBOLS$', '5ymbols', '5YMBOLS', '_aberrr', '_ABERRR', 'a_berr?', 'A_BERR?', '000pss', '000PSS', 'Ape head', 'APE HEAD'];
 			var users = invalidUsernames.map(invalidUsername => { return { fname: fields.fname, username: invalidUsername, email: fields.email, password: fields.password }; })
 																	.map(fieldsObj => new UserModel(fieldsObj));
 			users.forEach(user => {
@@ -93,7 +93,7 @@ describe.only('UserModel', function() {
 			});
 		});
 		it('should not throw a validation error if it does conform to our username regex', function() {
-			var validUsernames = ['a2345', 'A2345', 'a....', 'A....', 'a..55', 'A..55', 'a1.2.3.4.5', 'A1.2.3.4.5'];
+			var validUsernames = ['a2345', 'A2345', 'a____', 'A____', 'a__55', 'A__55', 'a1_2_3_4_5', 'A1_2_3_4_5'];
 			var users = validUsernames.map(validUsername => { return { fname: fields.fname, username: validUsername, email: fields.email, password: fields.password }; })
 																	.map(fieldsObj => new UserModel(fieldsObj));
 			users.forEach(user => {
@@ -122,7 +122,7 @@ describe.only('UserModel', function() {
 			expect(error.errors.username.kind).to.equal('maxlength');
 		});
 		it(`should return no validation error if username is ${constants.user.username.min} to ${constants.user.username.max} characters long, inclusive`, function() {
-			const validLengthdUsernames = ['five5', 'sixsix', 'seven77', /* ... */ 'tententen.', 'e11leven.11', 'twelvetwelve'];
+			const validLengthdUsernames = ['five5', 'sixsix', 'seven77', /* ... */ 'tententen_', 'e11leven_11', 'twelvetwelve'];
 			const users = validLengthdUsernames.map(validUsername => { return { fname: fields.fname, username: validUsername, email: fields.email, password: fields.password }; })
 																				 .map(fieldsObj => new UserModel(fieldsObj));
 			users.forEach(user => {
