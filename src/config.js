@@ -5,11 +5,13 @@ if(!DB_URL) {
 }
 
 const SESSION_COOKIE_NAME = 's.id';
+const SERVER_ERROR_COOKIE_NAME = 's_error';
 const SALT_ROUNDS = 10;
 
 
 module.exports = {
 	DB_URL,
 	SESSION_COOKIE_NAME,
-	SALT_ROUNDS
+	SALT_ROUNDS,
+	SERVER_ERROR_COOKIE_NAME
 };

@@ -1,6 +1,8 @@
 const { matchedData } = require('express-validator/filter');
 const { validationResult } = require('express-validator/check');
-const { SESSION_COOKIE_NAME, SALT_ROUNDS } = require('../config');
+const { SESSION_COOKIE_NAME,
+        SALT_ROUNDS,
+        SERVER_ERROR_COOKIE_NAME } = require('../config');
 const debug = require('debug')('routeHandlers:signup');
 
 // POST /signup
@@ -33,8 +35,14 @@ const postSignup = function(req, res, errors, validData, userController, hasher)
 
 // GET /signup
 const getSignup = function(req, res) {
+  if(req.cookies[SESSION_COOKIE_NAME])
+    return res.redirect("/dashboard");
+  if(req.cookies[SERVER_ERROR_COOKIE_NAME])
+    return res.render('signup', { title: 'Signup', error: req.cookies[SERVER_ERROR_COOKIE_NAME] });
+  return res.render('signup', { title: 'Signup' });
 };
 
 module.exports = {
-  postSignup
+  postSignup,
+  getSignup
 };
