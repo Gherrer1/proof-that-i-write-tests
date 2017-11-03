@@ -6,7 +6,9 @@ const request = require('supertest');
 const app = require('../../src/app');
 const seed = require('../../seed');
 const {SESSION_COOKIE_NAME,
-       SERVER_ERROR_COOKIE_NAME} = require('../../src/config');
+       SERVER_ERROR_COOKIE_NAME,
+       CLIENT_ERROR_COOKIE_NAME,
+       CLIENT_SUCCESS_COOKIE_NAME} = require('../../src/config');
 const debug = require('debug')('test-order');
 
 describe('#Authentication Routes', function() {
@@ -55,16 +57,47 @@ describe('#Authentication Routes', function() {
         .expect(302)
         .expect('Location', '/dashboard', done);
     });
-    it('should render page with client error message if request has a client-error flashmessage cookie');
-    it('should render page with generic server error message if request has a server-error flash message cookie');
-    it('should render page with success message if request has a signup-success flash message cookie', function(done) {
+    it('should render page with client error message if request has a client-error flashmessage cookie and should erase cookie', function(done) {
+      request(app).get('/login')
+        .set('Cookie', `${CLIENT_ERROR_COOKIE_NAME}=${"Invalid login credentials"}`)
+        .expect(200)
+        .expect(/Invalid login credentials/)
+        .end(function(err, res) {
+          if(err)
+            return done(err);
+          // to ensure that cookie is erased
+          expect(res.headers['set-cookie']).to.deep.equal({}); // INCOMPLETE - just dont know the shape of this data IRL yet
+          done();
+        });
+    });
+    it('should render page with generic server error message if request has a server-error flash message cookie and should erase cookie', function(done) {
+      request(app).get('/login')
+        .set('Cookie', `${SERVER_ERROR_COOKIE_NAME}=${"Something went wrong, please try again"}`)
+        .expect(200)
+        .expect(/Something went wrong, please try again/)
+        .end(function(err, res) {
+          if(err)
+            return done(err);
+          // to check that cookie got erased
+          expect(res.headers['set-cookie']).to.deep.equal({}); // INCOMPLETE - just dont know the shape of this data IRL yet
+          done();
+        });
+    });
+    it('should render page with success message if request has a signup-success flash message cookie and should erase cookie', function(done) {
       debug('running test');
       request(app).get('/login')
-        .set('Cookie', [`success=true`])
+        .set('Cookie', [`${CLIENT_SUCCESS_COOKIE_NAME}=${true}`])
         .expect(200)
-        .expect(/Successfully signed up!/, done);
+        .expect(/Successfully signed up!/)
+        .end(function(err, res) {
+          if(err)
+            return done(err);
+          // to check that cookie got erased
+          expect(res.headers['set-cookie']).to.deep.equal({}); // INCOMPLETE - just dont know the shape of this data IRL yet
+          done();
+        });
     });
-    it('should render an HTML file with a form field that we can regex (if no session cookie is present)', function(done) {
+    it('should render page with a form field that we can regex (if no session cookie is present)', function(done) {
         debug('running test');
         request(app).get('/login')
           .expect(200)
