@@ -282,8 +282,8 @@ describe('#Signup Validators', function() {
         .catch(err => done(err));
       });
 
-      it('should include username in errors if it isnt strictly alphanumeric with message \n\t    "Username must begin with letter and can only contain letters numbers and periods" \n\t    with the exception of periods (.)', function(done) {
-        var invalidUsernames = ['w space', 'W SPACE', 'symbols!', 'SYMBOLS!', 'symbols1#', 'SYMBOLS1#', 'symbols$', 'SYMBOLS$', '5ymbols', '5YMBOLS', '.aberrr', '.ABERRR', 'a.berr?', 'A.BERR?', '000pss', '000PSS', 'Ape head', 'APE HEAD'];
+      it('should include username in errors if it isnt strictly alphanumeric with message \n\t    "Username must begin with letter and can only contain letters numbers and underscores" \n\t    with the exception of underscores (_)', function(done) {
+        var invalidUsernames = ['w space', 'a47593_be.e', 'A47593_BE.E', 'a....', 'A....', 'a..55', 'A..55', 'a1.2.3.4.5', 'A1.2.3.4.5', 'W SPACE', 'symbols!', 'SYMBOLS!', 'symbols1#', 'SYMBOLS1#', 'symbols$', 'SYMBOLS$', '5ymbols', '5YMBOLS', '_aberrr', '_ABERRR', 'a_berr?', 'A_BERR?', '000pss', '000PSS', 'Ape head', 'APE HEAD'];
         var promises = invalidUsernames.map(invalidUsername => {
           return { fname: data.fname, username: invalidUsername, email: data.email, password: data.password, passwordConfirmation: data.passwordConfirmation };
         })
@@ -298,15 +298,15 @@ describe('#Signup Validators', function() {
         .then(results => {
           results.forEach(resObj => {
             expect(resObj.res.body.errors.username).to.exist;
-            expect(resObj.res.body.errors.username.msg).to.equal('Username must begin with a letter and can only contain letters, numbers, and periods');
+            expect(resObj.res.body.errors.username.msg).to.equal('Username must begin with a letter and can only contain letters, numbers, and underscores');
           });
         })
         .then(err => done(err))
         .catch(err => done(err));
       });
 
-      it('should consider a username with only alphanumeric and periods as valid and pass it onto validData', function(done) {
-        var validUsernames = ['a2345', 'A2345', 'a....', 'A....', 'a..55', 'A..55', 'a1.2.3.4.5', 'A1.2.3.4.5'];
+      it('should consider a username with only alphanumeric and underscores as valid and pass it onto validData', function(done) {
+        var validUsernames = ['a2345', 'A2345', 'a____', 'A____', 'a__55', 'A__55', 'a1_2_3_4_5', 'A1_2_3_4_5'];
         var promises = validUsernames.map(validUsername => {
           return { fname: data.fname, username: validUsername, email: data.email, password: data.password, passwordConfirmation: data.passwordConfirmation };
         })
