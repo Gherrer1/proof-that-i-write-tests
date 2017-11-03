@@ -5,7 +5,7 @@ const signupRouteHandler = require('../../../src/routeHandlers/signup');
 const { SESSION_COOKIE_NAME,
         SERVER_ERROR_COOKIE_NAME } = require('../../../src/config');
 
-describe('#Signup route handlers', function() {
+describe.only('#Signup route handlers', function() {
   // postSignup(req, res, errors, validData, userController, hasher)
   describe('#postSignup', function() {
     let req, res, errz, validData, userController, hasher;
@@ -170,7 +170,7 @@ describe('#Signup route handlers', function() {
   });
 
   // getSignup(req, res)
-  describe.only('#getSignup', function() {
+  describe('#getSignup', function() {
     let req, res;
 
     beforeEach(function() {
@@ -193,10 +193,10 @@ describe('#Signup route handlers', function() {
       expect(res.redirect.calledWith('/dashboard'), 'res.redirect() not called with "/dashboard"').to.be.true;
     });
     /* this should only ever happen with legit server errors, no client errors - clientside JS will handle those*/
-    it('should return res.render("/signup") with {title, error} string passed in if request comes with a server-error cookie', function() {
+    it('should return res.render("/signup") with {title, errors} string passed in if request comes with a server-error cookie', function() {
       const expectedReturnValue = 'darlenesGUNN';
       const errorCookieValue = 'Hashing failed';
-      const expectedRenderParams = { title: 'Signup', error: errorCookieValue };
+      const expectedRenderParams = { title: 'Signup', errors: [errorCookieValue] };
 
       res.render = sinon.stub().returns(expectedReturnValue);
       req.cookies[SERVER_ERROR_COOKIE_NAME] = errorCookieValue;
@@ -207,9 +207,9 @@ describe('#Signup route handlers', function() {
       expect(res.render.args[0][0], `res.render()s first argument was not "signup" but ${res.render.args[0][0]}`).to.equal('signup');
       expect(res.render.args[0][1]).to.deep.equal(expectedRenderParams);
     });
-    it('should return res.render("/signup") with {title} passed in if request comes with no cookies', function() {
+    it('should return res.render("/signup") with {title, errors: []} passed in if request comes with no cookies', function() {
       const expectedReturnValue = 'tyrelliot';
-      const expectedRenderParams = { title: 'Signup' };
+      const expectedRenderParams = { title: 'Signup', errors: [] };
       res.render = sinon.stub().returns(expectedReturnValue);
       const retVal = signupRouteHandler.getSignup(req, res);
 
