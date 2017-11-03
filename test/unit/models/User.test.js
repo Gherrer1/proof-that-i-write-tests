@@ -3,7 +3,7 @@ const constants 		= require('../../../src/validators/validatorConstants');
 const expect				= require('chai').expect;
 const assert				= require('chai').assert;
 
-describe.only('UserModel', function() {
+describe('UserModel', function() {
 
 	let fields;
 

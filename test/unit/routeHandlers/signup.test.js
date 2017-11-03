@@ -167,4 +167,18 @@ describe('#Signup route handlers', function() {
       });
     });
   });
+
+  // getSignup(req, res)
+  describe('#getSignup', function() {
+    it('should return res.redirect("/dashboard") if request comes with a session cookie', function() {
+      throw new Error('red-green refactor');
+    });
+    /* this should only ever happen with legit server errors, no client errors - clientside JS will handle those*/
+    it('should return res.render("/signup") with an error string passed in if request comes with a server-error cookie', function() {
+      throw new Error('red-green refactor');
+    });
+    it('should render res.render("/signup") with {title} passed in if request comes with no cookies', function() {
+      throw new Error('red-green refactor');
+    });
+  });
 });

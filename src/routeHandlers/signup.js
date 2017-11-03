@@ -31,6 +31,10 @@ const postSignup = function(req, res, errors, validData, userController, hasher)
     });
 };
 
+// GET /signup
+const getSignup = function(req, res) {
+};
+
 module.exports = {
   postSignup
 };

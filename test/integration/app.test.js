@@ -5,7 +5,6 @@ const sinon = require('sinon');
 const request = require('supertest');
 const app = require('../../src/app');
 const seed = require('../../seed');
-// const config = require('../../config');
 const {SESSION_COOKIE_NAME} = require('../../src/config');
 const debug = require('debug')('test-order');
 
@@ -39,7 +38,7 @@ describe('#Authentication Routes', function() {
         .expect(200)
         .expect(/Something went wrong/, done);
     });
-    it('should return an HTML file with a form field that we can regex (if no session cookie is present)', function(done){
+    it('should return an HTML file with a form field that we can regex (if no cookies present)', function(done){
       debug('running test');
       request(app).get('/signup')
         .expect(200)
