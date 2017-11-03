@@ -191,6 +191,8 @@ describe('#Signup Validators', function() {
             done();
           });
       });
+      /* express-validator's isEmail() validator makes the cutoff around 70 chars. I've set mine to 75 in case express-validator stops handling this for me in the future
+          If this ever breaks, adjust the test to make sure its below vConstants.user.email.max */
       it(`should include email in errors with message \n\t    "Invalid email" \n\t     if its greater than 64 characters long`, function(done) {
         data.email = 'dkjsgkdfhgkdfkjxhkjdfghjfkjhfgkljbkjfnbkfjgjdfghkjgfklhfccccccccc@email.com';
         request(app).post('/signupTest')
