@@ -101,6 +101,7 @@ describe('#UserController', function() {
     it('should return a promise', function() {
       userController.setModel(fakeModel);
       const promise = userController.createUser(validData)
+      promise.then(() => {}).catch(() => {}); // just to get rid of warning
       expect(promise.then).to.exist;
       expect(promise.catch).to.exist;
     });
