@@ -115,7 +115,7 @@ describe('#Authentication Routes', function() {
     it('should redirect to /login with success message if no session cookie and if request body is all valid, including unique username and email', function(done) {
       debug('running test');
       request(app).post('/signup')
-        .send({ fname: 'Uniqueuser', email: 'uniqueEmail@email.com', password: '1111111111', username: 'uniqueUsername', passwordConfirmation: '1111111111' })
+        .send({ fname: 'Uniqueuser', email: 'uniqueEmail@email.com', password: '1111111111', username: 'uniqueUname', passwordConfirmation: '1111111111' })
         .expect(302)
         .expect('Location', '/login')
         .end(function(err, res) {
