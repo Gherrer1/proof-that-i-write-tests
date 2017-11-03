@@ -151,8 +151,14 @@ describe.only('UserModel', function() {
 			let error = user.validateSync();
 			expect(error).to.be.undefined;
 		});
-		it('should maybe? return a validation error if email is too long? maybe? like express-validator does?', function() {
-			throw new Error('red-green refactor');
+		it(`should return a validation error if email is greater than ${constants.user.email.max} chars long`, function() {
+			fields.email = 'onehundreddamnchaehundredharacterslongonehundreddamncharaterslongs@email.com'; // 76 chars
+			let user = new UserModel(fields);
+			let error = user.validateSync();
+			expect(error, 'There should have been an error raised').to.exist;
+			expect(error.errors.email).to.exist;
+			expect(error.errors.email.message).to.match(/is longer than the maximum allowed length/);
+			expect(error.errors.email.kind).to.equal('maxlength');
 		});
 		it('should be saved as all lowercase when object instantiated', function() {
 			fields.email = 'JAKE@EMAIL.COM';

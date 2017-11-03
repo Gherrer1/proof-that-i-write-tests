@@ -5,7 +5,8 @@ module.exports = {
     password: {
       signup: { min: 8, max: 100 },
       model: { max: 100 }
-    }
+    },
+    email: { max: 75 }
   }
 };
 
