@@ -5,7 +5,8 @@ const sinon = require('sinon');
 const request = require('supertest');
 const app = require('../../src/app');
 const seed = require('../../seed');
-const {SESSION_COOKIE_NAME} = require('../../src/config');
+const {SESSION_COOKIE_NAME,
+       SERVER_ERROR_COOKIE_NAME} = require('../../src/config');
 const debug = require('debug')('test-order');
 
 describe('#Authentication Routes', function() {
@@ -34,9 +35,9 @@ describe('#Authentication Routes', function() {
       debug('running test');
       const errorMessage = 'Something went wrong'
       request(app).get('/signup')
-        .set('Cookie', ['server-error=Something went wrong'])
+        .set('Cookie', [`${SERVER_ERROR_COOKIE_NAME}=${errorMessage}`])
         .expect(200)
-        .expect(/Something went wrong/, done);
+        .expect(/<li>Something went wrong<\/li>/, done);
     });
     it('should return an HTML file with a form field that we can regex (if no cookies present)', function(done){
       debug('running test');
@@ -49,7 +50,7 @@ describe('#Authentication Routes', function() {
   describe('#GET /login', function() {
     it('should redirect to /dashboard if request has a session cookie', function(done) {
       debug('running test');
-      request(app).get('/signup')
+      request(app).get('/login')
         .set('Cookie', [`${SESSION_COOKIE_NAME}=1234`])
         .expect(302)
         .expect('Location', '/dashboard', done);

@@ -5,7 +5,7 @@ const signupRouteHandler = require('../../../src/routeHandlers/signup');
 const { SESSION_COOKIE_NAME,
         SERVER_ERROR_COOKIE_NAME } = require('../../../src/config');
 
-describe.only('#Signup route handlers', function() {
+describe('#Signup route handlers', function() {
   // postSignup(req, res, errors, validData, userController, hasher)
   describe('#postSignup', function() {
     let req, res, errz, validData, userController, hasher;
