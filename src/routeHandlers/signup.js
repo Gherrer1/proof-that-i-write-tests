@@ -39,7 +39,7 @@ const getSignup = function(req, res) {
     return res.redirect("/dashboard");
   if(req.cookies[SERVER_ERROR_COOKIE_NAME])
     return res.render('signup', { title: 'Signup', errors: [ req.cookies[SERVER_ERROR_COOKIE_NAME] ] });
-  return res.render('signup', { title: 'Signup', errors: [] });
+  return res.render('signup', { title: 'Signup' });
 };
 
 module.exports = {

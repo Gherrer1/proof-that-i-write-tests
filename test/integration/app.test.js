@@ -45,7 +45,7 @@ describe('#Authentication Routes', function() {
       debug('running test');
       request(app).get('/signup')
         .expect(200)
-        .expect(/<ul class="signup-errors">/, done);
+        .expect(/<form action="\/signup" method="POST">/, done);
     });
   });
 

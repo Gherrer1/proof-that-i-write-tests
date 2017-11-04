@@ -207,9 +207,9 @@ describe('#Signup route handlers', function() {
       expect(res.render.args[0][0], `res.render()s first argument was not "signup" but ${res.render.args[0][0]}`).to.equal('signup');
       expect(res.render.args[0][1]).to.deep.equal(expectedRenderParams);
     });
-    it('should return res.render("/signup") with {title, errors: []} passed in if request comes with no cookies', function() {
+    it('should return res.render("/signup") with {title} passed in if request comes with no cookies', function() {
       const expectedReturnValue = 'tyrelliot';
-      const expectedRenderParams = { title: 'Signup', errors: [] };
+      const expectedRenderParams = { title: 'Signup' };
       res.render = sinon.stub().returns(expectedReturnValue);
       const retVal = signupRouteHandler.getSignup(req, res);
 

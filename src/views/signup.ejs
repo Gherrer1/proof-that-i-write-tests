@@ -1,11 +1,13 @@
 <% include partials/splash_header.ejs %>
 
   <div class="container-fluid">
-		<ul class="signup-errors">
-			<% errors.forEach(function(err) { %>
-				<li><%= err %></li>
-			<% }) %>
-		</ul>
+  		<% if(locals.errors && locals.errors.length) { %>
+  			<ul class="signup-errors">
+				<% locals.errors.forEach(function(err) { %>
+					<li><%= err %></li>
+				<% }) %>
+			</ul>
+  		<% } %>
 		<form action="/signup" method="POST">
 			<div class="form-group">
 				<label>First Name: <input type="text" class="form-control form-control-sm" name="fname" required></label> <br>

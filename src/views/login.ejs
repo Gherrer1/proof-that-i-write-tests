@@ -2,11 +2,13 @@
 
   <div class="app">
     <h1>Login Page</h1>
-    <ul class="login-errors">
-      <% errors.forEach(function(err) { %>
-        <li><%= err %></li>
-      <% }) %>
-    </ul>
+    <% if(locals.errors) { %>
+      <ul class="login-errors">
+        <% errors.forEach(function(err) { %>
+          <li><%= err %></li>
+        <% }) %>
+      </ul>
+    <% } %>
     if(locals.success) {
       <p id="signup_success"><%= locals.success %></p>
     }
