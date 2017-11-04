@@ -11,6 +11,7 @@ const { validationResult } 	= require('express-validator/check');
 const userController 				= require('./controllers/user');
 userController.setModel( require('./models/User') );
 const signupRouteHandlers 	= require('./routeHandlers/signup');
+const loginRouteHandlers		= require('./routeHandlers/login');
 const app = express();
 
 mongoose.Promise = global.Promise;
@@ -45,9 +46,10 @@ app.use(function cookiePrinter(req, res, next) {
 // 	res.render('splash', { title: 'LMN' });
 // });
 //
-// app.get('/login', function(req, res) {
-// 	res.render('login', { title: 'LMN | Login', errors: [] });
-// });
+app.get('/login', function(req, res) {
+	loginRouteHandlers.getLogin(req, res);
+});
+
 app.get('/signup', function(req, res) {
 	signupRouteHandlers.getSignup(req, res);
 });

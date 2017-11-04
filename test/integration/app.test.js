@@ -66,7 +66,7 @@ describe('#Authentication Routes', function() {
           if(err)
             return done(err);
           // to ensure that cookie is erased
-          expect(res.headers['set-cookie']).to.deep.equal({}); // INCOMPLETE - just dont know the shape of this data IRL yet
+          expect(res.headers['set-cookie'], 'still need to make sure flash message cookie gets deleted').to.deep.equal({}); // INCOMPLETE - just dont know the shape of this data IRL yet
           done();
         });
     });
@@ -74,26 +74,26 @@ describe('#Authentication Routes', function() {
       request(app).get('/login')
         .set('Cookie', `${SERVER_ERROR_COOKIE_NAME}=${"Something went wrong, please try again"}`)
         .expect(200)
-        .expect(/Something went wrong, please try again/)
+        .expect(/Something went wrong. Please try again/)
         .end(function(err, res) {
           if(err)
             return done(err);
           // to check that cookie got erased
-          expect(res.headers['set-cookie']).to.deep.equal({}); // INCOMPLETE - just dont know the shape of this data IRL yet
+          expect(res.headers['set-cookie'], 'still need to make sure flash message cookie gets deleted').to.deep.equal({}); // INCOMPLETE - just dont know the shape of this data IRL yet
           done();
         });
     });
     it('should render page with success message if request has a signup-success flash message cookie and should erase cookie', function(done) {
       debug('running test');
       request(app).get('/login')
-        .set('Cookie', [`${CLIENT_SUCCESS_COOKIE_NAME}=${true}`])
+        .set('Cookie', [`${CLIENT_SUCCESS_COOKIE_NAME}=${"Successfully signed up!"}`])
         .expect(200)
         .expect(/Successfully signed up!/)
         .end(function(err, res) {
           if(err)
             return done(err);
           // to check that cookie got erased
-          expect(res.headers['set-cookie']).to.deep.equal({}); // INCOMPLETE - just dont know the shape of this data IRL yet
+          expect(res.headers['set-cookie'], 'still need to make sure flash message cookie gets deleted').to.deep.equal({}); // INCOMPLETE - just dont know the shape of this data IRL yet
           done();
         });
     });
