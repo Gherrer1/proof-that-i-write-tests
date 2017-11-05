@@ -7,12 +7,12 @@ function getLogin(req, res) {
 	if(req.cookies[SESSION_COOKIE_NAME])
 		return res.redirect('/dashboard');
 	if(req.cookies[CLIENT_ERROR_COOKIE_NAME])
-		return res.render('login', { title: 'Login', errors: [req.cookies[CLIENT_ERROR_COOKIE_NAME]] });
+		return res.render('login', { errors: [req.cookies[CLIENT_ERROR_COOKIE_NAME]] });
 	if(req.cookies[SERVER_ERROR_COOKIE_NAME])
-		return res.render('login', { title: 'Login', errors: ['Something went wrong. Please try again'] });
+		return res.render('login', { errors: ['Something went wrong. Please try again'] });
 	if(req.cookies[CLIENT_SUCCESS_COOKIE_NAME])
-		return res.render('login', { title: 'Login', success: req.cookies[CLIENT_SUCCESS_COOKIE_NAME] });
-	return res.render('login', { title: 'Login' });
+		return res.render('login', { success: req.cookies[CLIENT_SUCCESS_COOKIE_NAME] });
+	return res.render('login');
 }
 
 module.exports = {

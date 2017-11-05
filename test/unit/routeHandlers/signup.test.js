@@ -193,10 +193,10 @@ describe('#Signup route handlers', function() {
       expect(res.redirect.calledWith('/dashboard'), 'res.redirect() not called with "/dashboard"').to.be.true;
     });
     /* this should only ever happen with legit server errors, no client errors - clientside JS will handle those*/
-    it('should return res.render("/signup") with {title, errors} string passed in if request comes with a server-error cookie', function() {
+    it('should return res.render("/signup") with {errors} string passed in if request comes with a server-error cookie', function() {
       const expectedReturnValue = 'darlenesGUNN';
       const errorCookieValue = 'Hashing failed';
-      const expectedRenderParams = { title: 'Signup', errors: [errorCookieValue] };
+      const expectedRenderParams = { errors: [errorCookieValue] };
 
       res.render = sinon.stub().returns(expectedReturnValue);
       req.cookies[SERVER_ERROR_COOKIE_NAME] = errorCookieValue;
@@ -207,9 +207,8 @@ describe('#Signup route handlers', function() {
       expect(res.render.args[0][0], `res.render()s first argument was not "signup" but ${res.render.args[0][0]}`).to.equal('signup');
       expect(res.render.args[0][1]).to.deep.equal(expectedRenderParams);
     });
-    it('should return res.render("/signup") with {title} passed in if request comes with no cookies', function() {
+    it('should return res.render("/signup") with no locals if request comes with no cookies', function() {
       const expectedReturnValue = 'tyrelliot';
-      const expectedRenderParams = { title: 'Signup' };
       res.render = sinon.stub().returns(expectedReturnValue);
       const retVal = signupRouteHandler.getSignup(req, res);
 
@@ -217,7 +216,7 @@ describe('#Signup route handlers', function() {
       expect(res.render.calledOnce, `res.render() not called once but ${res.render.callCount} times`).to.be.true;
       expect(res.render.args[0][0], `res.render()s first argument was not "signup" like expected but ${res.render.args[0][0]}`).to.equal('signup');
       const secondRenderArg = res.render.args[0][1];
-      expect(secondRenderArg, `Expected res.render()s second argument to deep equal ...`).to.deep.equal(expectedRenderParams);
+      expect(secondRenderArg, 'Should not pass in a locals object to res.render()').to.be.undefined;
     });
   });
 });

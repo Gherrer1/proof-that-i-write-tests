@@ -38,8 +38,8 @@ const getSignup = function(req, res) {
   if(req.cookies[SESSION_COOKIE_NAME])
     return res.redirect("/dashboard");
   if(req.cookies[SERVER_ERROR_COOKIE_NAME])
-    return res.render('signup', { title: 'Signup', errors: [ req.cookies[SERVER_ERROR_COOKIE_NAME] ] });
-  return res.render('signup', { title: 'Signup' });
+    return res.render('signup', { errors: [ req.cookies[SERVER_ERROR_COOKIE_NAME] ] });
+  return res.render('signup');
 };
 
 module.exports = {
