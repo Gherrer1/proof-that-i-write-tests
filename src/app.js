@@ -29,7 +29,7 @@ mongoose.connect(DB_URL, { useMongoClient: true })
 // config
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
-app.use(express.static('public'));
+app.use(express.static(__dirname + '/public'));
 
 // Middleware
 app.use(logger('dev'));
@@ -42,9 +42,10 @@ app.use(function cookiePrinter(req, res, next) {
 	next();
 });
 
-// app.get('/', function(req, res) {
-// 	res.render('splash', { title: 'LMN' });
-// });
+app.get('/', function(req, res) {
+	// res.render('splash', { title: 'LMN' });
+	res.render('neww');
+});
 //
 app.get('/login', function(req, res) {
 	loginRouteHandlers.getLogin(req, res);
