@@ -17,9 +17,9 @@
         <% }) %>
       </ul>
     <% } %>
-    if(locals.success) {
+    <% if(locals.success) { %>
       <p id="signup_success"><%= locals.success %></p>
-    }
+    <% } %>
     <!-- TODO: make these fields required -->
     <form action="/login" method="post">
       <label for="emailInput">Email:</label>
