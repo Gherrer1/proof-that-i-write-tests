@@ -3,7 +3,7 @@ const constants 		= require('../../../src/validators/validatorConstants');
 const expect				= require('chai').expect;
 const assert				= require('chai').assert;
 
-describe('UserModel', function() {
+describe.only('UserModel', function() {
 
 	let fields;
 
@@ -51,21 +51,18 @@ describe('UserModel', function() {
 		});
 		it('should not throw a validation error if fname does conform to regex', function() {
 			var validNames = ['jerry withspaces', 'jerry with\'neil', 'j. erry', 'look ma two  spaces', 'kareem-abdul jabbar'];
-			var users = validNames.map(name => {
-				return { fname: name, username: fields.username, email: fields.email, password: fields.password };
-			}).map(fieldsObj => new UserModel(fieldsObj));
+			var users = validNames.map(name => new UserModel({ fname: name, username: fields.username, email: fields.email, password: fields.password }) )
 			users.forEach(user => {
 				let error = user.validateSync();
-				expect(error).to.be.undefined;
+				expect(error, `expected no errors becaues name "${user.fname}" should be valid`).to.be.undefined;
 			});
 		});
 		it('should throw a validation error if fname does not conform to regex', function() {
 			var invalidNames = ['jerry1', 'Verylegit1Name', 'jerry!', 'j@rry', '?erry', 'j{}rry', 'j+rry', 'je#y', 'je:;y'];
-			var users = invalidNames.map(name => {
-				return { fname: name, username: fields.username, email: fields.email, password: fields.password };
-			}).map(fieldsObj => new UserModel(fieldsObj));
+			var users = invalidNames.map(name => new UserModel({ fname: name, username: fields.username, email: fields.email, password: fields.password }) )
 			users.forEach(user => {
 				let error = user.validateSync();
+				expect(error, `expected errors to exist from invalid name "${user.fname}"`).to.exist;
 				expect(error.errors.fname).to.exist;
 				expect(error.errors.fname.message).to.match(/is invalid/);
 				expect(error.errors.fname.kind).to.equal('regexp');
@@ -82,11 +79,10 @@ describe('UserModel', function() {
 		});
 		it('should throw validation error if it doesnt conform to our username regex', function() {
 			var invalidUsernames = ['w space', 'a47593_be.e', 'A47593_BE.E', 'a....', 'A....', 'a..55', 'A..55', 'a1.2.3.4.5', 'A1.2.3.4.5', 'W SPACE', 'symbols!', 'SYMBOLS!', 'symbols1#', 'SYMBOLS1#', 'symbols$', 'SYMBOLS$', '5ymbols', '5YMBOLS', '_aberrr', '_ABERRR', 'a_berr?', 'A_BERR?', '000pss', '000PSS', 'Ape head', 'APE HEAD'];
-			var users = invalidUsernames.map(invalidUsername => { return { fname: fields.fname, username: invalidUsername, email: fields.email, password: fields.password }; })
-																	.map(fieldsObj => new UserModel(fieldsObj));
+			var users = invalidUsernames.map(invalidUsername =>  new UserModel({ fname: fields.fname, username: invalidUsername, email: fields.email, password: fields.password }) );
 			users.forEach(user => {
 				let error = user.validateSync();
-				expect(error, 'There are no errors gleaned from validateSync()').to.exist;
+				expect(error, 'There are no errors gleaned from validateSync() but there should have been').to.exist;
 				assert.exists(error.errors.username, 'there are no errors with username contrary to what we expect');
 				expect(error.errors.username.message).to.match(/is invalid/);
 				expect(error.errors.username.kind).to.equal('regexp');
@@ -94,8 +90,7 @@ describe('UserModel', function() {
 		});
 		it('should not throw a validation error if it does conform to our username regex', function() {
 			var validUsernames = ['a2345', 'A2345', 'a____', 'A____', 'a__55', 'A__55', 'a1_2_3_4_5', 'A1_2_3_4_5'];
-			var users = validUsernames.map(validUsername => { return { fname: fields.fname, username: validUsername, email: fields.email, password: fields.password }; })
-																	.map(fieldsObj => new UserModel(fieldsObj));
+			var users = validUsernames.map(validUsername => new UserModel({ fname: fields.fname, username: validUsername, email: fields.email, password: fields.password }) );
 			users.forEach(user => {
 				let error = user.validateSync();
 				expect(error, 'There are errors though there shouldnt be').to.be.undefined;
