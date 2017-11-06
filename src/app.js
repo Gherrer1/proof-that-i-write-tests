@@ -42,11 +42,7 @@ app.use(function cookiePrinter(req, res, next) {
 	next();
 });
 
-app.get('/', function(req, res) {
-	// res.render('splash', { title: 'LMN' });
-	res.render('neww');
-});
-//
+
 app.get('/login', function(req, res) {
 	loginRouteHandlers.getLogin(req, res);
 });
