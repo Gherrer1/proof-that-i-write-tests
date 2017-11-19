@@ -4,6 +4,7 @@ const chai                    = require('chai');
 const expect                  = chai.expect;
 const request                 = require('supertest');
 const { signupValidators }    = require('../../src/validators');
+const { loginValidators }     = require('../../src/validators');
 const { validationResult }    = require('express-validator/check');
 const { matchedData }         = require('express-validator/filter');
 const vConstants              = require('../../src/validators/validatorConstants');
@@ -24,7 +25,6 @@ app.post('/signupTest', signupValidators, function(req, res) {
 
   res.json(json);
 });
-loginValidators = [];
 app.post('/loginTest', loginValidators, function(req, res) {
   const errors = validationResult(req);
   const validData = matchedData(req);
@@ -39,14 +39,8 @@ app.post('/loginTest', loginValidators, function(req, res) {
 });
 
 // Automate testing that the validators work
-describe.only('#Signup Validators', function() {
-  let data = {
-    fname: 'jerry',
-    email: 'email@email.com',
-    username: 'jerry',
-    password: 'mypassword',
-    passwordConfirmation: 'mypassword'
-  };
+describe('#Signup_Validators', function() {
+  let data;
 
   beforeEach(function() {
     data = {
@@ -333,11 +327,8 @@ describe.only('#Signup Validators', function() {
         Promise.all(promises)
         .then(results => {
           results.forEach(resObj => {
-            // expect(resObj.res.body.errors.usernaem).to.exist;
             expect(resObj.res.body.errors).to.be.undefined;
-            // expect(resObj.res.body.validData).to.exist;
             expect(resObj.res.body.validData.username).to.exist;
-            // expect(resObj.res.body.validData.username).to.be.undefined;
           });
         })
         .then(err => done(err))
@@ -376,9 +367,122 @@ describe.only('#Signup Validators', function() {
   });
 });
 
-describe.only('#Login Validators', function() {
-  let data = {
-    email: 'email@email.com',
-    password: '1111111111'
-  };
+describe('#Login_Validators', function() {
+  let data;
+
+  beforeEach(function() {
+    data = {
+      email: 'email@email.com',
+      password: '1111111111'
+    };
+  });
+
+  describe('#Validation', function() {
+    describe('#Required_fields', function() {
+      it('should contain email or password in errors if ANY of those fields are missing', function(done) {
+        request(app).post('/loginTest')
+        // dont send any data
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            // nothing should be valid btw
+            expect(res.body.validData).to.deep.equal({});
+            expect(res.body.errors.email).to.exist;
+            expect(res.body.errors.email.msg).to.equal('Email missing');
+            expect(res.body.errors.password, 'Expected password in errors, but it wasnt').to.exist;
+            expect(res.body.errors.password.msg).to.equal('Password missing');
+            done();
+          });
+      });
+      it('should contain email or password in errors if ANY of those fields are 0 characters long', function(done) {
+        data = { email: '', password: '' };
+        request(app).post('/loginTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors, 'We expected errors but got NONE').to.exist;
+            expect(res.body.errors.email).to.exist;
+            expect(res.body.errors.password, 'Expected password to be in errors but it wasnt').to.exist;
+            done();
+          });
+      });
+      it('should contain email or password in errors if ANY of those fields are just spaces but meet min required chars', function(done) {
+        data.email = '   '; // will fail bc its an email
+        data.password = '              ';
+        request(app).post('/loginTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors, 'Expected errors but we got none').to.exist;
+            expect(res.body.errors.email).to.exist;
+            expect(res.body.errors.email.msg).to.equal('Invalid email');
+            // TODO: implement validation to make sure password isnt too weak
+            // expect(res.body.errors.password).to.exist; TODO
+            // expect(res.body.errors.passwordConfirmation).to.exist; dont really need todo, password should be enough and passwordConfirmation matching should be enough
+            done();
+          });
+      });
+    });
+
+    describe('#Length Mins/Maxs', function() {
+      /* express-validator's isEmail() validator makes the cutoff around 70 chars. I've set mine to 75 in case express-validator stops handling this for me in the future
+          If this ever breaks, adjust the test to make sure its below vConstants.user.email.max */
+      it(`should include email in errors with message \n\t    "Invalid email" \n\t     if its greater than 64 characters long`, function(done) {
+        data.email = 'dkjsgkdfhgkdfkjxhkjdfghjfkjhfgkljbkjfnbkfjgjdfghkjgfklhfccccccccc@email.com';
+        request(app).post('/loginTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors, 'Expected Errors but got NONE').to.exist;
+            expect(res.body.errors.email).to.exist;
+            expect(res.body.errors.email.msg).to.equal('Invalid email');
+            done();
+          });
+      });
+      it(`should include password in errors with message \n\t    "Password must be between 8 and 100 characters long" \n\t     if its not between 8 <= chars <=  100`, function(done) {
+        // test1
+        data.password = 'seven77'; // 7
+        request(app).post('/loginTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors, 'Expected errors to exist but got NONE').to.exist;
+            expect(res.body.errors.password).to.exist;
+            expect(res.body.errors.password.msg).to.equal(`Password must be between 8 and 100 characters long`);
+
+            // test2
+            data.password = 'djfghkldhgdjfghkldhgdjfghkldhgdjfghkldhgdjfghkldhgdjfghkldhgdjfghkldhgdjfghkldhgdjfghkldhgdjfghkldhgs'; // 101
+            request(app).post('/loginTest')
+              .send(data)
+              .end(function(err, res) {
+                if(err)
+                  return done(err);
+                expect(res.body.errors, 'Expected errors but got NONE').to.exist;
+                expect(res.body.errors.password).to.exist;
+                expect(res.body.errors.password.msg).to.equal(`Password must be between ${vConstants.user.password.signup.min} and ${vConstants.user.password.signup.max} characters long`);
+                done();
+              });
+          });
+      });
+    });
+
+    describe('#Misc', function() {
+      it('should include email in errors with message "Invalid email" if it isnt an email', function(done) {
+        data.email = 'jerry';
+        request(app).post('/loginTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors.email).to.exist;
+            expect(res.body.errors.email.msg).to.equal('Invalid email');
+            done();
+          });
+      });
+    });
+  });
 });

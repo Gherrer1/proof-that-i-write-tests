@@ -28,19 +28,19 @@ var signupValidators = [
     .exists()
     .isLength({ min: 1 }) // not saved so we DGAF about how long
     .custom( (value, { req }) => value === req.body.password ).withMessage('Password confirmation does not match password')
-  // check('fname', /*message=*/'first name missing') // manually tested
-  //   .exists()
-  //   .trim(),
-  // check('username')
-  //   .exists().withMessage('Username missing') // manually tested
-  //   .isLength({ min: 7, max: 15 }).withMessage('Username not between 7 and 15 characters long')
-  //   .trim(),
-  // check('email', /*message=*/'invalid email')
-  //   .isEmail()
-  //   .trim()
-  //   .normalizeEmail(),
+];
+
+const loginValidators = [
+  check('email', 'Email missing')
+    .exists()
+    .isLength({ min: 1 })
+    .isEmail().withMessage('Invalid email'),
+  check('password', 'Password missing')
+    .exists()
+    .isLength({ min: vConstants.user.password.signup.min, max: vConstants.user.password.signup.max }).withMessage(`Password must be between ${vConstants.user.password.signup.min} and ${vConstants.user.password.signup.max} characters long`)
 ];
 
 module.exports = {
-  signupValidators // Array of middleware functions
+  signupValidators, // Array of middleware functions
+  loginValidators
 }
