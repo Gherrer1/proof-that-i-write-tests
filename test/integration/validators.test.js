@@ -485,4 +485,36 @@ describe('#Login_Validators', function() {
       });
     });
   });
+
+  describe('#Sanitization', function() {
+    it('should lowercase email ONLY', function(done) {
+      data = { email: 'EMAIL@EMAIL.COM', password: '   MYPASSWORD   ' };
+      const expectedValidData = { email: 'email@email.com', password: data.password };
+
+      request(app).post('/loginTest')
+        .send(data)
+        .end(function(err, res) {
+          if(err)
+            return done(err);
+          expect(res.body.validData.email).to.equal(expectedValidData.email);
+          done();
+        });
+    });
+
+    it('email (automatically) should be trimmed. Password should not', function(done) {
+      data = { email: '   email@email.com   ', password: '   mypassword   ' };
+      const expectedValidData = { email: 'email@email.com', password: data.password }
+      request(app).post('/loginTest')
+        .send(data)
+        .end(function(err, res) {
+          if(err) {
+            return done(err);
+          }
+
+          expect(res.body.errors).to.be.undefined;
+          expect(res.body.validData).to.deep.equal(expectedValidData);
+          done();
+        });
+    });
+  });
 });

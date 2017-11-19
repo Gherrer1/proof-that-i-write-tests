@@ -33,8 +33,10 @@ var signupValidators = [
 const loginValidators = [
   check('email', 'Email missing')
     .exists()
+    .trim()
     .isLength({ min: 1 })
-    .isEmail().withMessage('Invalid email'),
+    .isEmail().withMessage('Invalid email')
+    .normalizeEmail(),
   check('password', 'Password missing')
     .exists()
     .isLength({ min: vConstants.user.password.signup.min, max: vConstants.user.password.signup.max }).withMessage(`Password must be between ${vConstants.user.password.signup.min} and ${vConstants.user.password.signup.max} characters long`)
