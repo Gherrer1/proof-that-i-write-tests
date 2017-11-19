@@ -9,24 +9,37 @@ const { matchedData }         = require('express-validator/filter');
 const vConstants              = require('../../src/validators/validatorConstants');
 const debug                   = require('debug')('validator-integration-tests');
 
+// create a fake app
+let app = express();
+app.use(bodyParser.json());
+app.post('/signupTest', signupValidators, function(req, res) {
+  const errors = validationResult(req);
+  const validData = matchedData(req);
+  const sentData = req.body;
+
+  const json = { validData, sentData };
+  if(!errors.isEmpty()) {
+    json.errors = errors.mapped();
+  }
+
+  res.json(json);
+});
+loginValidators = [];
+app.post('/loginTest', loginValidators, function(req, res) {
+  const errors = validationResult(req);
+  const validData = matchedData(req);
+  const sentData = req.body;
+
+  const json = { validData, sentData };
+  if(!errors.isEmpty()) {
+    json.errors = errors.mapped();
+  }
+
+  res.json(json);
+});
+
 // Automate testing that the validators work
-describe('#Signup Validators', function() {
-  // create a fake app
-  let app = express();
-  app.use(bodyParser.json());
-  app.post('/signupTest', signupValidators, function(req, res) {
-    const errors = validationResult(req);
-    const validData = matchedData(req);
-    const sentData = req.body;
-
-    const json = { validData, sentData };
-    if(!errors.isEmpty()) {
-      json.errors = errors.mapped();
-    }
-
-    res.json(json);
-  });
-
+describe.only('#Signup Validators', function() {
   let data = {
     fname: 'jerry',
     email: 'email@email.com',
@@ -361,4 +374,11 @@ describe('#Signup Validators', function() {
       });
     });
   });
+});
+
+describe.only('#Login Validators', function() {
+  let data = {
+    email: 'email@email.com',
+    password: '1111111111'
+  };
 });

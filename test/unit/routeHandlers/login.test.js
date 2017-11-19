@@ -7,6 +7,10 @@ const {SESSION_COOKIE_NAME,
        CLIENT_SUCCESS_COOKIE_NAME} = require('../../../src/config');
 
 describe('#Login route handlers', function() {
+  // postLogin(req, res, errors, validData, userController, hasher)
+  describe('#postLogin', function() {
+
+  });
   describe('#getLogin', function() {
     let req, res;
 
