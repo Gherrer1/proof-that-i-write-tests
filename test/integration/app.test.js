@@ -11,7 +11,7 @@ const {SESSION_COOKIE_NAME,
        CLIENT_SUCCESS_COOKIE_NAME} = require('../../src/config');
 const debug = require('debug')('test-order');
 
-describe('#Authentication Routes', function() {
+describe.only('#Authentication_Routes', function() {
 
   beforeEach(function(done) {
     debug(':)');
@@ -24,7 +24,7 @@ describe('#Authentication Routes', function() {
     done();
   });
 
-  describe('#GET /signup', function() {
+  describe('[GET /signup]', function() {
     it('should redirect to /dashboard if request has a session cookie', function(done){
       // dont worry, itll run into authentication middleware to validate the cookie
       debug('running test');
@@ -49,7 +49,7 @@ describe('#Authentication Routes', function() {
     });
   });
 
-  describe('#GET /login', function() {
+  describe('[GET /login]', function() {
     it('should redirect to /dashboard if request has a session cookie', function(done) {
       debug('running test');
       request(app).get('/login')
@@ -105,7 +105,7 @@ describe('#Authentication Routes', function() {
     });
   });
 
-  describe('#POST /signup', function() {
+  describe('[POST /signup]', function() {
     it('should redirect to /dashboard if request has a session cookie', function(done) {
       debug('running test');
       request(app).post('/signup')
@@ -163,7 +163,10 @@ describe('#Authentication Routes', function() {
     it('should redirect to /signup with error message via cookie (something went wrong) for server errors (*1)');
   });
 
-  describe('#POST /login', function() {
+  describe('[POST /login]', function() {
+    // might not need to do this - since passport.session() will automatically fill in req.user if your cookie is valid, we can go straight to dashboard
+    // so when i say might not need to do this, what I really mean is that we might not need to send to authorization middleware
+    // however, if we DO have a cookie and no req.user, that means our sessionID wasnt valid... do we have to manually delete it?
     it('should redirect to /dashboard if request has a session cookie', function(done) {
       debug('running test');
       request(app).post('/login')
@@ -171,7 +174,7 @@ describe('#Authentication Routes', function() {
         .expect(302)
         .expect('Location', '/dashboard', done);
     });
-    it('should redirect to /login with invalid-params cookie and tried-username cookie if data is invalid - as in simply doesnt fit the requirements used for signup', function(done) {
+    it('should redirect to /login with client-error cookie and username-you-just-tried cookie if data is invalid - as in simply doesnt fit the requirements used for signup', function(done) {
       debug('running test');
       request(app).post('/login')
         .send({ email: 'a', password: '1' })
@@ -181,6 +184,9 @@ describe('#Authentication Routes', function() {
           if(err)
             return done(err);
           // TODO: make sure invalid-params cookie sent
+          const cookies = res.headers['set-cookie'];
+          const expectedCookies = { rey: true };
+          expect(cookies).to.deep.equal(expectedCookies);
           done();
         });
     });
@@ -194,7 +200,26 @@ describe('#Authentication Routes', function() {
           if(err) {
             return done(err);
           }
-          // todo: inspect cookies and make sure there's a session cookie
+          // TODO: inspect cookies and make sure there's a session cookie
+          const cookies = res.headers['set-cookie'];
+          const expectedCookies = { chewbacca: true };
+          expect(cookies).to.deep.equal(expectedCookies);
+          done();
+        });
+    });
+    it('if no session cookie but invalid credentials, should redirect to /login and should NOT be given a session cookie, should be given client-error cookie and username-you-just-tried cookie', function(done) {
+      request(app).post('/login')
+        .send({ email: 'sato@email.com', password: '1111111111' })
+        .expect(302)
+        .expect('Location', '/login')
+        .end(function(err, response) {
+          if(err)
+            return done(err);
+          // TODO:
+          // assert that we get the cookies we're expecting and nothing more
+          const expectedCookies = { bro: 'haha' }; // dummy, just wanna see expected/actual
+          const cookies = response.headers['set-cookie'];
+          expect(cookies).to.deep.equal(expectedCookies);
           done();
         });
     });
