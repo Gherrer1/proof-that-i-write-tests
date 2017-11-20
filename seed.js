@@ -86,7 +86,7 @@ function addUsers() {
     var fakeUsers = ['Jiro', 'Todoroki', 'Midoriya', 'Mineta', 'Uraraka', 'Momo', 'Tsu', 'Tokoyami', 'Koda', 'Kaminari',
                       'Iida', 'Bakugo', 'Sero', 'Kirishima', 'Hagakure', 'Auyoma', 'Ashido', 'Sato', 'Shoji', 'Ojiro'];
     var fakeEmails = fakeUsers.map( userFName => userFName + '@email.com');
-    const fakePassword = '1111111111';
+    const fakePassword = '$2a$10$NLHx7bNKOY3KGxps82fN6u.SM5UZm.kOt21bzxHYwrbLtTYpjOwby'; // hash generated from '1111111111' 10 salt rounds later
 
     let savePromises = fakeUsers.map(fUser => {
       const usernamePaddingLength = 7 - fUser.length;

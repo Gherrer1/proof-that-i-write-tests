@@ -9,7 +9,7 @@ const SERVER_ERROR_COOKIE_NAME = 's_error';
 const CLIENT_ERROR_COOKIE_NAME = 'c_error';
 const CLIENT_SUCCESS_COOKIE_NAME = 'c_success';
 const COOKIE_SECRET	= 'keyboard cat'; // TODO: pull from env var
-const SALT_ROUNDS = 10;
+const SALT_ROUNDS = 10; // DO NOT CHANGE THIS LIGHTLY
 
 
 module.exports = {
