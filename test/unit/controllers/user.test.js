@@ -172,7 +172,7 @@ describe('#UserController', function() {
     });
   });
 
-  describe.only('#validateLoginCredentials', function() {
+  describe('#validateLoginCredentials', function() {
     const expectedHashedValue = 'hashed ;)';
     let email, password, hasher, fakeModel;
 
@@ -244,6 +244,21 @@ describe('#UserController', function() {
       userController.setModel(fakeModel);
 
       return userController.validateLoginCredentials(email, password, hasher).should.eventually.deep.equal(expectedUser);
+    });
+  });
+
+  describe('#findById', function() {
+    it('should return a promise', function() {
+      throw new Error('red-green refactor');
+    });
+    it('should reject with error if model throws an error', function() {
+      throw new Error('red-green refactor');
+    });
+    it('should resolve with false if no user exists with that id', function() {
+      throw new Error('red-green refactor');
+    });
+    it('should resolve with true a user does exist with that id', function() {
+      throw new Error('red-green refactor');
     });
   });
 });
