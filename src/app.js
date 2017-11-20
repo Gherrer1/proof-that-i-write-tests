@@ -1,4 +1,5 @@
 const bodyParser 						= require('body-parser');
+const cookieParser					= require('cookie-parser');
 const express								= require('express');
 const logger								= require('morgan');
 const mongoose							= require('mongoose');
@@ -6,7 +7,8 @@ const mongoose							= require('mongoose');
 const config								= require('./config');
 const {
 				DB_URL,
-				SESSION_COOKIE_NAME
+				SESSION_COOKIE_NAME,
+				COOKIE_SECRET
 			}											= config;
 const { signupValidators }	= require('./validators');
 const { matchedData } 			= require('express-validator/filter');
@@ -36,6 +38,7 @@ app.use(express.static(__dirname + '/public'));
 
 // Middleware
 app.use(logger('dev'));
+app.use(cookieParser(COOKIE_SECRET));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 // const sessionOptions = {
