@@ -53,9 +53,24 @@ function validateLoginCredentials(email, password, hasher) {
   });
 }
 
+function findById(id) {
+  const model = this.model;
+  return new Promise(function(resolve, reject) {
+    model.findById(id)
+    .then(user => {
+      if(!user)
+        return resolve(false);
+      delete user.password;
+      resolve(user);
+    })
+    .catch(err => reject(err));
+  });
+}
+
 module.exports = {
   setModel,
   createUser,
   ensureEmailAndUsernameUnique,
-  validateLoginCredentials
+  validateLoginCredentials,
+  findById
 };

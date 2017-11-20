@@ -248,17 +248,39 @@ describe('#UserController', function() {
   });
 
   describe('#findById', function() {
-    it('should return a promise', function() {
-      throw new Error('red-green refactor');
+    let id, fakeModel;
+
+    beforeEach(function() {
+      id = '5a126dd2f55cea2b66e62663';
+      fakeModel = { findById() { return Promise.resolve({ /* fake user */})} };
     });
-    it('should reject with error if model throws an error', function() {
-      throw new Error('red-green refactor');
+    it('should return a promise', function() {
+      userController.setModel(fakeModel);
+
+      var promise = userController.findById(id);
+      expect(promise.then).to.exist;
+      expect(promise.catch).to.exist;
+      promise.then(()=>{}).catch(()=>{}); // to get rid of warning
+    });
+    it('should reject with error if model.findById() throws an error', function() {
+      const expectedErrorMessage = 'Something went wrong';
+      fakeModel.findById = sinon.stub().rejects(new Error('Something went wrong'));
+      userController.setModel(fakeModel);
+
+      return userController.findById(id).should.be.rejectedWith(expectedErrorMessage);
     });
     it('should resolve with false if no user exists with that id', function() {
-      throw new Error('red-green refactor');
+      fakeModel.findById = sinon.stub().resolves(null);
+      userController.setModel(fakeModel);
+
+      return userController.findById(id).should.eventually.be.false;
     });
-    it('should resolve with true a user does exist with that id', function() {
-      throw new Error('red-green refactor');
+    it('should resolve with user (without password field) if user does exist with that id', function() {
+      const expectedUser = { fname: 'Yo', username: 'reiner_brain', email: 'reiner@email.com' };
+      fakeModel.findById = sinon.stub().resolves({ fname: 'Yo', username: 'reiner_brain', email: 'reiner@email.com', password: 'some long hashed value' });
+      userController.setModel(fakeModel);
+
+      return userController.findById(id).should.eventually.deep.equal(expectedUser);
     });
   });
 });
