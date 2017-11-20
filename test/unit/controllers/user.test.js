@@ -169,7 +169,81 @@ describe('#UserController', function() {
       userController.setModel(fakeModel);
       let promise = userController.createUser(validData);
       return promise.should.eventually.deep.equal(expectedResolve);
-      // throw new Error('red-green refactor');
+    });
+  });
+
+  describe.only('#validateLoginCredentials', function() {
+    const expectedHashedValue = 'hashed ;)';
+    let email, password, hasher, fakeModel;
+
+    beforeEach(function() {
+      email = 'valid@email.com';
+      password = '12345678';
+      hasher = { hash: function(password, saltRounds) { return Promise.resolve(expectedHashedValue) } };
+      fakeModel = {
+        findOne() {
+          return new Promise(function(resolve, reject) {
+            resolve({});
+          })
+        }
+      }
+    });
+    // this function should only ever be called with a legitimate email and password
+    it('should return a Promise', function() {
+      userController.setModel(fakeModel);
+      var promise = userController.validateLoginCredentials(email, password, hasher);
+      expect(promise.then).to.exist;
+      expect(promise.catch).to.exist;
+    });
+    it('should call model.findOne with email', function(done) {
+      var spy = sinon.spy(fakeModel, 'findOne');
+      userController.setModel(fakeModel);
+      userController.validateLoginCredentials(email, password, hasher)
+      .then(user => {
+        expect(spy.calledOnce, 'model.findOne() was not called once').to.be.true;
+        expect(spy.calledWith(email), 'model.findOne() not called with email').to.be.true;
+      })
+      .catch(err => {
+        expect(spy.calledOnce, 'model.findOne() was not called once').to.be.true;
+        expect(spy.args[0][0], 'model.findOne() not called with email').to.deep.equal({ email });
+      })
+      .then(done, done);
+    });
+    it('should reject with error if the model throws an error', function() {
+      const expectedErrorMessage = 'Error with DB';
+      fakeModel.findOne = sinon.stub().rejects(new Error('Error with DB'));
+      userController.setModel(fakeModel);
+
+      var promise = userController.validateLoginCredentials(email, password, hasher);
+      return promise.should.be.rejectedWith(expectedErrorMessage);
+    });
+    it('should resolve to false if no user with that email is found', function() {
+      fakeModel.findOne = sinon.stub().resolves(null);
+      userController.setModel(fakeModel);
+
+      return userController.validateLoginCredentials(email, password, hasher).should.eventually.be.false;
+    });
+    it('should reject with error if password hasher throws an error', function() {
+      hasher.hash = sinon.stub().rejects(new Error('Problem with hasher bro'));
+      userController.setModel(fakeModel);
+
+      var promise = userController.validateLoginCredentials(email, password, hasher);
+      return promise.should.be.rejectedWith('Problem with hasher bro');
+    });
+    it('should resolve to false if hash result does not match found users hashed password', function() {
+      fakeModel.findOne = sinon.stub().resolves({ password: 'hahaha' });
+      hasher.hash = sinon.stub().resolves('hehehe');
+      userController.setModel(fakeModel);
+
+      return userController.validateLoginCredentials(email, password, hasher).should.eventually.be.false;
+    });
+    it('should resolve to user obj without password if user found and hashed passwords match', function() {
+      const expectedUser = { fname: 'Jay', username: 'jayboutit', email: 'blaaaahh@email.com'};
+      fakeModel.findOne = sinon.stub().resolves({ fname: 'Jay', username: 'jayboutit', email: 'blaaaahh@email.com', password: 'hahaha' });
+      hasher.hash = sinon.stub().resolves('hahaha');
+      userController.setModel(fakeModel);
+
+      return userController.validateLoginCredentials(email, password, hasher).should.eventually.deep.equal(expectedUser);
     });
   });
 });
