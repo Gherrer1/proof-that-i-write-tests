@@ -1,7 +1,4 @@
-const bodyParser 						= require('body-parser');
-const cookieParser					= require('cookie-parser');
 const express								= require('express');
-const logger								= require('morgan');
 const mongoose							= require('mongoose');
 // const session								= require('express-session');
 const config								= require('./config');
@@ -37,10 +34,10 @@ app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/public'));
 
 // Middleware
-app.use(logger('dev'));
-app.use(cookieParser(COOKIE_SECRET));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(require('morgan')('dev')); // logger
+app.use(require('cookie-parser')(COOKIE_SECRET));
+app.use(require('body-parser').urlencoded({ extended: true }));
+app.use(require('body-parser').json());
 // const sessionOptions = {
 // 	// settings object for the sessionID cookie TODO: set more secure options too
 // 	cookie: { maxAge: 1000 * 30 },
