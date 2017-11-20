@@ -1,10 +1,13 @@
-const express								= require('express');
 const bodyParser 						= require('body-parser');
-const cookieParser					= require('cookie-parser');
+const express								= require('express');
 const logger								= require('morgan');
 const mongoose							= require('mongoose');
+// const session								= require('express-session');
 const config								= require('./config');
-const { DB_URL, COOKIE_NAME }							= config;
+const {
+				DB_URL,
+				SESSION_COOKIE_NAME
+			}											= config;
 const { signupValidators }	= require('./validators');
 const { matchedData } 			= require('express-validator/filter');
 const { validationResult } 	= require('express-validator/check');
@@ -35,12 +38,15 @@ app.use(express.static(__dirname + '/public'));
 app.use(logger('dev'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cookieParser());
-
-app.use(function cookiePrinter(req, res, next) {
-	// console.log('Cookies:', req.cookies);
-	next();
-});
+// const sessionOptions = {
+// 	// settings object for the sessionID cookie TODO: set more secure options too
+// 	cookie: { maxAge: 1000 * 30 },
+// 	// name of the cookie
+// 	name: SESSION_COOKIE_NAME,
+// 	// secret used for signing the sessionID
+// 	secret: 'keyboard cat'
+// };
+// app.use(session(sessionOptions));
 
 
 app.get('/login', function(req, res) {
