@@ -1,25 +1,18 @@
 const express								= require('express');
 const mongoose							= require('mongoose');
+const passport							= require('passport');
 // const session								= require('express-session');
 const config								= require('./config');
-const {
-				DB_URL,
-				SESSION_COOKIE_NAME,
-				COOKIE_SECRET
-			}											= config;
-const { signupValidators }	= require('./validators');
-const { matchedData } 			= require('express-validator/filter');
-const { validationResult } 	= require('express-validator/check');
+const {signupValidators}		= require('./validators');
 const userController 				= require('./controllers/user');
 userController.setModel( require('./models/User') );
 const signupRouteHandlers 	= require('./routeHandlers/signup');
 const loginRouteHandlers		= require('./routeHandlers/login');
+
 const app = express();
 
 mongoose.Promise = global.Promise;
-
-mongoose.connect(DB_URL, { useMongoClient: true })
-.then(
+mongoose.connect(config.DB_URL, { useMongoClient: true }).then(
 	function connectSuccess() { console.log(`Connected to ${DB_URL}`) }
 		,
 	function connectFail(err) {
@@ -35,20 +28,20 @@ app.use(express.static(__dirname + '/public'));
 
 // Middleware
 app.use(require('morgan')('dev')); // logger
-app.use(require('cookie-parser')(COOKIE_SECRET));
+app.use(require('cookie-parser')(config.COOKIE_SECRET));
 app.use(require('body-parser').urlencoded({ extended: true }));
 app.use(require('body-parser').json());
 // const sessionOptions = {
 // 	// settings object for the sessionID cookie TODO: set more secure options too
 // 	cookie: { maxAge: 1000 * 30 },
 // 	// name of the cookie
-// 	name: SESSION_COOKIE_NAME,
+// 	name: config.SESSION_COOKIE_NAME,
 // 	// secret used for signing the sessionID
 // 	secret: 'keyboard cat'
 // };
 // app.use(session(sessionOptions));
 
-
+// Routes
 app.get('/login', function(req, res) {
 	loginRouteHandlers.getLogin(req, res);
 });
@@ -58,6 +51,8 @@ app.get('/signup', function(req, res) {
 });
 
 app.post('/signup', signupValidators, function(req, res) {
+	const {matchedData} = require('express-validator/filter');
+	const {validationResult} = require('express-validator/check');
 	const errors = validationResult(req);
 	const validData = matchedData(req);
 	signupRouteHandlers.postSignup(req, res, errors, validData, userController, require('bcrypt'));
