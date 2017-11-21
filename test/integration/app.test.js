@@ -24,6 +24,14 @@ describe.only('#Authentication_Routes', function() {
     done();
   });
 
+  describe.only('new [GET /login]', function() {
+  	it('should redirect to /dashboard if user is already logged in');
+  	it('should show client-error flash message on page if session includes client-error');
+  	it('should show server-error flash message on page if session includes server-error');
+  	it('should show signup-success flash message on page if session includes signup-success');
+  	it('should show no flash message on page if no flash messages in session');
+  });
+
   describe('[GET /signup]', function() {
     it('should redirect to /dashboard if request has a session cookie', function(done){
       // dont worry, itll run into authentication middleware to validate the cookie
