@@ -1,3 +1,4 @@
+const MongoClient = require('mongodb').MongoClient;
 const mongoose  = require('mongoose');
 mongoose.Promise = global.Promise;
 const { DB_URL } = require('./src/config');
@@ -49,6 +50,7 @@ function seed() {
     .then(clearUsers)
     .then(addUsers)
     .then(ids => createListings(ids))
+    .then(clearSessions)
     .then(() => resolve())
     .catch(err => reject(err));
   });
@@ -167,6 +169,20 @@ function createListings(ids) {
           console.log(`Created ${res.length} listings`);
         resolve(res); })
       .catch(err => reject(err));
+  });
+}
+
+function clearSessions() {
+  return new Promise(function(resolve, reject) {
+    MongoClient.connect(DB_URL, function(err, db) {
+      db.collection('sessions').deleteMany({}, function(err, result) {
+        db.close();
+        if(err) {
+          return reject(err);
+        }
+        return resolve();
+      });
+    });
   });
 }
 
