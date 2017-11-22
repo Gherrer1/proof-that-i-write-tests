@@ -51,6 +51,7 @@ function validateLoginCredentials(email, password, hasher) {
   });
 }
 
+/* id --> user/false or err */
 function findById(id) {
   const model = this.model;
   return new Promise(function(resolve, reject) {
