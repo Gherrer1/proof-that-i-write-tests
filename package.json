@@ -39,6 +39,7 @@
     "mocha": "^3.5.3",
     "mongodb": "^2.2.33",
     "nodemon": "^1.12.1",
+    "puppeteer": "^0.13.0",
     "sinon": "^4.0.0",
     "supertest": "^3.0.0"
   }

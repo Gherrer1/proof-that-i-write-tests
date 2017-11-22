@@ -46,6 +46,10 @@ app.get('/login', function(req, res) {
 	loginRouteHandlers.getLogin(req, res);
 });
 
+app.post('/login', function(req, res) {
+	
+});
+
 app.get('/signup', function(req, res) {
 	signupRouteHandlers.getSignup(req, res);
 });
