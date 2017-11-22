@@ -179,11 +179,11 @@ describe('#UserController', function() {
     beforeEach(function() {
       email = 'valid@email.com';
       password = '12345678';
-      hasher = { hash: function(password, saltRounds) { return Promise.resolve(expectedHashedValue) } };
+      hasher = { compare: function(plaintext, hash) { return Promise.resolve(true) } };
       fakeModel = {
         findOne() {
           return new Promise(function(resolve, reject) {
-            resolve({});
+            resolve({ password: 'hashed ;)' });
           })
         }
       }
@@ -223,24 +223,41 @@ describe('#UserController', function() {
 
       return userController.validateLoginCredentials(email, password, hasher).should.eventually.be.false;
     });
+    it('should call hash.compare() with plaintext,hash if user found', function(done) {
+      hasher.compare = sinon.stub().resolves(true);
+      userController.setModel(fakeModel);
+
+      const expectedPlaintext = password;
+      const expectedHashedPassword = 'hashed ;)';
+      userController.validateLoginCredentials(email, password, hasher)
+      .then(user => {
+        expect(hasher.compare.calledOnce, 'hasher.compare() not called').to.be.true;
+        expect(hasher.compare.calledWith(expectedPlaintext, expectedHashedPassword), 'hasher.compare() not called with plaintext,hash').to.be.true;
+      })
+      .catch(err => {
+        expect(hasher.compare.calledOnce, 'hasher.compare() not called').to.be.true;
+        expect(hasher.compare.calledWith(expectedPlaintext, expectedHashedPassword), 'hasher.compare() not called with plaintext,hash').to.be.true;
+      })
+      .then(done, done);
+    })
     it('should reject with error if password hasher throws an error', function() {
-      hasher.hash = sinon.stub().rejects(new Error('Problem with hasher bro'));
+      hasher.compare = sinon.stub().rejects(new Error('Problem with hasher bro'));
       userController.setModel(fakeModel);
 
       var promise = userController.validateLoginCredentials(email, password, hasher);
       return promise.should.be.rejectedWith('Problem with hasher bro');
     });
-    it('should resolve to false if hash result does not match found users hashed password', function() {
-      fakeModel.findOne = sinon.stub().resolves({ password: 'hahaha' });
-      hasher.hash = sinon.stub().resolves('hehehe');
+    it('should resolve to false if hasher.compare() resolves to false', function() {
+      // fakeModel.findOne = sinon.stub().resolves({ password: 'hahaha' });
+      hasher.compare = sinon.stub().resolves(false);
       userController.setModel(fakeModel);
 
       return userController.validateLoginCredentials(email, password, hasher).should.eventually.be.false;
     });
     it('should resolve to user obj without password if user found and hashed passwords match', function() {
       const expectedUser = { fname: 'Jay', username: 'jayboutit', email: 'blaaaahh@email.com'};
-      fakeModel.findOne = sinon.stub().resolves({ fname: 'Jay', username: 'jayboutit', email: 'blaaaahh@email.com', password: 'hahaha' });
-      hasher.hash = sinon.stub().resolves('hahaha');
+      fakeModel.findOne = sinon.stub().resolves({ fname: 'Jay', username: 'jayboutit', email: 'blaaaahh@email.com', password: 'hashed ;)' });
+      hasher.compare = sinon.stub().resolves(true);
       userController.setModel(fakeModel);
 
       return userController.validateLoginCredentials(email, password, hasher).should.eventually.deep.equal(expectedUser);
