@@ -14,7 +14,7 @@ const app = express();
 
 mongoose.Promise = global.Promise;
 mongoose.connect(config.DB_URL, { useMongoClient: true }).then(
-	function connectSuccess() { console.log(`Connected to ${DB_URL}`) }
+	function connectSuccess() { console.log(`Connected to ${config.DB_URL}`) }
 		,
 	function connectFail(err) {
 		console.log('Connection Error:\n', err);
@@ -32,6 +32,7 @@ app.use(require('morgan')('dev')); // logger
 app.use(require('cookie-parser')(config.COOKIE_SECRET));
 app.use(require('body-parser').urlencoded({ extended: true }));
 app.use(require('body-parser').json());
+app.use(require('cookie-flash-messages'));
 
 // Routes
 app.get('/login', function(req, res) {

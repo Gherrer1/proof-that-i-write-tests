@@ -24,12 +24,18 @@ describe.only('#Authentication_Routes', function() {
     done();
   });
 
-  describe.only('new [GET /login]', function() {
+  describe('new [GET /login]', function() {
+
+    it('should show client-error flash message on page if flash cookie contains client error message, also flash cookie should be cleared', function(done) {
+      request(app).get('/login')
+        .set('Cookie', ['cookie_flash_message=%7B%22type%22%3A%22client_error%22%2C%22text%22%3A%22Invalid%20Credentials%22%7D'])
+        .expect(200)
+        .expect(/Invalid Credentials/, done);
+    });
   	it('should redirect to /dashboard if user is already logged in');
-  	it('should show client-error flash message on page if session includes client-error');
-  	it('should show server-error flash message on page if session includes server-error');
-  	it('should show signup-success flash message on page if session includes signup-success');
-  	it('should show no flash message on page if no flash messages in session');
+  	it('should show server-error flash message on page if flash cookie includes server-error, and should clear cookie');
+  	it('should show signup-success flash message on page if flash cookie includes signup success message, and cookie should be cleared');
+  	it('should show login page without any messages if no flash message cookie sent');
   });
 
   describe('[GET /signup]', function() {
