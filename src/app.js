@@ -1,13 +1,14 @@
 const express								= require('express');
 const mongoose							= require('mongoose');
 const passport							= require('passport');
-// const session								= require('express-session');
+const session								= require('express-session');
 const config								= require('./config');
 const {signupValidators}		= require('./validators');
 const userController 				= require('./controllers/user');
-userController.setModel( require('./models/User') );
 const signupRouteHandlers 	= require('./routeHandlers/signup');
 const loginRouteHandlers		= require('./routeHandlers/login');
+
+userController.setModel( require('./models/User') );
 
 const app = express();
 
@@ -31,15 +32,6 @@ app.use(require('morgan')('dev')); // logger
 app.use(require('cookie-parser')(config.COOKIE_SECRET));
 app.use(require('body-parser').urlencoded({ extended: true }));
 app.use(require('body-parser').json());
-// const sessionOptions = {
-// 	// settings object for the sessionID cookie TODO: set more secure options too
-// 	cookie: { maxAge: 1000 * 30 },
-// 	// name of the cookie
-// 	name: config.SESSION_COOKIE_NAME,
-// 	// secret used for signing the sessionID
-// 	secret: 'keyboard cat'
-// };
-// app.use(session(sessionOptions));
 
 // Routes
 app.get('/login', function(req, res) {
@@ -47,7 +39,6 @@ app.get('/login', function(req, res) {
 });
 
 app.post('/login', function(req, res) {
-	
 });
 
 app.get('/signup', function(req, res) {
