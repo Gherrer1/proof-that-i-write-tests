@@ -24,16 +24,17 @@ describe.only('#Authentication_Routes', function() {
     done();
   });
 
-  describe('new [GET /login]', function() {
+  describe('[GET /login]', function() {
     it('should redirect to /dashboard if user is already logged in', function() {
       throw new Error('Come back to - when POST /login is solidified');
     });
-    it('should show client_error flash message on page if flash cookie contains client error message, also flash cookie should be cleared', function(done) {
+    it('should show client_error flash message on page along with just-tried username if flash cookie contains client error message, also flash cookie should be cleared', function(done) {
       request(app).get('/login')
         .set('Cookie', ['cookie_flash_message=%7B%22type%22%3A%22client_error%22%2C%22text%22%3A%22Invalid%20Credentials%22%7D'])
         .expect(200)
         .expect(/class="client_error"/)
         .expect(/Invalid Credentials/)
+        .expect(/qerardo/)
         .end(function(err, res) {
           if(err)
             return done(err);
@@ -157,16 +158,11 @@ describe.only('#Authentication_Routes', function() {
     it('should redirect to /signup with error message via cookie (something went wrong) for server errors (*1)');
   });
 
-  describe.skip('[POST /login]', function() {
-    // might not need to do this - since passport.session() will automatically fill in req.user if your cookie is valid, we can go straight to dashboard
-    // so when i say might not need to do this, what I really mean is that we might not need to send to authorization middleware
-    // however, if we DO have a cookie and no req.user, that means our sessionID wasnt valid... do we have to manually delete it?
-    it('should redirect to /dashboard if request has a session cookie', function(done) {
-      debug('running test');
-      request(app).post('/login')
-        .set('Cookie', [`${SESSION_COOKIE_NAME}=1234`])
-        .expect(302)
-        .expect('Location', '/dashboard', done);
+  describe('[POST /login]', function() {
+
+    it('should redirect to /dashboard if user already has a session', function(done) {
+      // puppeteer
+      done(new Error('red-green refactor'));
     });
     it('should redirect to /login with client-error cookie and username-you-just-tried cookie if data is invalid - as in simply doesnt fit the requirements used for signup', function(done) {
       debug('running test');
@@ -184,26 +180,13 @@ describe.only('#Authentication_Routes', function() {
           done();
         });
     });
-    it('should redirect to /login with server-error cookie/flash message if there are server errors'); // find out how to mock this
-    it('if no session cookie, valid params, no server errors, should give session cookie and redirect to /dashboard', function(done) {
-      request(app).post('/login')
-        .send({ email: 'sato@email.com', password: '1111111111'})
-        .expect(302)
-        .expect('Location', '/dashboard')
-        .end(function(err, res) {
-          if(err) {
-            return done(err);
-          }
-          // TODO: inspect cookies and make sure there's a session cookie
-          const cookies = res.headers['set-cookie'];
-          const expectedCookies = { chewbacca: true };
-          expect(cookies).to.deep.equal(expectedCookies);
-          done();
-        });
+    it('should redirect to /login with server-error cookie/flash message if there are server errors', function() {
+      // find out how to mock this
+      throw new Error('red-green refactor');
     });
-    it('if no session cookie but invalid credentials, should redirect to /login and should NOT be given a session cookie, should be given client-error cookie and username-you-just-tried cookie', function(done) {
+    it('should redirect to /login with client_error flash message (with username included) if login credentials are incorrect', function(done) {
       request(app).post('/login')
-        .send({ email: 'sato@email.com', password: '1111111111' })
+        .send({ email: 'satoo@email.com', password: '1111111111' })
         .expect(302)
         .expect('Location', '/login')
         .end(function(err, response) {
@@ -213,6 +196,22 @@ describe.only('#Authentication_Routes', function() {
           // assert that we get the cookies we're expecting and nothing more
           const expectedCookies = { bro: 'haha' }; // dummy, just wanna see expected/actual
           const cookies = response.headers['set-cookie'];
+          expect(cookies).to.deep.equal(expectedCookies);
+          done();
+        });
+    });
+    it('should give session cookie and signup_success flash message if login credentials are correct', function(done) {
+      request(app).post('/login')
+        .send({ email: 'sato@email.com', password: '1111111111' })
+        .expect(302)
+        .expect('Location', '/dashboard')
+        .end(function(err, res) {
+          if(err) {
+            return done(err);
+          }
+          // TODO: inspect cookies and make sure there's a session cookie
+          const cookies = res.headers['set-cookie'];
+          const expectedCookies = { chewbacca: true };
           expect(cookies).to.deep.equal(expectedCookies);
           done();
         });
