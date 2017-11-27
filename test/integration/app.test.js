@@ -177,9 +177,22 @@ describe.only('#Authentication_Routes', function() {
           done();
         });
     });
-    it('should redirect to /login with server-error cookie/flash message if there are server errors', function() {
-      // find out how to mock this
-      throw new Error('red-green refactor');
+    it('should redirect to /login with server-error cookie/flash message if there are server errors', function(done) {
+      var stub = sinon.stub(require('bcrypt'), 'compare').rejects(new Error('Hashing went wrong bro'));
+      request(app).post('/login')
+        .send({ email: 'sato@email.com', password: '1111111111' })
+        .expect(302)
+        .expect('Location', '/login')
+        .end(function(err, res) {
+          stub.restore();
+          if(err) {
+            return done(err);
+          }
+          const cookie = res.headers['set-cookie'][0];
+          expect(cookie).to.match(/cookie_flash_message=.+server_error.+email%22/);
+          expect(res.headers['set-cookie'].length).to.equal(1);
+          done();
+        });
     });
     it('should redirect to /login with client_error flash message (with email included) if username is incorrect', function(done) {
       request(app).post('/login')
