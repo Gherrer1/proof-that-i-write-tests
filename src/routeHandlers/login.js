@@ -1,8 +1,3 @@
-const {SESSION_COOKIE_NAME,
-	   CLIENT_ERROR_COOKIE_NAME,
-	   SERVER_ERROR_COOKIE_NAME,
-	   CLIENT_SUCCESS_COOKIE_NAME} = require('../config');
-
 function getLogin(req, res) {
 	if( req.isAuthenticated() ) {
 		res.redirect('/dashboard');
@@ -12,6 +7,17 @@ function getLogin(req, res) {
 	}
 }
 
+function ensureNoValidationErrs(req, res, next, matchedData, validationResult) {
+	const errors = validationResult(req);
+	if(!errors.isEmpty()) {
+		res.flash('client_error', 'Invalid credentials', req.body.email);
+		return res.redirect('/login');
+	}
+	return next();
+	// const errors = validationResult(req)
+}
+
 module.exports = {
-	getLogin
+	getLogin,
+	ensureNoValidationErrs
 };
