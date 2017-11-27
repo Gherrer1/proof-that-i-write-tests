@@ -22,7 +22,7 @@
     <!-- TODO: make these fields required -->
     <form action="/login" method="post">
       <label for="emailInput">Email:</label>
-      <input type="email" name="email" id="emailInput">
+      <input type="email" name="email" value="<%= (locals.flashMessage && locals.flashMessage.email) || '' %>" id="emailInput">
 
       <label for="passwordInput">Password:</label>
       <input type="password" name="password" id="passwordInput">

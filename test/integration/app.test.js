@@ -11,7 +11,7 @@ const debug = require('debug')('test-order');
 const puppeteer = require('puppeteer');
 
 describe('#Authentication_Routes', function() {
-  
+
   beforeEach(function(done) {
     debug(':)');
     seed.seed()
@@ -25,13 +25,13 @@ describe('#Authentication_Routes', function() {
 
   describe('[GET /login]', function() {
     it('should redirect to /dashboard if user is already logged in', function() { /* In Flows tests */});
-    it('should show client_error flash message on page along with just-tried username if flash cookie contains client error message, also flash cookie should be cleared', function(done) {
+    it('should show client_error flash message on page along with just-tried email if flash cookie contains client error message, also flash cookie should be cleared', function(done) {
       request(app).get('/login')
-        .set('Cookie', ['cookie_flash_message=%7B%22type%22%3A%22client_error%22%2C%22text%22%3A%22Invalid%20Credentials%22%7D'])
+        .set('Cookie', ['cookie_flash_message=%7B%22type%22%3A%22client_error%22%2C%22text%22%3A%22Invalid%20credentials%22%2C%22email%22%3A%22butthead%22%7D'])
         .expect(200)
         .expect(/class="client_error"/)
-        .expect(/Invalid Credentials/)
-        .expect(/qerardo/)
+        .expect(/Invalid credentials/)
+        .expect(/butthead/) // tried email
         .end(function(err, res) {
           if(err)
             return done(err);
@@ -39,12 +39,13 @@ describe('#Authentication_Routes', function() {
           done();
         });
     });
-  	it('should show server_error flash message on page if flash cookie includes server-error, and should clear cookie', function(done) {
+  	it('should show server_error flash message on page along with just-tried email if flash cookie includes server-error, and should clear cookie', function(done) {
       request(app).get('/login')
         .set('Cookie', ['cookie_flash_message=%7B%22type%22%3A%22server_error%22%2C%22text%22%3A%22Something%20went%20wrong%22%7D'])
         .expect(200)
         .expect(/class="server_error"/)
         .expect(/Something went wrong/)
+        .expect(/sato@email.com/)
         .end(function(err, res) {
           if(err)
             return done(err);
@@ -253,11 +254,10 @@ describe('#Flows', function() {
     });
     /* after ALL test */
     after(async function() {
-      browser.close();
-    });  
+      await browser.close();
+    });
 
     beforeEach(function(done) {
-      debug(':)');
       seed.seed()
       .then(done, done);
     });
