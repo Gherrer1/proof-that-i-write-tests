@@ -15,70 +15,29 @@ describe('#Login route handlers', function() {
     let req, res;
 
     beforeEach(function() {
-      req = { cookies: {} };
+      req = { locals: {}, isAuthenticated() { return false; } };
       res = {
         redirect() {},
         render() {}
       };
     });
 
-    it('should return res.redirect("/dashboard") if request comes with a session cookie', function() {
-      req.cookies[SESSION_COOKIE_NAME] = '1234';
-      const expectedReturnValue = 'scallywag';
-      res.redirect = sinon.stub().withArgs('/dashboard').returns(expectedReturnValue);
+    it('should return res.redirect("/dashboard") if user is already logged in', function() {
+      req.isAuthenticated = sinon.stub().returns(true);
+      var spy = sinon.spy(res, 'redirect');
+      loginRouteHandlers.getLogin(req, res);
 
-      const retVal = loginRouteHandlers.getLogin(req, res);
-      expect(retVal, 'expected to return res.redirect("/dashboard")').to.equal(expectedReturnValue);
-      expect(res.redirect.calledOnce, `did not call res.redirect() once but ${res.redirect.callCount} times`).to.be.true;
+      expect(req.isAuthenticated.calledOnce, 'Did not check if user is authenticated').to.be.true;
+      expect(res.redirect.calledOnce, 'Did not call res.redirect()').to.be.true;
       expect(res.redirect.calledWith('/dashboard'), 'Did not call res.redirect() with "/dashboard"').to.be.true;
     });
-    it('should return res.render("login") with { success } if request comes with client-success cookie', function() {
-      const expectedSuccessMessage = 'You successfully signed up!';
-      const expectedReturnValue = 'jimbo';
-      req.cookies[CLIENT_SUCCESS_COOKIE_NAME] = expectedSuccessMessage;
-      const expectedSecondParamForRender = { success: expectedSuccessMessage };
-      res.render = sinon.stub().returns(expectedReturnValue);
-
-      const retVal = loginRouteHandlers.getLogin(req, res);
-      expect(retVal, 'Did not return the right res.render()').to.equal(expectedReturnValue);
-      expect(res.render.calledOnce, `Did not call res.render() once but ${res.render.callCount} times`).to.be.true;
-      expect(res.render.args[0][0], `Did not call res.render() with "login" but with ${res.render.args[0][0]}`).to.equal('login');
-      expect(res.render.args[0][1]).to.deep.equal(expectedSecondParamForRender);
+    it('should return res.redirect("/dashboard") if user is already logged in even if request came with flash message', function() {
+      throw new Error('red-green refactor');
     });
-    it('should return res.render("login") with { errors } if request comes with client-error cookie', function() {
-      const expectedClientError = 'Invalid login credentials';
-      const expectedReturnValue = 'cuppycake';
-      req.cookies[CLIENT_ERROR_COOKIE_NAME] = expectedClientError;
-      const expectedSecondParamForRender = { errors: [expectedClientError] };
-      res.render = sinon.stub().returns(expectedReturnValue);
-
-      const retVal = loginRouteHandlers.getLogin(req, res);
-      expect(retVal, 'Did not return the right res.render()').to.equal(expectedReturnValue);
-      expect(res.render.calledOnce, `Did not call res.render() once but ${res.render.callCount} times`).to.be.true;
-      expect(res.render.args[0][0], `Did not call res.render() with "login" but with ${res.render.args[0][0]}`).to.equal('login');
-      expect(res.render.args[0][1]).to.deep.equal(expectedSecondParamForRender);
-    });
-    it('should return res.render("login") with { errors: generic message } if request comes with server-error cookie', function() {
-      const expectedReturnValue = 'fkevindurant';
-      req.cookies[SERVER_ERROR_COOKIE_NAME] = '1234';
-      res.render = sinon.stub().returns(expectedReturnValue);
-      const expectedSecondParamForRender = { errors: ['Something went wrong. Please try again'] };
-
-      const retVal = loginRouteHandlers.getLogin(req, res);
-      expect(retVal, 'Did not return res.render()').to.equal(expectedReturnValue);
-      expect(res.render.calledOnce, `Did not call res.render once but ${res.render.callCount} times`).to.be.true;
-      expect(res.render.args[0][0], 'First param for render was not "login"').to.equal('login');
-      expect(res.render.args[0][1]).to.deep.equal(expectedSecondParamForRender);
-    });
-    it('should return res.render("login") with no locals if request comes with no cookies', function() {
-      const expectedReturnValue = 'wwwwwwarrrrrriors';
-      res.render = sinon.stub().returns(expectedReturnValue);
-
-      const retVal = loginRouteHandlers.getLogin(req, res);
-      expect(retVal, 'Did not return res.render()').to.equal(expectedReturnValue);
-      expect(res.render.calledOnce).to.be.true;
-      expect(res.render.args[0][0], 'First argument to render() was not "login"').to.equal('login');
-      expect(res.render.args[0][1], 'Should not pass in a locals object to res.render()').to.be.undefined;
+    it('should return res.render("login") if user isnt already authenticated', function() {
+      // var spy = sinon.spy(res, 'render');
+      // loginRouteHandlers.ge
+      throw new Error('red-green refactor');
     });
   });
 });

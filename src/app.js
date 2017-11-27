@@ -54,19 +54,4 @@ app.post('/signup', signupValidators, function(req, res) {
 	signupRouteHandlers.postSignup(req, res, errors, validData, userController, require('bcrypt'));
 });
 
-//
-// app.get('/dashboard', function(req, res) {
-// 	res.sendStatus(200);
-// });
-// app.get('/login', function(req, res) {
-// 	// TODO: check if authorized first - no need for logged in user to go through TSA
-//
-// 	res.render('login', { errors: [] });
-// });
-// app.post('/login', function(req, res) {
-// 	let { email, password } = req.body;
-// 	res.send(`Heres your JWT: ${email + password}`);
-// });
-
-
 module.exports = app;
