@@ -4,11 +4,8 @@ if(!DB_URL) {
 	process.exit(1);
 }
 
-const SESSION_COOKIE_NAME = 's.id';
-const SERVER_ERROR_COOKIE_NAME = 's_error';
-const CLIENT_ERROR_COOKIE_NAME = 'c_error';
-const CLIENT_SUCCESS_COOKIE_NAME = 'c_success';
-const COOKIE_SECRET	= 'keyboard cat'; // TODO: pull from env var
+const SESSION_COOKIE_NAME = 'thekid';
+const COOKIE_SECRET	= 'keyboard cizzat'; // TODO: Change to something with much more entropy, also dont change this lightly
 const SALT_ROUNDS = 10; // DO NOT CHANGE THIS LIGHTLY
 
 
@@ -16,7 +13,5 @@ module.exports = {
 	DB_URL,
 	SESSION_COOKIE_NAME,
 	SALT_ROUNDS,
-	// SERVER_ERROR_COOKIE_NAME,
-	// CLIENT_ERROR_COOKIE_NAME,
-	// CLIENT_SUCCESS_COOKIE_NAME
+	COOKIE_SECRET
 };
