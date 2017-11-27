@@ -1,9 +1,11 @@
 const express								= require('express');
+const {ensureLoggedOut}			= require('connect-ensure-login');
 const mongoose							= require('mongoose');
 const passport							= require('passport');
 const session								= require('express-session');
 const config								= require('./config');
 const {signupValidators}		= require('./validators');
+const {loginValidators}			= require('./validators');
 const userController 				= require('./controllers/user');
 const signupRouteHandlers 	= require('./routeHandlers/signup');
 const loginRouteHandlers		= require('./routeHandlers/login');
@@ -32,14 +34,23 @@ app.use(require('morgan')('dev')); // logger
 app.use(require('cookie-parser')(config.COOKIE_SECRET));
 app.use(require('body-parser').urlencoded({ extended: true }));
 app.use(require('body-parser').json());
-app.use(require('cookie-flash-messages'));
+app.use(require('./middleware/cookie-flash-messages'));
+app.use(require('express-session')(require('./config/express-session-config')));
+app.use(require('./config/passport-configured').initialize());
+app.use(require('./config/passport-configured').session());
 
 // Routes
 app.get('/login', function(req, res) {
 	loginRouteHandlers.getLogin(req, res);
 });
 
-app.post('/login', function(req, res) {
+// app.post(/login, ensureNotLoggedIn, validators, ensureErrorFree, passport.authenticate, function(req, res) { res.redirect("/dashboard"); })
+app.post('/login', /*ensureLoggedOut('/dashboard'),*/ loginValidators, function redirectIfErrors(req, res, next) {
+	const {matchedData} = require('express-validator/filter');
+	const {validationResult} = require('express-validator/check');
+	loginRouteHandlers.ensureNoValidationErrs(req, res, next, matchedData, validationResult);
+}, passport.authenticate('local', { failureRedirect: '/login', successRedirect: '/dashboard' }), function(req, res) {
+	res.send('hey');
 });
 
 app.get('/signup', function(req, res) {
