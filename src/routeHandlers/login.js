@@ -13,8 +13,8 @@ function ensureNoValidationErrs(req, res, next, matchedData, validationResult) {
 		res.flash('client_error', 'Invalid credentials', req.body.email);
 		return res.redirect('/login');
 	}
+	req.body = matchedData(req);
 	return next();
-	// const errors = validationResult(req)
 }
 
 module.exports = {

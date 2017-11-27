@@ -11,6 +11,7 @@ describe('#Login route handlers', function() {
   describe('#ensureNoValidationErrs', function() {
   	let req, res, next, matchedData, validationResult;
     const triedUsername = 'triedUsername';
+    const matched_data = { email: 'hehe' };
 
   	beforeEach(function() {
   		validationResult = function() {
@@ -18,6 +19,7 @@ describe('#Login route handlers', function() {
   				isEmpty() { return false; }
   			}
   		};
+      matchedData = function() { return matched_data; };
   		res = { redirect: function() {}, flash: function() {} };
       req = { body: { email: triedUsername } };
       next = function() {};
@@ -41,8 +43,10 @@ describe('#Login route handlers', function() {
       expect(spy.calledOnce, 'Did not call res.flash()').to.be.true;
       expect(spy.calledWith('client_error', 'Invalid credentials', triedUsername), 'Did not call res.flash with expected parameters').to.be.true;
     });
-    it('should set req.body to validData before calling next()', function() {
-      throw new Error('red-green refactor');
+    it('should set req.body to validData if there are no errors', function validDataAssignment() {
+      validationResult = function() { return { isEmpty() { return true; } } };
+      loginRouteHandlers.ensureNoValidationErrs(req, res, next, matchedData, validationResult);
+      expect(req.body).to.deep.equal(matched_data);
     });
     it('should call next() if no validation errors', function() {
       validationResult = function() { return { isEmpty() { return true; } } }; // returns an obj with a method that returns true
