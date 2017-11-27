@@ -1,10 +1,6 @@
 const loginRouteHandlers = require('../../../src/routeHandlers/login');
 const sinon = require('sinon');
 const expect = require('chai').expect;
-const {SESSION_COOKIE_NAME,
-       CLIENT_ERROR_COOKIE_NAME,
-       SERVER_ERROR_COOKIE_NAME,
-       CLIENT_SUCCESS_COOKIE_NAME} = require('../../../src/config');
 
 describe('#Login route handlers', function() {
   // ensureNoValidationErrs(req, res, next, matchedData, validationResult)
@@ -91,6 +87,37 @@ describe('#Login route handlers', function() {
 
       expect(res.render.calledOnce, 'Did not call res.render()').to.be.true;
       expect(res.render.calledWith('login'), 'Did not call res.render() with "login"').to.be.true;
+    });
+  });
+  // handleAuthenticationResult(req, res, err, user, info)
+  describe('#handleAuthenticationResult', function() {
+    let req, res, err, user, info;
+    beforeEach(function() {
+      req = { login(user, cb) { cb(new Error()); } }
+    });
+    it('[implementation] should call res.flash("server_error", "Something went wrong", req.body.email) if err is truthy', function() {
+      throw new Error('red-green refactor');
+    });
+    it('should call res.redirect("/login") if err is truthy', function() {
+      throw new Error('red-green refactor');
+    });
+    it('[implementation] should call res.flash("client_error", "Invalid credentials", req.body.email) if user is false', function() {
+      throw new Error('red-green refactor');
+    });
+    it('should call res.redirect("/login") if user is false', function() {
+      throw new Error('red-green refactor');
+    });
+    it('[implementation] should call req.login(user, cb) if no err and user is truthy', function() {
+      throw new Error('red-green refactor');
+    });
+    it('[implementation] should call res.flash("server_error", "Something went wrong", req.body.email) if req.login passes err to callback', function() {
+      throw new Error('red-green refactor');
+    });
+    it('should call res.redirect("/login") if req.login passes err to callback', function() {
+      throw new Error('red-green refactor');
+    });
+    it('should call res.redirect("/dashboard") if req.login doesnt pass err to callback', function() {
+      throw new Error('red-green refactor');
     });
   });
 });
