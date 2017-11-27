@@ -7,9 +7,49 @@ const {SESSION_COOKIE_NAME,
        CLIENT_SUCCESS_COOKIE_NAME} = require('../../../src/config');
 
 describe('#Login route handlers', function() {
-  // postLogin(req, res, errors, validData, userController, hasher)
-  describe('#postLogin', function() {
+  // ensureNoValidationErrs(req, res, next, matchedData, validationResult)
+  describe('#ensureNoValidationErrs', function() {
+  	let req, res, next, matchedData, validationResult;
+    const triedUsername = 'triedUsername';
 
+  	beforeEach(function() {
+  		validationResult = function() {
+  			return {
+  				isEmpty() { return false; }
+  			}
+  		};
+  		res = { redirect: function() {}, flash: function() {} };
+      req = { body: { email: triedUsername } };
+      next = function() {};
+  	});
+
+  	it('should call res.redirect("/login") if we have validation errors', function() {
+  		var spy = sinon.spy(res, 'redirect');
+  		loginRouteHandlers.ensureNoValidationErrs(req, res, next, matchedData, validationResult);
+  		expect(spy.calledOnce, 'Did not call res.redirect()').to.be.true;
+  		expect(spy.calledWith('/login'), 'Did not call res.redirect() with "login"').to.be.true;
+  	});
+    it('should not call next() if we have validation errors', function() {
+      var spy = sinon.spy();
+      loginRouteHandlers.ensureNoValidationErrs(req, res, spy, matchedData, validationResult);
+      expect(spy.called, 'Should not have called next() if there are validation errors').to.be.false;
+    })
+    it('should call res.flash("client_error", "Invalid credentials", email) if we have validation errors', function() {
+      // Implementation detail, non essential test.
+      const spy = sinon.spy(res, 'flash');
+      loginRouteHandlers.ensureNoValidationErrs(req, res, next, matchedData, validationResult);
+      expect(spy.calledOnce, 'Did not call res.flash()').to.be.true;
+      expect(spy.calledWith('client_error', 'Invalid credentials', triedUsername), 'Did not call res.flash with expected parameters').to.be.true;
+    });
+    it('should set req.body to validData before calling next()', function() {
+      throw new Error('red-green refactor');
+    });
+    it('should call next() if no validation errors', function() {
+      validationResult = function() { return { isEmpty() { return true; } } }; // returns an obj with a method that returns true
+      var spy = sinon.spy();
+      loginRouteHandlers.ensureNoValidationErrs(req, res, spy, matchedData, validationResult);
+      expect(spy.calledOnce, 'next() not called once').to.be.true;
+    });
   });
   describe('#getLogin', function() {
     let req, res;
