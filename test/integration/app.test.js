@@ -25,17 +25,53 @@ describe.only('#Authentication_Routes', function() {
   });
 
   describe('new [GET /login]', function() {
-
-    it('should show client-error flash message on page if flash cookie contains client error message, also flash cookie should be cleared', function(done) {
+    it('should redirect to /dashboard if user is already logged in', function() {
+      throw new Error('Come back to - when POST /login is solidified');
+    });
+    it('should show client_error flash message on page if flash cookie contains client error message, also flash cookie should be cleared', function(done) {
       request(app).get('/login')
         .set('Cookie', ['cookie_flash_message=%7B%22type%22%3A%22client_error%22%2C%22text%22%3A%22Invalid%20Credentials%22%7D'])
         .expect(200)
-        .expect(/Invalid Credentials/, done);
+        .expect(/Invalid Credentials/)
+        .end(function(err, res) {
+          if(err)
+            return done(err);
+          // expect(res.headers['set-cookie'])\
+          console.log(res.headers);
+          done();
+        });
     });
-  	it('should redirect to /dashboard if user is already logged in');
-  	it('should show server-error flash message on page if flash cookie includes server-error, and should clear cookie');
-  	it('should show signup-success flash message on page if flash cookie includes signup success message, and cookie should be cleared');
-  	it('should show login page without any messages if no flash message cookie sent');
+  	it('should show server_error flash message on page if flash cookie includes server-error, and should clear cookie', function(done) {
+      request(app).get('/login')
+        .set('Cookie', ['cookie_flash_message=%7B%22type%22%3A%22server_error%22%2C%22text%22%3A%22Something%20went%20wrong%22%7D'])
+        .expect(200)
+        .expect(/Something went wrong/)
+        .end(function(err, res) {
+          if(err)
+            return done(err);
+          // expect(res.headers['set-cookie'])\
+          console.log(res.headers);
+          done();
+        });
+    });
+  	it('should show signup_success flash message on page if flash cookie includes signup success message, and cookie should be cleared', function(done) {
+      request(app).get('/login')
+        .set('Cookie', ['cookie_flash_message=%7B%22type%22%3A%22signup_success%22%2C%22text%22%3A%22Sign%20up%20successful!%22%7D'])
+        .expect(200)
+        .expect(/Sign up successful!/)
+        .end(function(err, res) {
+          if(err)
+            return done(err);
+          // expect(res.headers['set-cookie'])\
+          console.log(res.headers);
+          done();
+        });
+    });
+  	it('should show login page without any messages if no flash message cookie sent', function(done) {
+      request(app).get('/login')
+        .expect(200)
+        .expect(/<form action="\/login" method="post">/, done);
+    });
   });
 
   describe('[GET /signup]', function() {
@@ -60,62 +96,6 @@ describe.only('#Authentication_Routes', function() {
       request(app).get('/signup')
         .expect(200)
         .expect(/<form action="\/signup" method="POST">/, done);
-    });
-  });
-
-  describe('[GET /login]', function() {
-    it('should redirect to /dashboard if request has a session cookie', function(done) {
-      debug('running test');
-      request(app).get('/login')
-        .set('Cookie', [`${SESSION_COOKIE_NAME}=1234`])
-        .expect(302)
-        .expect('Location', '/dashboard', done);
-    });
-    it('should render page with client error message if request has a client-error flashmessage cookie and should erase cookie', function(done) {
-      request(app).get('/login')
-        .set('Cookie', `${CLIENT_ERROR_COOKIE_NAME}=${"Invalid login credentials"}`)
-        .expect(200)
-        .expect(/Invalid login credentials/)
-        .end(function(err, res) {
-          if(err)
-            return done(err);
-          // to ensure that cookie is erased
-          expect(res.headers['set-cookie'], 'still need to make sure flash message cookie gets deleted').to.deep.equal({}); // INCOMPLETE - just dont know the shape of this data IRL yet
-          done();
-        });
-    });
-    it('should render page with generic server error message if request has a server-error flash message cookie and should erase cookie', function(done) {
-      request(app).get('/login')
-        .set('Cookie', `${SERVER_ERROR_COOKIE_NAME}=${"Something went wrong, please try again"}`)
-        .expect(200)
-        .expect(/Something went wrong. Please try again/)
-        .end(function(err, res) {
-          if(err)
-            return done(err);
-          // to check that cookie got erased
-          expect(res.headers['set-cookie'], 'still need to make sure flash message cookie gets deleted').to.deep.equal({}); // INCOMPLETE - just dont know the shape of this data IRL yet
-          done();
-        });
-    });
-    it('should render page with success message if request has a signup-success flash message cookie and should erase cookie', function(done) {
-      debug('running test');
-      request(app).get('/login')
-        .set('Cookie', [`${CLIENT_SUCCESS_COOKIE_NAME}=${"Successfully signed up!"}`])
-        .expect(200)
-        .expect(/Successfully signed up!/)
-        .end(function(err, res) {
-          if(err)
-            return done(err);
-          // to check that cookie got erased
-          expect(res.headers['set-cookie'], 'still need to make sure flash message cookie gets deleted').to.deep.equal({}); // INCOMPLETE - just dont know the shape of this data IRL yet
-          done();
-        });
-    });
-    it('should render page with a form field that we can regex (if no session cookie is present)', function(done) {
-        debug('running test');
-        request(app).get('/login')
-          .expect(200)
-          .expect(/<form action="\/login" method="post">/, done);
     });
   });
 
