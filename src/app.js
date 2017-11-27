@@ -71,4 +71,8 @@ app.post('/signup', signupValidators, function(req, res) {
 	signupRouteHandlers.postSignup(req, res, errors, validData, userController, require('bcrypt'));
 });
 
+app.get('/dashboard', function(req, res) {
+	res.render('dashboard');
+});
+
 module.exports = app;
