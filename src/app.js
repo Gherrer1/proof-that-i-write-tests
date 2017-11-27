@@ -44,14 +44,20 @@ app.get('/login', function(req, res) {
 	loginRouteHandlers.getLogin(req, res);
 });
 
-// app.post(/login, ensureNotLoggedIn, validators, ensureErrorFree, passport.authenticate, function(req, res) { res.redirect("/dashboard"); })
-app.post('/login', /*ensureLoggedOut('/dashboard'),*/ loginValidators, function redirectIfErrors(req, res, next) {
-	const {matchedData} = require('express-validator/filter');
-	const {validationResult} = require('express-validator/check');
-	loginRouteHandlers.ensureNoValidationErrs(req, res, next, matchedData, validationResult);
-}, passport.authenticate('local', { failureRedirect: '/login', successRedirect: '/dashboard' }), function(req, res) {
-	res.send('hey');
-});
+app.post('/login',
+		/*ensureLoggedOut('/dashboard'),*/
+				loginValidators,
+						function redirectIfErrors(req, res, next) {
+							const {matchedData} = require('express-validator/filter');
+							const {validationResult} = require('express-validator/check');
+							loginRouteHandlers.ensureNoValidationErrs(req, res, next, matchedData, validationResult);
+						},
+	function authenticate(req, res) {
+		passport.authenticate('local', function(err, user, info) {
+			loginRouteHandlers.handleAuthenticationResult(req, res, err, user, info);
+		})(req, res);
+	}
+);
 
 app.get('/signup', function(req, res) {
 	signupRouteHandlers.getSignup(req, res);

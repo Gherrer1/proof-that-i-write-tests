@@ -173,6 +173,7 @@ describe.only('#Authentication_Routes', function() {
             return done(err);
           const cookie = res.headers['set-cookie'][0];
           expect(cookie).to.match(/cookie_flash_message=.+client_error.+email%22/);
+          expect(res.headers['set-cookie'].length).to.equal(1);
           done();
         });
     });
@@ -180,7 +181,7 @@ describe.only('#Authentication_Routes', function() {
       // find out how to mock this
       throw new Error('red-green refactor');
     });
-    it('should redirect to /login with client_error flash message (with username included) if username is incorrect', function(done) {
+    it('should redirect to /login with client_error flash message (with email included) if username is incorrect', function(done) {
       request(app).post('/login')
         .send({ email: 'satoo@email.com', password: '1111111111' })
         .expect(302)
@@ -190,10 +191,11 @@ describe.only('#Authentication_Routes', function() {
             return done(err);
           const cookie = response.headers['set-cookie'][0];
           expect(cookie).to.match(/cookie_flash_message=.+client_error.+email%22/);
+          expect(response.headers['set-cookie'].length).to.equal(1);
           done();
         });
     });
-    it('should redirect to /login with client_error flash message (with username included) if username correct but password incorrect', function(done) {
+    it('should redirect to /login with client_error flash message (with email included) if username correct but password incorrect', function(done) {
       request(app).post('/login')
         .send({ email: 'sato@email.com', password: '1112221112' })
         .expect(302)
@@ -202,7 +204,9 @@ describe.only('#Authentication_Routes', function() {
           if(err)
             return done(err);
           const cookie = response.headers['set-cookie'][0];
-          expect(cookie).to.match(/cookie_flash_message=.+Invalid credentials/); // Invalid.+credentials
+          expect(cookie).to.match(/cookie_flash_message=.+Invalid.+credentials.+email/); // Invalid.+credentials
+          expect(response.headers['set-cookie'].length).to.equal(1);
+          done();
         });
     });
     it('should give session cookie and signup_success flash message if login credentials are correct', function(done) {
