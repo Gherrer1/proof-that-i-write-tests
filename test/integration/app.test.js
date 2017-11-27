@@ -6,9 +6,7 @@ const request = require('supertest');
 const app = require('../../src/app');
 const seed = require('../../seed');
 const {SESSION_COOKIE_NAME,
-       SERVER_ERROR_COOKIE_NAME,
-       CLIENT_ERROR_COOKIE_NAME,
-       CLIENT_SUCCESS_COOKIE_NAME} = require('../../src/config');
+       SERVER_ERROR_COOKIE_NAME} = require('../../src/config');
 const debug = require('debug')('test-order');
 
 describe.only('#Authentication_Routes', function() {
@@ -218,6 +216,7 @@ describe.only('#Authentication_Routes', function() {
           }
           const cookie = res.headers['set-cookie'][0];
           expect(cookie).to.match(/thekid=.+\./); // session cookie
+          expect(res.headers['set-cookie'].length).to.equal(1);
           done();
         });
     });

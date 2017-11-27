@@ -3,7 +3,7 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const config = require('./index');
 
 const options = {
-	name: config.SESION_COOKIE_NAME,
+	name: config.SESSION_COOKIE_NAME,
 	secret: config.COOKIE_SECRET,
 	store: new MongoDBStore({
 		uri: require('./index.js').DB_URL, 
