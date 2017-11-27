@@ -158,13 +158,13 @@ describe.only('#Authentication_Routes', function() {
     it('should redirect to /signup with error message via cookie (something went wrong) for server errors (*1)');
   });
 
-  describe('[POST /login]', function() {
+  describe.only('[POST /login]', function() {
 
     it('should redirect to /dashboard if user already has a session', function(done) {
       // puppeteer
       done(new Error('red-green refactor'));
     });
-    it('should redirect to /login with client-error cookie and username-you-just-tried cookie if data is invalid - as in simply doesnt fit the requirements used for signup', function(done) {
+    it('should redirect to /login with client_error flash message (including attempted email) if data is invalid - as in simply doesnt fit the requirements used for signup', function(done) {
       debug('running test');
       request(app).post('/login')
         .send({ email: 'a', password: '1' })
@@ -173,10 +173,8 @@ describe.only('#Authentication_Routes', function() {
         .end(function(err, res) {
           if(err)
             return done(err);
-          // TODO: make sure invalid-params cookie sent
-          const cookies = res.headers['set-cookie'];
-          const expectedCookies = { rey: true };
-          expect(cookies).to.deep.equal(expectedCookies);
+          const cookie = res.headers['set-cookie'][0];
+          expect(cookie).to.match(/cookie_flash_message=.+client_error.+email%22/);
           done();
         });
     });
@@ -184,7 +182,7 @@ describe.only('#Authentication_Routes', function() {
       // find out how to mock this
       throw new Error('red-green refactor');
     });
-    it('should redirect to /login with client_error flash message (with username included) if login credentials are incorrect', function(done) {
+    it('should redirect to /login with client_error flash message (with username included) if username is incorrect', function(done) {
       request(app).post('/login')
         .send({ email: 'satoo@email.com', password: '1111111111' })
         .expect(302)
@@ -192,12 +190,21 @@ describe.only('#Authentication_Routes', function() {
         .end(function(err, response) {
           if(err)
             return done(err);
-          // TODO:
-          // assert that we get the cookies we're expecting and nothing more
-          const expectedCookies = { bro: 'haha' }; // dummy, just wanna see expected/actual
-          const cookies = response.headers['set-cookie'];
-          expect(cookies).to.deep.equal(expectedCookies);
+          const cookie = response.headers['set-cookie'][0];
+          expect(cookie).to.match(/cookie_flash_message=.+client_error.+email%22/);
           done();
+        });
+    });
+    it('should redirect to /login with client_error flash message (with username included) if username correct but password incorrect', function(done) {
+      request(app).post('/login')
+        .send({ email: 'sato@email.com', password: '1112221112' })
+        .expect(302)
+        .expect('Location', '/login')
+        .end(function(err, response) {
+          if(err)
+            return done(err);
+          const cookie = response.headers['set-cookie'][0];
+          expect(cookie).to.match(/cookie_flash_message=.+Invalid credentials/); // Invalid.+credentials
         });
     });
     it('should give session cookie and signup_success flash message if login credentials are correct', function(done) {
@@ -209,10 +216,8 @@ describe.only('#Authentication_Routes', function() {
           if(err) {
             return done(err);
           }
-          // TODO: inspect cookies and make sure there's a session cookie
-          const cookies = res.headers['set-cookie'];
-          const expectedCookies = { chewbacca: true };
-          expect(cookies).to.deep.equal(expectedCookies);
+          const cookie = res.headers['set-cookie'][0];
+          expect(cookie).to.match(/thekid=.+\./); // session cookie
           done();
         });
     });
