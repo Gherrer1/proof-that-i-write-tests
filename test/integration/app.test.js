@@ -10,27 +10,8 @@ const {SESSION_COOKIE_NAME,
 const debug = require('debug')('test-order');
 const puppeteer = require('puppeteer');
 
-describe.only('#Authentication_Routes', function() {
-  let page, browser;
-  const width = 1920;
-  const height = 1080;
-  /* before ALL tests*/
-  before(async function() {
-    this.timeout(10000);
-    const browserConfig = { headless: true };
-    if(!browserConfig.headless) {
-      browserConfig.slowMo = 80;
-      browserConfig.args = [`--window-size=${width},${height}`]
-    }
-    browser = await puppeteer.launch(browserConfig);
-    page = await browser.newPage();
-    await page.setViewport({ width, height });
-  });
-  /* after ALL test */
-  after(async function() {
-    browser.close();
-  });
-
+describe('#Authentication_Routes', function() {
+  
   beforeEach(function(done) {
     debug(':)');
     seed.seed()
@@ -43,9 +24,7 @@ describe.only('#Authentication_Routes', function() {
   });
 
   describe('[GET /login]', function() {
-    it('should redirect to /dashboard if user is already logged in', function() {
-      throw new Error('Come back to - when POST /login is solidified');
-    });
+    it('should redirect to /dashboard if user is already logged in', function() { /* In Flows tests */});
     it('should show client_error flash message on page along with just-tried username if flash cookie contains client error message, also flash cookie should be cleared', function(done) {
       request(app).get('/login')
         .set('Cookie', ['cookie_flash_message=%7B%22type%22%3A%22client_error%22%2C%22text%22%3A%22Invalid%20Credentials%22%7D'])
@@ -176,7 +155,7 @@ describe.only('#Authentication_Routes', function() {
     it('should redirect to /signup with error message via cookie (something went wrong) for server errors (*1)');
   });
 
-  describe.only('[POST /login]', function() {
+  describe('[POST /login]', function() {
 
     it('should redirect to /login with client_error flash message (including attempted email) if data is invalid - as in simply doesnt fit the requirements used for signup', function(done) {
       debug('running test');
@@ -253,7 +232,37 @@ describe.only('#Authentication_Routes', function() {
           done();
         });
     });
-    it('should redirect to /dashboard if user already has a session', async function() {
+  });
+});
+
+describe('#Flows', function() {
+    let page, browser;
+    const width = 1920;
+    const height = 1080;
+    /* before ALL tests*/
+    before(async function() {
+      this.timeout(10000);
+      const browserConfig = { headless: true };
+      if(!browserConfig.headless) {
+        browserConfig.slowMo = 80;
+        browserConfig.args = [`--window-size=${width},${height}`]
+      }
+      browser = await puppeteer.launch(browserConfig);
+      page = await browser.newPage();
+      await page.setViewport({ width, height });
+    });
+    /* after ALL test */
+    after(async function() {
+      browser.close();
+    });  
+
+    beforeEach(function(done) {
+      debug(':)');
+      seed.seed()
+      .then(done, done);
+    });
+
+    it('successful POST /login -> GET /dashboard, then GET /login --redirect--> GET /dashboard because already signed in', async function() {
       this.timeout(17000);
       var server = app.listen(3000);
       await page.goto('http://localhost:3000/login');
@@ -267,7 +276,6 @@ describe.only('#Authentication_Routes', function() {
       await page.waitForSelector('#welcome', { timeout: 2000 });
       server.close();
     });
-  });
 });
 
 /**
