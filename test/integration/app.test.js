@@ -32,12 +32,12 @@ describe.only('#Authentication_Routes', function() {
       request(app).get('/login')
         .set('Cookie', ['cookie_flash_message=%7B%22type%22%3A%22client_error%22%2C%22text%22%3A%22Invalid%20Credentials%22%7D'])
         .expect(200)
+        .expect(/class="client_error"/)
         .expect(/Invalid Credentials/)
         .end(function(err, res) {
           if(err)
             return done(err);
-          // expect(res.headers['set-cookie'])\
-          console.log(res.headers);
+          expect(res.headers['set-cookie'][0]).to.match(/cookie_flash_message=.+01 Jan 1970/); // this signifies that cookie has been cleared
           done();
         });
     });
@@ -45,12 +45,12 @@ describe.only('#Authentication_Routes', function() {
       request(app).get('/login')
         .set('Cookie', ['cookie_flash_message=%7B%22type%22%3A%22server_error%22%2C%22text%22%3A%22Something%20went%20wrong%22%7D'])
         .expect(200)
+        .expect(/class="server_error"/)
         .expect(/Something went wrong/)
         .end(function(err, res) {
           if(err)
             return done(err);
-          // expect(res.headers['set-cookie'])\
-          console.log(res.headers);
+          expect(res.headers['set-cookie'][0]).to.match(/cookie_flash_message=.+01 Jan 1970/); // this signifies that cookie has been cleared
           done();
         });
     });
@@ -58,12 +58,12 @@ describe.only('#Authentication_Routes', function() {
       request(app).get('/login')
         .set('Cookie', ['cookie_flash_message=%7B%22type%22%3A%22signup_success%22%2C%22text%22%3A%22Sign%20up%20successful!%22%7D'])
         .expect(200)
+        .expect(/class="signup_success"/)
         .expect(/Sign up successful!/)
         .end(function(err, res) {
           if(err)
             return done(err);
-          // expect(res.headers['set-cookie'])\
-          console.log(res.headers);
+          expect(res.headers['set-cookie'][0]).to.match(/cookie_flash_message=.+01 Jan 1970/); // this signifies that cookie has been cleared
           done();
         });
     });
@@ -157,7 +157,7 @@ describe.only('#Authentication_Routes', function() {
     it('should redirect to /signup with error message via cookie (something went wrong) for server errors (*1)');
   });
 
-  describe('[POST /login]', function() {
+  describe.skip('[POST /login]', function() {
     // might not need to do this - since passport.session() will automatically fill in req.user if your cookie is valid, we can go straight to dashboard
     // so when i say might not need to do this, what I really mean is that we might not need to send to authorization middleware
     // however, if we DO have a cookie and no req.user, that means our sessionID wasnt valid... do we have to manually delete it?

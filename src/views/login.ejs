@@ -10,15 +10,14 @@
 
   <div class="app">
     <h1>Login Page</h1>
-    <% if(locals.errors) { %>
-      <ul class="login-errors">
-        <% errors.forEach(function(err) { %>
-          <li><%= err %></li>
-        <% }) %>
-      </ul>
-    <% } %>
-    <% if(locals.success) { %>
-      <p id="signup_success"><%= locals.success %></p>
+    <% if(locals.flashMessage) { %>
+        <% if(locals.flashMessage.type === 'client_error') { %>
+          <p class="client_error"><%= locals.flashMessage.text %></p>
+        <% } else if(locals.flashMessage.type === 'server_error') { %>
+          <p class="server_error"><%= locals.flashMessage.text %></p>
+        <% } else if(locals.flashMessage.type === 'signup_success') { %>
+          <p class="signup_success"><%= locals.flashMessage.text %></p>
+        <% } %>
     <% } %>
     <!-- TODO: make these fields required -->
     <form action="/login" method="post">
