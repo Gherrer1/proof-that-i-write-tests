@@ -32,12 +32,21 @@ describe('#Login route handlers', function() {
       expect(res.redirect.calledWith('/dashboard'), 'Did not call res.redirect() with "/dashboard"').to.be.true;
     });
     it('should return res.redirect("/dashboard") if user is already logged in even if request came with flash message', function() {
-      throw new Error('red-green refactor');
+      req.locals.flashMessage = { type: 'Success', text: 'Success' };
+      req.isAuthenticated = sinon.stub().returns(true);
+      var spy = sinon.spy(res, 'redirect');
+      loginRouteHandlers.getLogin(req, res);
+
+      expect(req.isAuthenticated.calledOnce, 'Did not check if user is authenticated').to.be.true;
+      expect(res.redirect.calledOnce, 'Did not call res.redirect()').to.be.true;
+      expect(res.redirect.calledWith('/dashboard'), 'Did not call res.redirect() with "/dashboard"').to.be.true;
     });
     it('should return res.render("login") if user isnt already authenticated', function() {
-      // var spy = sinon.spy(res, 'render');
-      // loginRouteHandlers.ge
-      throw new Error('red-green refactor');
+      var spy = sinon.spy(res, 'render');
+      loginRouteHandlers.getLogin(req, res);
+
+      expect(res.render.calledOnce, 'Did not call res.render()').to.be.true;
+      expect(res.render.calledWith('login'), 'Did not call res.render() with "login"').to.be.true;
     });
   });
 });
