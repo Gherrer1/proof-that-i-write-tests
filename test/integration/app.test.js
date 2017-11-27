@@ -41,7 +41,7 @@ describe('#Authentication_Routes', function() {
     });
   	it('should show server_error flash message on page along with just-tried email if flash cookie includes server-error, and should clear cookie', function(done) {
       request(app).get('/login')
-        .set('Cookie', ['cookie_flash_message=%7B%22type%22%3A%22server_error%22%2C%22text%22%3A%22Something%20went%20wrong%22%7D'])
+        .set('Cookie', ['cookie_flash_message=%7B%22type%22%3A%22server_error%22%2C%22text%22%3A%22Something%20went%20wrong.%20Please%20try%20again%22%2C%22email%22%3A%22sato%40email.com%22%7D'])
         .expect(200)
         .expect(/class="server_error"/)
         .expect(/Something went wrong/)
