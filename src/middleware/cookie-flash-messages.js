@@ -7,16 +7,16 @@ module.exports = function (req, res, next) {
 
     // Set a flash method to the res object
     // Usage : res.flash('error|info|success|warning', 'Your message here');
-    // note: if we pass in a username string, add it to the cookie - this will be for failed login attempts
-    res.flash = function (type, text, username) {
+    // note: if we pass in an email string, add it to the cookie - this will be for failed login attempts
+    res.flash = function (type, text, email) {
 
         var message = {
             type: type,
             text: text
         };
 
-        if(username) {
-            message.username = username;
+        if(email) {
+            message.email = email;
         }
 
         res.cookie('cookie_flash_message', JSON.stringify(message), { httpOnly: true });
@@ -34,9 +34,9 @@ module.exports = function (req, res, next) {
                 text: escape(flashMessage.text)
             }
 
-            // add escaped username property as well if it was in the cookie
-            if(flashMessage.username) {
-                flashMessageEscaped.username = escape(flashMessage.username);
+            // add escaped email property as well if it was in the cookie
+            if(flashMessage.email) {
+                flashMessageEscaped.email = escape(flashMessage.email);
             }
 
             res.locals.flashMessage = flashMessageEscaped;
