@@ -92,32 +92,62 @@ describe('#Login route handlers', function() {
   // handleAuthenticationResult(req, res, err, user, info)
   describe('#handleAuthenticationResult', function() {
     let req, res, err, user, info;
+    let flashSpy, redirectSpy, loginSpy;
+    const email = 'e@email.com'
     beforeEach(function() {
-      req = { login(user, cb) { cb(new Error()); } }
+      req = { login(user, cb) { cb(new Error()); }, body: { email } };
+      res = { flash() {}, redirect() {} };
+      flashSpy = sinon.spy(res, 'flash');
+      redirectSpy = sinon.spy(res, 'redirect');
+      loginSpy = sinon.spy(req, 'login');
+      err = null;
+      user = {};
     });
-    it('[implementation] should call res.flash("server_error", "Something went wrong", req.body.email) if err is truthy', function() {
-      throw new Error('red-green refactor');
+    it('[implementation] should call res.flash("server_error", "Something went wrong. Please try again", req.body.email) if err is truthy', function() {
+      err = new Error('Something went wong');
+      loginRouteHandlers.handleAuthenticationResult(req, res, err, user, info);
+      expect(flashSpy.calledOnce, 'Did not call res.flash()').to.be.true;
+      expect(flashSpy.args[0]).to.deep.equal(['server_error', 'Something went wrong. Please try again', email]);
     });
     it('should call res.redirect("/login") if err is truthy', function() {
-      throw new Error('red-green refactor');
+      err = new Error('Something went wong');
+      loginRouteHandlers.handleAuthenticationResult(req, res, err, user, info);
+      expect(redirectSpy.calledOnce, 'Did not call res.redirect()').to.be.true;
+      expect(redirectSpy.args[0][0]).to.equal('/login');
     });
     it('[implementation] should call res.flash("client_error", "Invalid credentials", req.body.email) if user is false', function() {
-      throw new Error('red-green refactor');
+      user = false;
+      loginRouteHandlers.handleAuthenticationResult(req, res, err, user, info);
+      expect(flashSpy.calledOnce, 'Did not call res.flash()').to.be.true;
+      expect(flashSpy.args[0]).to.deep.equal(['client_error', 'Invalid credentials', email]);
     });
     it('should call res.redirect("/login") if user is false', function() {
-      throw new Error('red-green refactor');
+      user = false;
+      loginRouteHandlers.handleAuthenticationResult(req, res, err, user, info);
+      expect(redirectSpy.calledOnce, 'Did not call res.redirect()').to.be.true;
+      expect(redirectSpy.args[0][0]).to.equal('/login');
     });
     it('[implementation] should call req.login(user, cb) if no err and user is truthy', function() {
-      throw new Error('red-green refactor');
+      loginRouteHandlers.handleAuthenticationResult(req, res, err, user, info);
+      expect(loginSpy.calledOnce, 'Did not call req.login()').to.be.true;
+      expect(loginSpy.args[0][0]).to.deep.equal(user);
     });
-    it('[implementation] should call res.flash("server_error", "Something went wrong", req.body.email) if req.login passes err to callback', function() {
-      throw new Error('red-green refactor');
+    it('[implementation] should call res.flash("server_error", "Something went wrong. Please try again", req.body.email) if req.login passes err to callback', function() {
+      loginRouteHandlers.handleAuthenticationResult(req, res, err, user, info);
+      // even though req.login() is async, our mock is not.
+      expect(flashSpy.calledOnce, 'Did not call res.flash() from req.login() callback').to.be.true;
+      expect(flashSpy.args[0]).to.deep.equal(['server_error', 'Something went wrong. Please try again', email]);
     });
     it('should call res.redirect("/login") if req.login passes err to callback', function() {
-      throw new Error('red-green refactor');
+      loginRouteHandlers.handleAuthenticationResult(req, res, err, user, info);
+      expect(redirectSpy.calledOnce, 'Did not call res.redirect() from within req.login() callback').to.be.true;
+      expect(redirectSpy.args[0][0], 'Did not call res.redirect() with "/login"').to.equal('/login');
     });
     it('should call res.redirect("/dashboard") if req.login doesnt pass err to callback', function() {
-      throw new Error('red-green refactor');
+      req.login = function(u, cb) { cb(null); }
+      loginRouteHandlers.handleAuthenticationResult(req, res, err, user, info);
+      expect(redirectSpy.calledOnce, 'Did not call res.redirect() from within req.login() callback').to.be.true;
+      expect(redirectSpy.args[0][0], 'Did not call res.redirect("/dashboard") from within req.login() callback').to.equal('/dashboard');
     });
   });
 });
