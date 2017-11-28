@@ -34,11 +34,12 @@ const postSignup = function(req, res, errors, validData, userController, hasher)
 };
 
 // GET /signup
+/**
+ * Note: does not need to handle redirecting logged in users because middleware will do that.
+ * Also: middleware handles extracting and clearing flash messages and adding them to req.locals,
+ *       and req.locals is automatically passed into render, so all we literally need to do is call render().
+ */
 const getSignup = function(req, res) {
-  if(req.cookies[SESSION_COOKIE_NAME])
-    return res.redirect("/dashboard");
-  if(req.cookies[SERVER_ERROR_COOKIE_NAME])
-    return res.render('signup', { errors: [ req.cookies[SERVER_ERROR_COOKIE_NAME] ] });
   return res.render('signup');
 };
 

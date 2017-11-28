@@ -174,40 +174,12 @@ describe('#Signup route handlers', function() {
     let req, res;
 
     beforeEach(function() {
-      req = {
-        cookies: {}
-      };
-      res = {
-        redirect() {},
-        render() {}
-      };
+      req = {};
+      res = { render() {} };
     });
 
-    it('should return res.redirect("/dashboard") if request comes with a session cookie', function() {
-      req.cookies[SESSION_COOKIE_NAME] = '1234';
-      const expectedReturnValue = 'secrethehe'
-      res.redirect = sinon.stub().returns(expectedReturnValue);
-      const retVal = signupRouteHandler.getSignup(req, res);
-      expect(retVal).to.equal(expectedReturnValue);
-      expect(res.redirect.calledOnce, 'res.redirect() not called once').to.be.true;
-      expect(res.redirect.calledWith('/dashboard'), 'res.redirect() not called with "/dashboard"').to.be.true;
-    });
     /* this should only ever happen with legit server errors, no client errors - clientside JS will handle those*/
-    it('should return res.render("/signup") with {errors} string passed in if request comes with a server-error cookie', function() {
-      const expectedReturnValue = 'darlenesGUNN';
-      const errorCookieValue = 'Hashing failed';
-      const expectedRenderParams = { errors: [errorCookieValue] };
-
-      res.render = sinon.stub().returns(expectedReturnValue);
-      req.cookies[SERVER_ERROR_COOKIE_NAME] = errorCookieValue;
-      var retVal = signupRouteHandler.getSignup(req, res);
-
-      expect(retVal).to.equal(expectedReturnValue);
-      expect(res.render.calledOnce, `res.render() not called once but ${res.render.callCount} times`).to.be.true;
-      expect(res.render.args[0][0], `res.render()s first argument was not "signup" but ${res.render.args[0][0]}`).to.equal('signup');
-      expect(res.render.args[0][1]).to.deep.equal(expectedRenderParams);
-    });
-    it('should return res.render("/signup") with no locals if request comes with no cookies', function() {
+    it('should return res.render("/signup")', function() {
       const expectedReturnValue = 'tyrelliot';
       res.render = sinon.stub().returns(expectedReturnValue);
       const retVal = signupRouteHandler.getSignup(req, res);
@@ -215,8 +187,6 @@ describe('#Signup route handlers', function() {
       expect(retVal, 'Expected function to return res.render()').to.equal(expectedReturnValue);
       expect(res.render.calledOnce, `res.render() not called once but ${res.render.callCount} times`).to.be.true;
       expect(res.render.args[0][0], `res.render()s first argument was not "signup" like expected but ${res.render.args[0][0]}`).to.equal('signup');
-      const secondRenderArg = res.render.args[0][1];
-      expect(secondRenderArg, 'Should not pass in a locals object to res.render()').to.be.undefined;
     });
   });
 });
