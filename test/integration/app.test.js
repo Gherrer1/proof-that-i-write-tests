@@ -74,14 +74,7 @@ describe('#Authentication_Routes', function() {
   });
 
   describe('[GET /signup]', function() {
-    it('should redirect to /dashboard if request has a session cookie', function(done){
-      // dont worry, itll run into authentication middleware to validate the cookie
-      debug('running test');
-      request(app).get('/signup')
-        .set('Cookie', [`${SESSION_COOKIE_NAME}=1234`])
-        .expect(302)
-        .expect('Location', '/dashboard', done);
-    });
+    it('should redirect to /dashboard if user already signed in', function() { /* Moved to Flows */ });
     it('should render an HTML file with an error message above the signup form if server-error cookie is present', function(done) {
       debug('running test');
       const errorMessage = 'Something went wrong'
@@ -234,48 +227,6 @@ describe('#Authentication_Routes', function() {
         });
     });
   });
-});
-
-describe('#Flows', function() {
-    let page, browser;
-    const width = 1920;
-    const height = 1080;
-    /* before ALL tests*/
-    before(async function() {
-      this.timeout(10000);
-      const browserConfig = { headless: true };
-      if(!browserConfig.headless) {
-        browserConfig.slowMo = 80;
-        browserConfig.args = [`--window-size=${width},${height}`]
-      }
-      browser = await puppeteer.launch(browserConfig);
-      page = await browser.newPage();
-      await page.setViewport({ width, height });
-    });
-    /* after ALL test */
-    after(async function() {
-      await browser.close();
-    });
-
-    beforeEach(function(done) {
-      seed.seed()
-      .then(done, done);
-    });
-
-    it('successful POST /login -> GET /dashboard, then GET /login --redirect--> GET /dashboard because already signed in', async function() {
-      this.timeout(17000);
-      var server = app.listen(3000);
-      await page.goto('http://localhost:3000/login');
-      await page.waitForSelector('#emailInput');
-      await page.type('#emailInput', 'sato@email.com');
-      await page.type('#passwordInput', '1111111111');
-      await page.click('#submitInput');
-      await page.waitForSelector('#welcome');
-      await page.goto('http://localhost:3000/login');
-      // by waiting for #welcome, we're really expecting to be redirected back to /dashboard
-      await page.waitForSelector('#welcome', { timeout: 2000 });
-      server.close();
-    });
 });
 
 /**
