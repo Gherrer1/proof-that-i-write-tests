@@ -4,6 +4,7 @@ const app = require('../../src/app');
 
 
 describe.only('#Flows', function() {
+    var server = app.listen(3000);
     let page, browser;
     const width = 1920;
     const height = 1080;
@@ -21,6 +22,7 @@ describe.only('#Flows', function() {
     });
     /* after ALL test */
     after(async function() {
+      server.close();
       await browser.close();
     });
 
@@ -31,7 +33,6 @@ describe.only('#Flows', function() {
 
     it('successful POST /login -> GET /dashboard, then GET /login --redirect--> GET /dashboard because already signed in', async function() {
       this.timeout(17000);
-      var server = app.listen(3000);
       await page.goto('http://localhost:3000/login');
       await page.waitForSelector('#emailInput');
       await page.type('#emailInput', 'sato@email.com');
@@ -41,16 +42,13 @@ describe.only('#Flows', function() {
       await page.goto('http://localhost:3000/login');
       // by waiting for #welcome, we're really expecting to be redirected back to /dashboard
       await page.waitForSelector('#welcome', { timeout: 2000 });
-      server.close();
     });
     it('should allow me to go to /login from the start of this test (i know, testing a test, but its really for my confidence in the future)', async function() {
       this.timeout(5000);
-      var server = app.listen(3000);
       await page.goto('http://localhost:3000/login');
       await page.waitForSelector('#emailInput', { timeout: 1500 });
-      server.close();
     });
     it('should redirect from /signup to /dashboard if user is already logged in (we are gonna log in first)', async function() {
-
+      this.timeout(5000);
     });
 });
