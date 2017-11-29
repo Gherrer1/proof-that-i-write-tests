@@ -9,7 +9,7 @@ const {SESSION_COOKIE_NAME} = require('../../src/config');
 const debug = require('debug')('test-order');
 const puppeteer = require('puppeteer');
 
-describe.only('#Authentication_Routes', function() {
+describe('#Authentication_Routes', function() {
 
   beforeEach(function(done) {
     debug(':)');
@@ -78,9 +78,16 @@ describe.only('#Authentication_Routes', function() {
       debug('running test');
       const errorMessage = 'Something went wrong'
       request(app).get('/signup')
-        // .set('Cookie', [``]) // TODO: send cookie
+        .set('Cookie', ['cookie_flash_message=%7B%22type%22%3A%22server_error%22%2C%22text%22%3A%22Something%20went%20wrong.%20Please%20try%20again%22%7D'])
         .expect(200)
-        .expect(/<li>Something went wrong<\/li>/, done);
+        .expect(/id="server_error".+Something went wrong\. Please try again/)
+        .end(function(err, res) {
+          if(err)
+            return done(err);
+          let flashCookie = res.headers['set-cookie'][0];
+          expect(flashCookie, 'flash message cookie wasnt cleared').to.match(/cookie_flash_message=.+01 Jan 1970/);
+          done();
+        });
     });
     it('should return an HTML file with a form field that we can regex (if no cookies present)', function(done){
       debug('running test');
@@ -227,7 +234,7 @@ describe.only('#Authentication_Routes', function() {
           if(err)
             return done(err);
           const cookie = response.headers['set-cookie'][0];
-          expect(cookie).to.match(/cookie_flash_message=.+Invalid.+credentials.+email/); // Invalid.+credentials
+          expect(cookie).to.match(/cookie_flash_message=.+Invalid.+credentials.+email/);
           expect(response.headers['set-cookie'].length).to.equal(1);
           done();
         });

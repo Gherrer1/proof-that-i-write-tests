@@ -9,12 +9,8 @@
 <% include partials/splash_navbar.ejs %>
 
 	<div class="container-fluid">
-  		<% if(locals.errors && locals.errors.length) { %>
-  			<ul class="signup-errors">
-				<% locals.errors.forEach(function(err) { %>
-					<li><%= err %></li>
-				<% }) %>
-			</ul>
+  		<% if(locals.flashMessage && locals.flashMessage.type === 'server_error') { %>
+  			<p id="server_error"><%= locals.flashMessage.text %></p>
   		<% } %>
 		<form action="/signup" method="POST">
 			<div class="form-group">

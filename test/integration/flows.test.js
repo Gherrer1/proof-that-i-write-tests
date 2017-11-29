@@ -3,7 +3,7 @@ const seed = require('../../seed');
 const app = require('../../src/app');
 
 
-describe.only('#Flows', function() {
+describe('#Flows', function() {
     var server = app.listen(3000);
     let page, browser;
     const width = 1920;
