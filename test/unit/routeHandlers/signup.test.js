@@ -1,9 +1,6 @@
-const chai = require('chai');
 const sinon = require('sinon');
-const expect = chai.expect;
+const expect = require('chai').expect;
 const signupRouteHandler = require('../../../src/routeHandlers/signup');
-const { SESSION_COOKIE_NAME,
-        SERVER_ERROR_COOKIE_NAME } = require('../../../src/config');
 
 describe('#Signup route handlers', function() {
   // postSignup(req, res, errors, validData, userController, hasher)

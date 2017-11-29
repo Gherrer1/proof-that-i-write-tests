@@ -1,8 +1,6 @@
-const { matchedData } = require('express-validator/filter');
-const { validationResult } = require('express-validator/check');
-const { SESSION_COOKIE_NAME,
-        SALT_ROUNDS,
-        SERVER_ERROR_COOKIE_NAME } = require('../config');
+const {matchedData} = require('express-validator/filter');
+const {validationResult} = require('express-validator/check');
+const {SALT_ROUNDS} = require('../config');
 const debug = require('debug')('routeHandlers:signup');
 
 // POST /signup
