@@ -91,7 +91,15 @@ describe.only('#Authentication_Routes', function() {
   });
 
   describe('[POST /signup]', function() {
-    it('should redirect to /dashboard if users already logged in', function() { throw new Error('red-green refactor'); }); // figure out how
+    it('should redirect to /dashboard if users already logged in', function(done) {
+      simulateLogIn()
+      .then(cookie => {
+        request(app).post('/signup')
+        .set('Cookie', [cookie])
+        .expect(302).expect('Location', '/dashboard', done);
+      })
+      .catch(err => { console.log(err); done(err); });
+    });
     it('should redirect to /signup if request body has invalid parameters without any error messages to discourage bots - browser will have clientside validation', function(done) {
       debug('running test');
       request(app).post('/signup')
@@ -102,8 +110,7 @@ describe.only('#Authentication_Routes', function() {
           if(err) {
             return done(err);
           }
-          var cookies = res.headers['set-cookie'];
-          expect(cookies.length, 'We shouldnt have a cookie').to.equal(0);
+          expect(res.headers['set-cookie']).to.be.undefined;
           done();
         });
     });
@@ -117,8 +124,7 @@ describe.only('#Authentication_Routes', function() {
           if(err) {
             return done(err);
           }
-          var cookies = res.headers['set-cookie'];
-          expect(cookies.length, 'We shouldnt have a cookie').to.equal(0);
+          expect(res.headers['set-cookie']).to.be.undefined;
           done()
         });
     });
@@ -138,12 +144,34 @@ describe.only('#Authentication_Routes', function() {
           done();
         });
     });
-    it('should redirect to /signup with error message via cookie (something went wrong) for server errors (*1)', function() { throw new Error('red-green refactor'); });
+    it('should redirect to /signup with server_error flash message for server errors (*1)', function(done) {
+      var stub = sinon.stub(require('bcrypt'), 'hash').rejects(new Error('Hashing went wrong bro'));
+      request(app).post('/signup')
+        .send({ fname: 'huntly', username: 'huntley', email: 'hunt@email.com', password: '1111111111', passwordConfirmation: '1111111111' })
+        .expect(302).expect('Location', '/signup')
+        .end(function(err, res) {
+          stub.restore();
+          if(err)
+            return done(err);
+          const cookie = res.headers['set-cookie'][0];
+          expect(cookie).to.match(/cookie_flash_message=.+server_error/);
+          expect(res.headers['set-cookie'].length, 'We got more than one cookie, that shouldnt happen').to.equal(1);
+          done();
+        });
+    });
   });
 
   describe('[POST /login]', function() {
 
-    it('should redirect to /dashboard if user is already logged in', function() { throw new Error('red-green refactor'); }); // figure out how
+    it('should redirect to /dashboard if user is already logged in', function(done) {
+      simulateLogIn()
+      .then(cookie => {
+        request(app).post('/login')
+        .set('Cookie', [cookie])
+        .expect(302).expect('Location', '/dashboard', done);
+      })
+      .catch(err => done(err));
+    });
 
     it('should redirect to /login with client_error flash message (including attempted email) if data is invalid - as in simply doesnt fit the requirements used for signup', function(done) {
       debug('running test');
@@ -168,9 +196,8 @@ describe.only('#Authentication_Routes', function() {
         .expect('Location', '/login')
         .end(function(err, res) {
           stub.restore();
-          if(err) {
+          if(err)
             return done(err);
-          }
           const cookie = res.headers['set-cookie'][0];
           expect(cookie).to.match(/cookie_flash_message=.+server_error.+email%22/);
           expect(res.headers['set-cookie'].length).to.equal(1);
@@ -226,3 +253,17 @@ describe.only('#Authentication_Routes', function() {
 /**
  * *1 server errors include db operation errors, hashing errors, etc
  */
+
+function simulateLogIn() {
+  return new Promise(function(resolve, reject) {
+    request(app).post('/login')
+      .send({ email: 'sato@email.com', password: '1111111111' })
+      .end(function(err, res) {
+        if(err)
+          return reject(err);
+        const cookie = res.headers['set-cookie'][0];
+        const cookieMainMeat = cookie.split(';')[0];
+        resolve(cookieMainMeat);
+      });
+  });
+}
