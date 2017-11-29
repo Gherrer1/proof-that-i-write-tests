@@ -6,9 +6,10 @@ const { SESSION_COOKIE_NAME,
 const debug = require('debug')('routeHandlers:signup');
 
 // POST /signup
+/**
+ * Note: middleware handles redirecting
+ */
 const postSignup = function(req, res, errors, validData, userController, hasher) {
-  if(req.cookies[SESSION_COOKIE_NAME])
-    return res.redirect('/dashboard');
   if(!errors.isEmpty())
     return res.redirect('/signup');
   userController.ensureEmailAndUsernameUnique(validData.email, validData.username)
@@ -23,12 +24,16 @@ const postSignup = function(req, res, errors, validData, userController, hasher)
       validData.password = hashedPassword;
       return userController.createUser(validData);
     })
-    .then(user => res.redirect('/login'))
+    .then(user => {
+      res.flash('signup_success', 'You successfully signed up!');
+      res.redirect('/login');
+    })
     .catch(err => {
       // if theres an error, that means we need to redirect somewhere. If no error, we've already invoked response object to handle it.
       debug(`err: ${err} (if undefined, probably means user is using a bot aka not the browser)`);
       if(!err)
         return; // if promise chain ends early and we dont have an error to throw, its handled here
+      res.flash('server_error', 'Something went wrong. Please try again');
       res.redirect('/signup');
     });
 };
