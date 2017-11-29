@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha test/unit/*",
     "start": "nodemon src/server.js",
-    "integration": "mocha test/integration/*"
+    "integration": "NODE_ENV=test mocha test/integration/*"
   },
   "repository": {
     "type": "git",

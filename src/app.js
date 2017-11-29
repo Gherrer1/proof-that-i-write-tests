@@ -30,7 +30,8 @@ app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/public'));
 
 // Middleware
-app.use(require('morgan')('dev')); // logger
+if(process.env.NODE_ENV !== 'test')
+	app.use(require('morgan')('dev')); // logger
 app.use(require('cookie-parser')(config.COOKIE_SECRET));
 app.use(require('body-parser').urlencoded({ extended: true }));
 app.use(require('body-parser').json());

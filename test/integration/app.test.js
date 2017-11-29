@@ -12,14 +12,8 @@ const puppeteer = require('puppeteer');
 describe('#Authentication_Routes', function() {
 
   beforeEach(function(done) {
-    debug(':)');
     seed.seed()
     .then(done, done);
-  });
-
-  afterEach(function(done) {
-    debug(':(');
-    done();
   });
 
   describe('[GET /login]', function() {
@@ -75,7 +69,6 @@ describe('#Authentication_Routes', function() {
   describe('[GET /signup]', function() {
     it('should redirect to /dashboard if user already signed in', function() { /* Moved to Flows */ });
     it('should render an HTML file with an error message above the signup form if request comes with server_error flash message (should clear flash cookie)', function(done) {
-      debug('running test');
       const errorMessage = 'Something went wrong'
       request(app).get('/signup')
         .set('Cookie', ['cookie_flash_message=%7B%22type%22%3A%22server_error%22%2C%22text%22%3A%22Something%20went%20wrong.%20Please%20try%20again%22%7D'])
@@ -90,7 +83,6 @@ describe('#Authentication_Routes', function() {
         });
     });
     it('should return an HTML file with a form field that we can regex (if no cookies present)', function(done){
-      debug('running test');
       request(app).get('/signup')
         .expect(200)
         .expect(/<form action="\/signup" method="POST">/, done);
@@ -108,7 +100,6 @@ describe('#Authentication_Routes', function() {
       .catch(err => { console.log(err); done(err); });
     });
     it('should redirect to /signup if request body has invalid parameters without any error messages to discourage bots - browser will have clientside validation', function(done) {
-      debug('running test');
       request(app).post('/signup')
         .send({ fname: 'Tester', email: 'invalid email lol', also: 'many fields are missing LOL' })
         .expect(302)
@@ -122,7 +113,6 @@ describe('#Authentication_Routes', function() {
         });
     });
     it('should redirect to /signup if username or email in request body are not unique without error \n\tmessages to discourage bots - clientside will check for uniqueness before allowing client to submit form', function(done) {
-      debug('running test');
       request(app).post('/signup')
         .send({ fname: 'Otherkirishima', email: 'kirishima@email.com', password: '1111111111', username: 'kirishima', passwordConfirmation: '1111111111' })
         .expect(302)
@@ -136,7 +126,6 @@ describe('#Authentication_Routes', function() {
         });
     });
     it('should redirect to /login with signup_success flash message if request body is all valid, including unique username and email', function(done) {
-      debug('running test');
       request(app).post('/signup')
         .send({ fname: 'Uniqueuser', email: 'uniqueEmail@email.com', password: '1111111111', username: 'uniqueUname', passwordConfirmation: '1111111111' })
         .expect(302)
@@ -181,7 +170,6 @@ describe('#Authentication_Routes', function() {
     });
 
     it('should redirect to /login with client_error flash message (including attempted email) if data is invalid - as in simply doesnt fit the requirements used for signup', function(done) {
-      debug('running test');
       request(app).post('/login')
         .send({ email: 'a', password: '1' })
         .expect(302)
