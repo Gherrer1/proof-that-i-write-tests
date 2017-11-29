@@ -5,12 +5,11 @@ const sinon = require('sinon');
 const request = require('supertest');
 const app = require('../../src/app');
 const seed = require('../../seed');
-const {SESSION_COOKIE_NAME,
-       SERVER_ERROR_COOKIE_NAME} = require('../../src/config');
+const {SESSION_COOKIE_NAME} = require('../../src/config');
 const debug = require('debug')('test-order');
 const puppeteer = require('puppeteer');
 
-describe('#Authentication_Routes', function() {
+describe.only('#Authentication_Routes', function() {
 
   beforeEach(function(done) {
     debug(':)');
@@ -75,11 +74,11 @@ describe('#Authentication_Routes', function() {
 
   describe('[GET /signup]', function() {
     it('should redirect to /dashboard if user already signed in', function() { /* Moved to Flows */ });
-    it('should render an HTML file with an error message above the signup form if server-error cookie is present', function(done) {
+    it('should render an HTML file with an error message above the signup form if request comes with server_error flash message (should clear flash cookie)', function(done) {
       debug('running test');
       const errorMessage = 'Something went wrong'
       request(app).get('/signup')
-        .set('Cookie', [`${SERVER_ERROR_COOKIE_NAME}=${errorMessage}`])
+        // .set('Cookie', [``]) // TODO: send cookie
         .expect(200)
         .expect(/<li>Something went wrong<\/li>/, done);
     });
@@ -92,13 +91,7 @@ describe('#Authentication_Routes', function() {
   });
 
   describe('[POST /signup]', function() {
-    it('should redirect to /dashboard if request has a session cookie', function(done) {
-      debug('running test');
-      request(app).post('/signup')
-        .set('Cookie', [`${SESSION_COOKIE_NAME}=1234`])
-        .expect(302)
-        .expect('Location', '/dashboard', done);
-    });
+    it('should redirect to /dashboard if users already logged in', function() { throw new Error('red-green refactor'); }); // figure out how
     it('should redirect to /signup if request body has invalid parameters without any error messages to discourage bots - browser will have clientside validation', function(done) {
       debug('running test');
       request(app).post('/signup')
@@ -109,10 +102,8 @@ describe('#Authentication_Routes', function() {
           if(err) {
             return done(err);
           }
-          // heres where we check that no cookies were sent
           var cookies = res.headers['set-cookie'];
-          debug(cookies);
-          // TODO: actually check that no cookies were sent, we dont know the shape of the data right now
+          expect(cookies.length, 'We shouldnt have a cookie').to.equal(0);
           done();
         });
     });
@@ -127,29 +118,32 @@ describe('#Authentication_Routes', function() {
             return done(err);
           }
           var cookies = res.headers['set-cookie'];
-          debug(cookies);
-          // TODO: actually check that no cookies were returned (cookies that mightve carried error messages)
+          expect(cookies.length, 'We shouldnt have a cookie').to.equal(0);
           done()
         });
     });
-    it('should redirect to /login with success message if no session cookie and if request body is all valid, including unique username and email', function(done) {
+    it('should redirect to /login with signup_success flash message if request body is all valid, including unique username and email', function(done) {
       debug('running test');
       request(app).post('/signup')
         .send({ fname: 'Uniqueuser', email: 'uniqueEmail@email.com', password: '1111111111', username: 'uniqueUname', passwordConfirmation: '1111111111' })
         .expect(302)
         .expect('Location', '/login')
         .end(function(err, res) {
-          // TODO: make sure a flash message cookie is present
           if(err) {
             return done(err);
           }
+          var successFlash = res.headers['set-cookie'][0];
+          expect(successFlash).to.match(/cookie_flash_message=.+signup_success/);
+          expect(res.headers['set-cookie'].length, 'We should only have 1 cookie - the flash cookie').to.equal(1);
           done();
         });
     });
-    it('should redirect to /signup with error message via cookie (something went wrong) for server errors (*1)');
+    it('should redirect to /signup with error message via cookie (something went wrong) for server errors (*1)', function() { throw new Error('red-green refactor'); });
   });
 
   describe('[POST /login]', function() {
+
+    it('should redirect to /dashboard if user is already logged in', function() { throw new Error('red-green refactor'); }); // figure out how
 
     it('should redirect to /login with client_error flash message (including attempted email) if data is invalid - as in simply doesnt fit the requirements used for signup', function(done) {
       debug('running test');

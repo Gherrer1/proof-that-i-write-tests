@@ -49,6 +49,15 @@ describe.only('#Flows', function() {
       await page.waitForSelector('#emailInput', { timeout: 1500 });
     });
     it('should redirect from /signup to /dashboard if user is already logged in (we are gonna log in first)', async function() {
-      this.timeout(5000);
+      this.timeout(10000);
+      await page.goto('http://localhost:3000/login');
+      await page.waitForSelector('#emailInput');
+      await page.type('#emailInput', 'sato@email.com');
+      await page.type('#passwordInput', '1111111111');
+      await page.click('#submitInput');
+      await page.waitForSelector('#welcome');
+      await page.goto('http://localhost:3000/signup');
+      // by waiting for #welcome, we're really expecting to be redirected back to /dashboard
+      await page.waitForSelector('#welcome', { timeout: 2000 });
     });
 });
