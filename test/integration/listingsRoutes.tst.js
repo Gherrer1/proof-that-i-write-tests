@@ -10,10 +10,10 @@ describe('#Listings_Routes', function() {
 	});
 	describe('[GET /listings/new]', function() {
 		it('should redirect to /login if not logged in, response should contain return_to CFM^*1', function() {
-			
+			throw new Error('red-green refactor');
 		});
 		it('should render create listings form if logged in', function() {
-			
+			throw new Error('red-green refactor');
 		});
 	});
 });
