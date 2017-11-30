@@ -74,4 +74,8 @@ app.get('/dashboard', function(req, res) {
 	res.render('dashboard');
 });
 
+app.get('/listings/new', function(req, res) {
+	// listingsRouteHandlers.
+});
+
 module.exports = app;

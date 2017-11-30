@@ -8,6 +8,7 @@ const seed = require('../../seed');
 const {SESSION_COOKIE_NAME} = require('../../src/config');
 const debug = require('debug')('test-order');
 const puppeteer = require('puppeteer');
+const {simulateLogIn} = require('./helpers');
 
 describe('#Authentication_Routes', function() {
 
@@ -279,17 +280,3 @@ describe('#Authentication_Routes', function() {
 /**
  * *1 server errors include db operation errors, hashing errors, etc
  */
-
-function simulateLogIn() {
-  return new Promise(function(resolve, reject) {
-    request(app).post('/login')
-      .send({ email: 'sato@email.com', password: '1111111111' })
-      .end(function(err, res) {
-        if(err)
-          return reject(err);
-        const cookie = res.headers['set-cookie'][0];
-        const cookieMainMeat = cookie.split(';')[0];
-        resolve(cookieMainMeat);
-      });
-  });
-}
