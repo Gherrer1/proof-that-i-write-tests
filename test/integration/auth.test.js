@@ -227,7 +227,20 @@ describe('#Authentication_Routes', function() {
           done();
         });
     });
-    it('should give session cookie and signup_success flash message if login credentials are correct', function(done) {
+    it('should give session cookie if login successful', function(done) {
+      request(app).post('/login')
+        .send({ email: 'sato@email.com', password: '1111111111' })
+        .end(function(err, res) {
+          if(err) {
+            return done(err);
+          }
+          const cookie = res.headers['set-cookie'][0];
+          expect(cookie).to.match(/thekid=.+\./); // session cookie
+          expect(res.headers['set-cookie'].length).to.equal(1);
+          done();
+        });
+    });
+    it('should redirect to /dashboard if login successful & no return_to flash', function(done) {
       request(app).post('/login')
         .send({ email: 'sato@email.com', password: '1111111111' })
         .expect(302)
@@ -239,6 +252,24 @@ describe('#Authentication_Routes', function() {
           const cookie = res.headers['set-cookie'][0];
           expect(cookie).to.match(/thekid=.+\./); // session cookie
           expect(res.headers['set-cookie'].length).to.equal(1);
+          done();
+        });
+    });
+    it('should redirect to /{return_to} if login successful & yes return_to flash, which should clear', function(done) {
+      request(app).post('/login')
+        .send({ email: 'sato@email.com', password: '1111111111' })
+        .set('Cookie', [/* set cookie here*/])
+        .expect(302)
+        .expect('Location', /* Set location here*/ )
+        .end(function(err, res) {
+          if(err) {
+            return done(err);
+          }
+          const sessionCookie = res.headers['set-cookie'][0];
+          expect(sessionCookie).to.match(/thekid=.+\./); // session cookie
+          expect(res.headers['set-cookie'].length).to.equal(2);
+          const clearedFlashCookie = res.headers['set-cookie'][1];
+          expect(clearedFlashCookie).to.match(/cookie_flash_message=.+01 Jan 1970/);
           done();
         });
     });
