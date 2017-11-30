@@ -8,16 +8,18 @@ module.exports = function (req, res, next) {
     // Set a flash method to the res object
     // Usage : res.flash('error|info|success|warning', 'Your message here');
     // note: if we pass in an email string, add it to the cookie - this will be for failed login attempts
-    res.flash = function (type, text, email) {
+    res.flash = function (type, text, email, returnTo) {
 
         var message = {
             type: type,
             text: text
         };
 
-        if(email) {
+        /* This will likely be an either-or type of deal - I cant imagine a scenario in which a user gets both */
+        if(email)
             message.email = email;
-        }
+        if(returnTo)
+            message.returnTo = returnTo;
 
         res.cookie('cookie_flash_message', JSON.stringify(message), { httpOnly: true });
     };
@@ -35,9 +37,10 @@ module.exports = function (req, res, next) {
             }
 
             // add escaped email property as well if it was in the cookie
-            if(flashMessage.email) {
+            if(flashMessage.email)
                 flashMessageEscaped.email = escape(flashMessage.email);
-            }
+            if(flashMessage.returnTo)
+                flashMessageEscaped.returnTo = escape(flashMessage.returnTo);
 
             res.locals.flashMessage = flashMessageEscaped;
 
