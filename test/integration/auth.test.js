@@ -13,8 +13,11 @@ const {simulateLogIn} = require('./helpers');
 describe('#Authentication_Routes', function() {
 
   beforeEach(function(done) {
-    seed.seed()
-    .then(done, done);
+    seed.seed().then(done, done);
+  });
+
+  after(function(done) {
+    seed.seed().then(done, done);
   });
 
   describe('[GET /login]', function() {
@@ -259,9 +262,9 @@ describe('#Authentication_Routes', function() {
     it('should redirect to /{return_to} if login successful & yes return_to flash, which should clear', function(done) {
       request(app).post('/login')
         .send({ email: 'sato@email.com', password: '1111111111' })
-        .set('Cookie', [/* set cookie here*/])
+        .set('Cookie', ['cookie_flash_message=%7B%22type%22%3A%22return_to%22%2C%22text%22%3A%22%22%2C%22returnTo%22%3A%22%2Flistings%2Fnew%22%7D'])
         .expect(302)
-        .expect('Location', /* Set location here*/ )
+        .expect('Location', '/listings/new')
         .end(function(err, res) {
           if(err) {
             return done(err);

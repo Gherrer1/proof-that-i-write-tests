@@ -58,6 +58,6 @@ describe('#Flows', function() {
       await page.waitForSelector('#welcome');
       await page.goto('http://localhost:3000/signup');
       // by waiting for #welcome, we're really expecting to be redirected back to /dashboard
-      await page.waitForSelector('#welcome', { timeout: 2000 });
+      await page.waitForSelector('#welcome', { timeout: 3000 });
     });
 });

@@ -1,5 +1,6 @@
 const express								= require('express');
-const {ensureLoggedOut}			= require('connect-ensure-login');
+const {ensureLoggedOut}			= require('./middleware/connect-ensure-login');
+const {ensureLoggedIn}			= require('./middleware/connect-ensure-login');
 const mongoose							= require('mongoose');
 const passport							= require('passport');
 const session								= require('express-session');
@@ -74,8 +75,9 @@ app.get('/dashboard', function(req, res) {
 	res.render('dashboard');
 });
 
-app.get('/listings/new', function(req, res) {
-	// listingsRouteHandlers.
+app.get('/listings/new', ensureLoggedIn({ redirectTo: '/login', setReturnTo: '/listings/new' }), function(req, res) {
+	/* the MOMENT this changes, strongly consider writing unit tests for this route */
+	res.render('newListing');
 });
 
 module.exports = app;

@@ -4,10 +4,12 @@ const app = require('../../src/app');
 const seed = require('../../seed');
 const {simulateLogIn} = require('./helpers');
 
-describe('#Listings_Routes', function() {
+describe.only('#Listings_Routes', function() {
 	beforeEach(function(done) {
-		seed.seed()
-		.then(done, done);
+		seed.seed().then(done, done);
+	});
+	after(function(done) {
+		seed.seed().then(done, done);
 	});
 	describe('[GET /listings/new]', function() {
 		it('should redirect to /login if not logged in, response should contain return_to CFM^*1', function(done) {
@@ -17,7 +19,7 @@ describe('#Listings_Routes', function() {
 					if(err)
 						return done(err);
 					const cookie = res.headers['set-cookie'][0];
-					expect(cookie).to.match(/buma/);
+					expect(cookie).to.match(/cookie_flash_message=.+return_to.+listings.+new/);
 					expect(res.headers['set-cookie'].length).to.equal(1);
 					done();
 				});
@@ -27,7 +29,7 @@ describe('#Listings_Routes', function() {
 			.then(sessionCookie => {
 				request(app).get('/listings/new')
 					.set('Cookie', [sessionCookie])
-					.expect(/id="titleInput"/, done);
+					.expect(/<form method="POST" action="\/listings">/, done);
 			})
 			.catch(err => { console.log(err); done(err); })
 		});
@@ -35,5 +37,5 @@ describe('#Listings_Routes', function() {
 });
 
 /**
- * *1 CFM = cookie flash message 
+ * *1 CFM = cookie flash message
  */

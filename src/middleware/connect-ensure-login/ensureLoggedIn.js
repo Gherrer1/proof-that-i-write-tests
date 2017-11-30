@@ -38,15 +38,14 @@ module.exports = function ensureLoggedIn(options) {
   options = options || {};
   
   var url = options.redirectTo || '/login';
-  var setReturnTo = (options.setReturnTo === undefined) ? true : options.setReturnTo;
+  var setReturnTo = options.setReturnTo || null;
   
   return function(req, res, next) {
     if (!req.isAuthenticated || !req.isAuthenticated()) {
       // if (setReturnTo && req.session) {
         // req.session.returnTo = req.originalUrl || req.url;
       // }
-      if(setReturnTo)
-        res.flash('return_to', '', null, req.originalUrl || req.url);
+      res.flash('return_to', '', null, setReturnTo);
       return res.redirect(url);
     }
     next();
