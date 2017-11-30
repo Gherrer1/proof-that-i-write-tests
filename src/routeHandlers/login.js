@@ -35,6 +35,8 @@ function handleAuthenticationResult(req, res, err, user, info) {
 			res.flash('server_error', 'Something went wrong. Please try again', req.body.email);
 			return res.redirect('/login');
 		}
+		if(res.locals && res.locals.flashMessage && res.locals.flashMessage.type && res.locals.flashMessage.type === 'return_to')
+			return res.redirect(res.locals.flashMessage.returnTo);
 		return res.redirect('/dashboard');
 	});
 }

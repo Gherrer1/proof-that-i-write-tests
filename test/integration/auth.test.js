@@ -269,10 +269,10 @@ describe('#Authentication_Routes', function() {
           if(err) {
             return done(err);
           }
-          const sessionCookie = res.headers['set-cookie'][0];
+          const sessionCookie = res.headers['set-cookie'][1];
           expect(sessionCookie).to.match(/thekid=.+\./); // session cookie
           expect(res.headers['set-cookie'].length).to.equal(2);
-          const clearedFlashCookie = res.headers['set-cookie'][1];
+          const clearedFlashCookie = res.headers['set-cookie'][0];
           expect(clearedFlashCookie).to.match(/cookie_flash_message=.+01 Jan 1970/);
           done();
         });

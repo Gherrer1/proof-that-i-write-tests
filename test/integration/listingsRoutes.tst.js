@@ -4,7 +4,7 @@ const app = require('../../src/app');
 const seed = require('../../seed');
 const {simulateLogIn} = require('./helpers');
 
-describe.only('#Listings_Routes', function() {
+describe('#Listings_Routes', function() {
 	beforeEach(function(done) {
 		seed.seed().then(done, done);
 	});

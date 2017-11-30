@@ -96,7 +96,7 @@ describe('#Login route handlers', function() {
     const email = 'e@email.com'
     beforeEach(function() {
       req = { login(user, cb) { cb(new Error()); }, body: { email } };
-      res = { flash() {}, redirect() {} };
+      res = { flash() {}, redirect() {}, locals: {} };
       flashSpy = sinon.spy(res, 'flash');
       redirectSpy = sinon.spy(res, 'redirect');
       loginSpy = sinon.spy(req, 'login');
@@ -143,8 +143,16 @@ describe('#Login route handlers', function() {
       expect(redirectSpy.calledOnce, 'Did not call res.redirect() from within req.login() callback').to.be.true;
       expect(redirectSpy.args[0][0], 'Did not call res.redirect() with "/login"').to.equal('/login');
     });
+    it('should call res.redirect("/${return_to}") if req.login doesnt pass err to callback and req.locals containts return_to flash msg', function() {
+      req.login = function(u, cb) { cb(null); };
+      const expected_return_to = '/listings/new';
+      res.locals.flashMessage = { type: 'return_to', returnTo: expected_return_to };
+      loginRouteHandlers.handleAuthenticationResult(req, res, err, user, info);
+      expect(redirectSpy.calledOnce, 'Did not call res.redirect() from within req.login() callback').to.be.true;
+      expect(redirectSpy.args[0][0], 'Did not call res.redirect("/listings/new") from within req.login() callback').to.equal(expected_return_to);
+    });
     it('should call res.redirect("/dashboard") if req.login doesnt pass err to callback', function() {
-      req.login = function(u, cb) { cb(null); }
+      req.login = function(u, cb) { cb(null); };
       loginRouteHandlers.handleAuthenticationResult(req, res, err, user, info);
       expect(redirectSpy.calledOnce, 'Did not call res.redirect() from within req.login() callback').to.be.true;
       expect(redirectSpy.args[0][0], 'Did not call res.redirect("/dashboard") from within req.login() callback').to.equal('/dashboard');
