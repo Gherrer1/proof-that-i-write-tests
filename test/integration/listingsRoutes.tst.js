@@ -33,6 +33,14 @@ describe('#Listings_Routes', function() {
 			})
 			.catch(err => { console.log(err); done(err); })
 		});
+		it('should redirect to /dashboard with over_limit flash if user has more than 10 active listings');
+	});
+	describe('[POST /listings]', function() {
+		it('should redirect to /login if not logged in, response should contain return_to CFM');
+		it('should redirect to /listings/new if there are validation errors, no error messages bc clientside js handles that');
+		it('should redirect to /dashboard with over_limit flash if user has more than 10 active listings');
+		it('should redirect to /dashboard with create_success flash if all goes well');
+		it('should redirect to /dashboard with server_error flash if server error occurs');
 	});
 });
 
