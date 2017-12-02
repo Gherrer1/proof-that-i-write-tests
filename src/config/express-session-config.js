@@ -11,8 +11,8 @@ const options = {
 	}),
 	cookie: { maxAge: 1000 * 30 }, // TODO: add more secure options too
 	saveUninitialized: false,
-	resave: false,
-	// rolling: true
+	resave: true,
+	rolling: true
 };
 
 module.exports = options;
