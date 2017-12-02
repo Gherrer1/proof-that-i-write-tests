@@ -71,7 +71,7 @@ app.post('/signup', ensureLoggedOut('/dashboard'), signupValidators, function(re
 	signupRouteHandlers.postSignup(req, res, errors, validData, userController, require('bcrypt'));
 });
 
-app.get('/dashboard', function(req, res) {
+app.get('/dashboard', ensureLoggedIn('/login'), function(req, res) {
 	res.render('dashboard');
 });
 

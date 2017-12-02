@@ -278,6 +278,22 @@ describe('#Authentication_Routes', function() {
         });
     });
   });
+
+  describe('[GET /dashboard]', function() {
+    it('should redirect to /login if not logged in', function(done) {
+      request(app).get('/dashboard')
+        .expect(302).expect('Location', '/login', done);
+    });
+    it('should return 200 if logged in', function(done) {
+      simulateLogIn()
+        .then(sessionCookie => {
+          request(app).get('/dashboard')
+            .set('Cookie', [sessionCookie])
+            .expect(200, done);
+        })
+        .catch(done);
+    });
+  });
 });
 
 /**
