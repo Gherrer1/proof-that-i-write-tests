@@ -10,6 +10,7 @@ const {loginValidators}			= require('./validators');
 const userController 				= require('./controllers/user');
 const signupRouteHandlers 	= require('./routeHandlers/signup');
 const loginRouteHandlers		= require('./routeHandlers/login');
+const logoutRouteHandler 		= require('./routeHandlers/logout');
 
 userController.setModel( require('./models/User') );
 
@@ -58,6 +59,10 @@ app.post('/login', ensureLoggedOut('/dashboard'), loginValidators,
 				})(req, res);
 			}
 );
+
+app.get('/logout', function(req, res) {
+	logoutRouteHandler.logout(req, res);
+});
 
 app.get('/signup', ensureLoggedOut('/dashboard'), function(req, res) {
 	signupRouteHandlers.getSignup(req, res);

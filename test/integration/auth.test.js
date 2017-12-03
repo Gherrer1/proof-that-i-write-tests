@@ -279,6 +279,35 @@ describe('#Authentication_Routes', function() {
     });
   });
 
+  describe('[GET] /logout', function() {
+    it('should clear the session cookie, destroy the session on the server, and redirect to /login', function(done) {
+      simulateLogIn()
+      .then(sessionCookie => {
+        request(app).get('/logout')
+        .expect(302).expect('Location', '/login')
+        .end(function(err, res) {
+          if(err)
+            return done(err);
+          // TODO: make sure we destroy the cookie on the server too, idk how yet
+          const _sessCookie = res.headers['set-cookie'][0];
+          expect(_sessCookie).to.match(/thekid=.+01 Jan 1970/);
+          done();
+        });
+      })
+      .catch(done);
+    });
+    it('not sure what it should do if user isnt already logged in', function(done) {
+      request(app).get('/logout')
+        .expect(302).expect('Location', '/login')
+        .end(function(err, res) {
+          if(err)
+            return done(err);
+          expect(res.headers['set-cookie']).to.be.undefined;
+          done();
+        });
+    });
+  });
+
   describe('[GET /dashboard]', function() {
     it('should redirect to /login if not logged in', function(done) {
       request(app).get('/dashboard')
