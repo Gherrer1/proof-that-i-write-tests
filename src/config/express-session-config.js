@@ -9,7 +9,7 @@ const options = {
 		uri: require('./index.js').DB_URL, 
 		collection: 'sessions'
 	}),
-	cookie: { maxAge: 1000 * 30 }, // TODO: add more secure options too
+	cookie: { maxAge: 1000 * 60 * 15 }, // TODO: add more secure options too
 	saveUninitialized: false,
 	resave: true,
 	rolling: true
