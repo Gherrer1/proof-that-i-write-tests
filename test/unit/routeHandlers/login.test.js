@@ -159,3 +159,9 @@ describe('#Login route handlers', function() {
     });
   });
 });
+
+describe('#Logout route handler', function() {
+  it('[implementation] should call req.logout()');
+  it('[implementation] should call to destroy session');
+  it('[implementation] should call res.redirect("/login")');
+});
