@@ -279,6 +279,10 @@ describe('#Authentication_Routes', function() {
     });
   });
 
+  /* Why its important that we delete the cookie: because if deleting the session fails,
+   * user will still have a session in the db! and a cookie! meaning whoever comes onto the
+   * computer after will still be logged in.
+   */
   describe('[GET] /logout', function() {
     it('should clear the session cookie, destroy the session on the server, and redirect to /login', function(done) {
       simulateLogIn()
@@ -296,13 +300,13 @@ describe('#Authentication_Routes', function() {
       })
       .catch(done);
     });
-    it('not sure what it should do if user isnt already logged in', function(done) {
+    it('should send a cleared cookie and redirect to /login even if not logged in', function(done) {
       request(app).get('/logout')
         .expect(302).expect('Location', '/login')
         .end(function(err, res) {
           if(err)
             return done(err);
-          expect(res.headers['set-cookie']).to.be.undefined;
+          expect(res.headers['set-cookie'][0]).to.match(/thekid=.+01 Jan 1970/);
           done();
         });
     });

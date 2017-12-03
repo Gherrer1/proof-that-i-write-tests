@@ -160,8 +160,35 @@ describe('#Login route handlers', function() {
   });
 });
 
+const logoutRouteHandler = require('../../../src/routeHandlers/logout');
+
 describe('#Logout route handler', function() {
-  it('[implementation] should call req.logout()');
-  it('[implementation] should call to destroy session');
-  it('[implementation] should call res.redirect("/login")');
+  let req, res;
+  let logoutSpy;
+  beforeEach(function() {
+    req = { logout() {}, session: { destroy(cb) { cb(); } } };
+    res = { redirect() {}, clearCookie() {} };
+    logoutSpy = sinon.spy(req, 'logout');
+    redirectSpy = sinon.spy(res, 'redirect');
+    destroySpy = sinon.spy(req.session, 'destroy');
+    clearCookieSpy = sinon.spy(res, 'clearCookie');
+  });
+  it('[implementation] should call req.logout()', function() {
+    logoutRouteHandler.logout(req, res);
+    expect(logoutSpy.calledOnce, 'Did not call req.logout()').to.be.true;
+  });
+  it('[implementation] should call res.session.destroy() to destroy session', function() {
+    logoutRouteHandler.logout(req, res);
+    expect(destroySpy.calledOnce, 'Did not call req.session.destroy()').to.be.true;
+  });
+  it('[implementation] should call res.clearCookie("thekid")', function() {
+    logoutRouteHandler.logout(req, res);
+    expect(clearCookieSpy.calledOnce, 'Did not call res.clearCookie()').to.be.true;
+    expect(clearCookieSpy.args[0][0], 'Did not call res.clearCookie() with "thekid"').to.equal('thekid');
+  });
+  it('[implementation] should call res.redirect("/login")', function() {
+    logoutRouteHandler.logout(req, res);
+    expect(redirectSpy.calledOnce, 'Did not call req.redirect()').to.be.true;
+    expect(redirectSpy.args[0][0], 'Did not call res.redirect() with "/login"').to.equal('/login');
+  });
 });
