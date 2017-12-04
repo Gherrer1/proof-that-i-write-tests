@@ -37,6 +37,17 @@ app.post('/loginTest', loginValidators, function(req, res) {
 
   res.json(json);
 });
+app.post('/listing', listingValidators, function(req, res) {
+  const errors = validationResult(req);
+  const validData = matchedData(req);
+  const sentData = req.body;
+
+  const json = { validData, sentData };
+  if(!errors.isEmpty())
+    json.errors = errors.mapped();
+
+  res.json(json);
+});
 
 // Automate testing that the validators work
 describe('#Signup_Validators', function() {
@@ -515,6 +526,35 @@ describe('#Login_Validators', function() {
           expect(res.body.validData).to.deep.equal(expectedValidData);
           done();
         });
+    });
+  });
+});
+
+describe('#Listing_Validators', function() {
+  let data;
+  beforeEach(function() {
+    data = {
+      title: '',
+      desc: '',
+      type: '',
+      lang: ''
+    }
+  });
+  describe('#Valdiation', function() {
+    describe('#Required_fields', function() {
+      it('should contain title, desc, type, or subject in errors if ANY of those fields are missing');
+      it('should contain title or desc if either of those fields are 0 chars long');
+      it('should contain title or desc in errors if either of those fields is just whitespace');
+    });
+
+    describe('#Length_Mins/Maxs', function() {
+      it('should not contain errors as long as title is 1 char long');
+      it('should not contain errors as long as desc is 1 char long');
+    });
+
+    describe('#Valid Enums', function() {
+      it('should contain a valid type enum');
+      it('should contain a valid lang enum');
     });
   });
 });
