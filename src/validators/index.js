@@ -44,5 +44,6 @@ const loginValidators = [
 
 module.exports = {
   signupValidators, // Array of middleware functions
-  loginValidators
+  loginValidators,
+  listingValidators: require('./listing')
 }

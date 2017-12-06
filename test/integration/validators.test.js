@@ -5,6 +5,7 @@ const expect                  = chai.expect;
 const request                 = require('supertest');
 const { signupValidators }    = require('../../src/validators');
 const { loginValidators }     = require('../../src/validators');
+const { listingValidators }   = require('../../src/validators');
 const { validationResult }    = require('express-validator/check');
 const { matchedData }         = require('express-validator/filter');
 const vConstants              = require('../../src/validators/validatorConstants');
@@ -530,7 +531,7 @@ describe('#Login_Validators', function() {
   });
 });
 
-describe('#Listing_Validators', function() {
+describe.only('#Listing_Validators', function() {
   let data;
   beforeEach(function() {
     data = {
@@ -542,19 +543,40 @@ describe('#Listing_Validators', function() {
   });
   describe('#Valdiation', function() {
     describe('#Required_fields', function() {
-      it('should contain title, desc, type, or subject in errors if ANY of those fields are missing');
-      it('should contain title or desc if either of those fields are 0 chars long');
-      it('should contain title or desc in errors if either of those fields is just whitespace');
+      it('should contain title, desc, type, or subject in errors if ANY of those fields are missing', function(done) {
+        done(new Error('red-green refactor'));
+      });
+      it('should contain title or desc if either of those fields are 0 chars long', function(done) {
+        done(new Error('red-green refactor'));
+      });
+      it('should contain title or desc in errors if either of those fields is just whitespace', function(done) {
+        done(new Error('red-green refactor'));
+      });
     });
 
     describe('#Length_Mins/Maxs', function() {
-      it('should not contain errors as long as title is 1 char long');
-      it('should not contain errors as long as desc is 1 char long');
+      it('should not contain errors as long as title is 1 char long', function(done) {
+        done(new Error('red-green refactor'));
+      });
+      it('should not contain errors as long as desc is 1 char long', function(done) {
+        done(new Error('red-green refactor'));
+      });
     });
 
     describe('#Valid Enums', function() {
-      it('should contain a valid type enum');
-      it('should contain a valid lang enum');
+      it('should contain a valid type enum', function(done) {
+        done(new Error('red-green refactor'));
+      });
+      it('should contain a valid lang enum', function(done) {
+        done(new Error('red-green refactor'));
+      });
+    });
+  });
+  describe('#Sanitization', function() {
+    describe('#Escaping', function() {
+      it('should escape title and description', function(done) {
+        done(new Error('red-green refactor'));
+      });
     });
   });
 });
