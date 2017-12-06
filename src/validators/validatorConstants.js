@@ -10,7 +10,9 @@ module.exports = {
   },
   listing: {
     typeEnum: require('../models/listingConstants').typeEnum,
-    langEnum: require('../models/listingConstants').langEnum
+    langEnum: require('../models/listingConstants').langEnum,
+    title: { max: 75 },
+    description: { max: 500 }
   }
 };
 
