@@ -1,10 +1,11 @@
 const mongoose          = require('mongoose'),
       Schema            = mongoose.Schema,
       ObjectId          = Schema.ObjectId;
+const constants         = require('./listingConstants')
 mongoose.Promise = global.Promise;
 
-const languageEnum = ['PYTHON', 'JAVASCRIPT', 'C++', 'JAVA', 'ELM', 'C', 'RUBY', 'GO'];
-const typeEnum = ['LONG_TERM', 'SHORT_TERM', 'FULL_TIME'];
+const languageEnum = constants.langEnum;
+const typeEnum = constants.typeEnum;
 const statusEnum = ['ACTIVE', 'LOCKED', 'COMPLETED'];
 
 const ListingSchema = new Schema({

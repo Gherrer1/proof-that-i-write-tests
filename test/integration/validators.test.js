@@ -38,7 +38,7 @@ app.post('/loginTest', loginValidators, function(req, res) {
 
   res.json(json);
 });
-app.post('/listing', listingValidators, function(req, res) {
+app.post('/listingsTest', listingValidators, function(req, res) {
   const errors = validationResult(req);
   const validData = matchedData(req);
   const sentData = req.body;
@@ -535,16 +535,27 @@ describe.only('#Listing_Validators', function() {
   let data;
   beforeEach(function() {
     data = {
-      title: '',
-      desc: '',
-      type: '',
-      lang: ''
-    }
+      title: 'y',
+      desc: 'o',
+      type: 'PYTHON',
+      lang: 'FULL_TIME'
+    };
   });
   describe('#Valdiation', function() {
     describe('#Required_fields', function() {
       it('should contain title, desc, type, or subject in errors if ANY of those fields are missing', function(done) {
-        done(new Error('red-green refactor'));
+        data = {};
+        request(app).post('/listingsTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors.title, 'title not in errors though it should be').to.exist;
+            expect(res.body.errors.description, 'description not in errors though it should be').to.exist;
+            expect(res.body.errors.type, 'type not in errors though it should be').to.exist;
+            expect(res.body.errors.lang, 'lang not in errors though it should be').to.exist;
+            done();
+          });
       });
       it('should contain title or desc if either of those fields are 0 chars long', function(done) {
         done(new Error('red-green refactor'));

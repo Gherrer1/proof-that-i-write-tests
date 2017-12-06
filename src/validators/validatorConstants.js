@@ -7,6 +7,10 @@ module.exports = {
       model: { max: 100 }
     },
     email: { max: 75 }
+  },
+  listing: {
+    typeEnum: require('../models/listingConstants').typeEnum,
+    langEnum: require('../models/listingConstants').langEnum
   }
 };
 
