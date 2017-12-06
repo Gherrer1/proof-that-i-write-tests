@@ -652,16 +652,63 @@ describe.only('#Listing_Validators', function() {
 
     describe('#Valid Enums', function() {
       it('should contain error if type is not a valid type enum', function(done) {
-        done(new Error('red-green refactor'));
+        data.type = 'FULL TIME';
+        request(app).post('/listingsTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors.type).to.exist;
+            expect(res.body.errors.type.msg).to.equal('Invalid type');
+            done();
+          });
       });
-      it('should not contain error if type is a valid type enum');
+      it('should not contain error if type is a valid type enum', function(done) {
+        data.type = 'FULL_TIME';
+        request(app).post('/listingsTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors).to.be.undefined;
+            done();
+          });
+      });
       it('should contain an error if lang is not a valid lang enum', function(done) {
-        done(new Error('red-green refactor'));
+        data.lang = 'java';
+        request(app).post('/listingsTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors.lang).to.exist;
+            expect(res.body.errors.lang.msg).to.equal('Invalid language');
+            done();
+          });
       });
-      it('should not contain an error if lang is a valid lang enum');
+      it('should not contain an error if lang is a valid lang enum', function(done) {
+        data.lang = 'PYTHON';
+        request(app).post('/listingsTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors).to.be.undefined;
+            done();
+          });
+      });
     });
 
-    it('should not contain ANY errors if all fields are present and valid');
+    it('should not contain ANY errors if all fields are present and valid', function(done) {
+      request(app).post('/listingsTest')
+        .send(data)
+        .end(function(err, res) {
+          if(err)
+            return done(err);
+          expect(res.body.errors).to.be.undefined;
+          done();
+        });
+    });
   });
   describe('#Sanitization', function() {
     describe('#Escaping', function() {
