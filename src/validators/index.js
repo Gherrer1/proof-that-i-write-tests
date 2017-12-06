@@ -1,5 +1,4 @@
-let { check, validationResult } = require('express-validator/check');
-let { matchedData }             = require('express-validator/filter');
+let { check } = require('express-validator/check'); // TODO: remove these validationResult and matchedData
 let vConstants                  = require('./validatorConstants');
 
 // the way these work: unless message is explicitly listed, default message inluded with check() is the message used
