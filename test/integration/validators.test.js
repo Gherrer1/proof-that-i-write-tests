@@ -600,20 +600,35 @@ describe.only('#Listing_Validators', function() {
     });
 
     describe('#Length_Mins/Maxs', function() {
-      it('should contain errors if title is more than 75 chars long');
-      it('should not contain errors if title is 75 or less chars long');
-      it('should contain errors if description is more than 500 chars long');
-      it('should not contain errors if description is 500 or less chars long');
+      it('should contain errors if title is more than 75 chars long', function(done) {
+        data.title = 'glfkdjgsjgjsdfjhdsfjlkhdsfhfdghjsdfl;khjdsflk;jghfsdlkjhklsdfjhlkfdsjhllfldk'; // 76
+        request(app).post('/listingsTest')
+          .send(data)
+          // .
+      });
+      it('should not contain errors if title is 75 or less chars long', function(done) {
+        done(new Error('red-green refactor'));
+      });
+      it('should contain errors if description is more than 500 chars long', function(done) {
+        done(new Error('red-green refactor'));
+      });
+      it('should not contain errors if description is 500 or less chars long', function(done) {
+        done(new Error('red-green refactor'));
+      });
     });
 
     describe('#Valid Enums', function() {
-      it('should contain a valid type enum', function(done) {
+      it('should contain error if type is not a valid type enum', function(done) {
         done(new Error('red-green refactor'));
       });
-      it('should contain a valid lang enum', function(done) {
+      it('should not contain error if type is a valid type enum');
+      it('should contain an error if lang is not a valid lang enum', function(done) {
         done(new Error('red-green refactor'));
       });
+      it('should not contain an error if lang is a valid lang enum');
     });
+
+    it('should not contain ANY errors if all fields are present and valid');
   });
   describe('#Sanitization', function() {
     describe('#Escaping', function() {
