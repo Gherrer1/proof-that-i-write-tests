@@ -600,12 +600,10 @@ describe.only('#Listing_Validators', function() {
     });
 
     describe('#Length_Mins/Maxs', function() {
-      it('should not contain errors as long as title is 1 char long', function(done) {
-        done(new Error('red-green refactor'));
-      });
-      it('should not contain errors as long as desc is 1 char long', function(done) {
-        done(new Error('red-green refactor'));
-      });
+      it('should contain errors if title is more than 75 chars long');
+      it('should not contain errors if title is 75 or less chars long');
+      it('should contain errors if description is more than 500 chars long');
+      it('should not contain errors if description is 500 or less chars long');
     });
 
     describe('#Valid Enums', function() {
