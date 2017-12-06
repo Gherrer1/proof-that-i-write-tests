@@ -536,7 +536,7 @@ describe.only('#Listing_Validators', function() {
   beforeEach(function() {
     data = {
       title: 'y',
-      desc: 'o',
+      description: 'o',
       type: 'PYTHON',
       lang: 'FULL_TIME'
     };
@@ -551,14 +551,33 @@ describe.only('#Listing_Validators', function() {
             if(err)
               return done(err);
             expect(res.body.errors.title, 'title not in errors though it should be').to.exist;
+            expect(res.body.errors.title.msg).to.equal('Title missing');
             expect(res.body.errors.description, 'description not in errors though it should be').to.exist;
+            expect(res.body.errors.description.msg).to.equal('Description missing');
             expect(res.body.errors.type, 'type not in errors though it should be').to.exist;
+            expect(res.body.errors.type.msg).to.equal('Invalid type');
             expect(res.body.errors.lang, 'lang not in errors though it should be').to.exist;
+            expect(res.body.errors.lang.msg).to.equal('Invalid language');
             done();
           });
       });
       it('should contain title or desc if either of those fields are 0 chars long', function(done) {
-        done(new Error('red-green refactor'));
+        data = { title: '', description: '', type: '', lang: '' };
+        request(app).post('/listingsTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err)
+            expect(res.body.errors.title, 'title not in errors though it should be').to.exist;
+            expect(res.body.errors.title.msg).to.equal('Title missing');
+            expect(res.body.errors.description, 'description not in errors though it should be').to.exist;
+            expect(res.body.errors.description.msg).to.equal('Description missing');
+            expect(res.body.errors.type, 'type not in errors though it should be').to.exist;
+            expect(res.body.errors.type.msg).to.equal('Invalid type');
+            expect(res.body.errors.lang, 'lang not in errors though it should be').to.exist;
+            expect(res.body.errors.lang.msg).to.equal('Invalid language');
+            done();
+          });
       });
       it('should contain title or desc in errors if either of those fields is just whitespace', function(done) {
         done(new Error('red-green refactor'));

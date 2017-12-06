@@ -3,12 +3,14 @@ const vConstants = require('./validatorConstants');
 
 const listingValidators = [
 	check('title', 'Title missing')
-		.exists(),
+		.exists()
+		.isLength({ min: 1 }),
 	check('description', 'Description missing')
-		.exists(),
-	check('type')
+		.exists()
+		.isLength({ min: 1 }),
+	check('type', 'Invalid type')
 		.isIn(vConstants.listing.typeEnum),
-	check('lang')
+	check('lang', 'Invalid language')
 		.isIn(vConstants.listing.langEnum)
 ];
 
