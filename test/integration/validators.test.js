@@ -537,8 +537,8 @@ describe.only('#Listing_Validators', function() {
     data = {
       title: 'y',
       description: 'o',
-      type: 'PYTHON',
-      lang: 'FULL_TIME'
+      type: 'FULL_TIME',
+      lang: 'PYTHON'
     };
   });
   describe('#Valdiation', function() {
@@ -604,16 +604,49 @@ describe.only('#Listing_Validators', function() {
         data.title = 'glfkdjgsjgjsdfjhdsfjlkhdsfhfdghjsdfl;khjdsflk;jghfsdlkjhklsdfjhlkfdsjhllfldk'; // 76
         request(app).post('/listingsTest')
           .send(data)
-          // .
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors.title, 'Title not in errors though it should be').to.exist;
+            expect(res.body.errors.title.msg).to.equal('Title cannot be greater than 75 characters long');
+            done();
+          });
       });
       it('should not contain errors if title is 75 or less chars long', function(done) {
-        done(new Error('red-green refactor'));
+        data.title = 'glfkdjgsjgjsdfjhdsfjlkhdsfhfdghjsdfl;khjdsflk;jghfsdlkjhksdfjhlkfdsjhllfldk'; // 75
+        request(app).post('/listingsTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors).to.be.undefined;
+            done();
+          });
       });
       it('should contain errors if description is more than 500 chars long', function(done) {
-        done(new Error('red-green refactor'));
+        data.description = 'you wanna know what 500 chars long looks like? well take a look right here bitch. RIGHT FUCKING HERE. THIS IS WHAT THE FUCK 500 chars looks like!!!! Damn, its not even that long lol. How am I possibly gonna be able to store enough info for ninjas to glean what exactly I want donsklgjlfjg become aware of the fact that im panicking FUCKKKK. Ill do whatever you want me to do, adrianna said. i choked her and told her shes mine. then i demanded she repeat it. she said, somewhat breathlessly, im yours.you wanna know what 500 chars long looks like? well take a look right here bitch. RIGHT FUCKING HERE. THIS IS WHAT THE FUCK 500 chars looks like!!!! Damn, its not even that long lol. How am I possibly gonna be able to store enough info for ninjas to glean what exactly I want donsklgjlfjg become aware of the fact that im panicking FUCKKKK. Ill do whatever you want me to do, adrianna said. i choked her and told her shes mine. then i demanded she repeat it. she said, somewhat breathlessly, im yours'; // 1001
+        expect(data.description.length).to.equal(1001);
+        request(app).post('/listingsTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors.description).to.exist;
+            expect(res.body.errors.description.msg).to.equal('Description cannot be greater than 1000 characters long');
+            done();
+          });
       });
       it('should not contain errors if description is 500 or less chars long', function(done) {
-        done(new Error('red-green refactor'));
+        data.description = 'you wanna know what 500 chars long looks like? well take a look right here bitch. RIGHT FUCKING HERE. THIS IS WHAT THE FUCK 500 chars looks like!!!! Damn, its not even that long lol. How am I possibly gonna b able to store enough info for ninjas to glean what exactly I want donsklgjlfjg become aware of the fact that im panicking FUCKKKK. Ill do whatever you want me to do, adrianna said. i choked her and told her shes mine. then i demanded she repeat it. she said, somewhat breathlessly, im yours.you wanna know what 500 chars long looks like? well take a look right here bitch. RIGHT FUCKING HERE. THIS IS WHAT THE FUCK 500 chars looks like!!!! Damn, its not even that long lol. How am I possibly gonna b able to store enough info for ninjas to glean what exactly I want donsklgjlfjg become aware of the fact that im panicking FUCKKKK. Ill do whatever you want me to do, adrianna said. i choked her and told her shes mine. then i demanded she repeat it. she said, somewhat breathlessly, im yours.'; // 1000
+        expect(data.description.length).to.equal(1000);
+        request(app).post('/listingsTest')
+          .send(data)
+          .end(function(err, res) {
+            if(err)
+              return done(err);
+            expect(res.body.errors).to.be.undefined;
+            done();
+          });
       });
     });
 
