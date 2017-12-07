@@ -9,6 +9,14 @@
 	<% include partials/dash_navbar.ejs %>
 	<div id="welcome">Welcome!</div>
 	<a href="/listings/new">Create Listing</a>
+	<% if(locals.listings && locals.listings.length > 0) { %>
+		<ul>
+			Your listings
+			<% locals.listings.forEach(function(lstng) { %>
+				<li>lstng.title <br> lstng.description</li>
+			<% }) %>
+		</ul>
+	<% } %>
 
 	<!-- just bootstrap -->
 	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
