@@ -85,4 +85,8 @@ app.get('/listings/new', ensureLoggedIn({ redirectTo: '/login', setReturnTo: '/l
 	res.render('newListing');
 });
 
+app.post('/listings', ensureLoggedIn({ redirectTo: '/login' }), function(req, res) {
+	res.send('hey');
+});
+
 module.exports = app;
