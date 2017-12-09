@@ -46,7 +46,24 @@ describe('#Listings_Routes', function() {
 					done();
 				});
 		});
-		it('should redirect to /listings/new if there are validation errors, no error messages bc clientside js handles that');
+		it('should redirect to /listings/new if there are validation errors, no error messages bc clientside js handles that', function(done) {
+			// Just one class of errors is used in the example below, we just want to make sure that on errors we redirect to /listings/new
+			const data = { title: 'b', description: '  ', lang: 'python', type: 'full_time' };
+			simulateLogIn()
+			.then(sessionCookie => {
+				request(app).post('/listings')
+					.set('Cookie', [sessionCookie])
+					.send(data)
+					.expect(302).expect('Location', '/listings/new')
+					.end(function(err, res) {
+						if(err)
+							return done(err);
+						expect(res.headers['set-cookie']).to.be.undefined;
+						done();
+					});
+			})
+			.catch(done);
+		});
 		it('should redirect to /dashboard with over_limit flash if user has more than 10 active listings');
 		it('should redirect to /dashboard with create_success flash if all goes well');
 		it('should redirect to /dashboard with server_error flash if server error occurs');

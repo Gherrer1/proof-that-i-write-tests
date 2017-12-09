@@ -85,8 +85,20 @@ app.get('/listings/new', ensureLoggedIn({ redirectTo: '/login', setReturnTo: '/l
 	res.render('newListing');
 });
 
-app.post('/listings', ensureLoggedIn({ redirectTo: '/login' }), function(req, res) {
-	res.send('hey');
-});
+app.post('/listings',
+	ensureLoggedIn({ redirectTo: '/login' }),
+	listingValidators,
+	function redirectIfErrors(req, res, next) {
+		const {matchedData} = require('express-validator/filter');
+		const {validationResult} = require('express-validator/check');
+		listingRouteHandlers.ensureNoValidationErrs(req, res, next, matchedData, validationResult);
+		// loginRouteHandlers.ensureNoValidationErrs(req, res, next, matchedData, validationResult); TODO
+	},
+	function createListing(req, res, next) {
+		const {matchedData} = require('express-validator/filter');
+		const validData = matchedData(req);
+		listingRouteHandlers.postListing(req, res, validData);
+	}
+);
 
 module.exports = app;
