@@ -58,7 +58,7 @@ describe('#Listings_Routes', function() {
 					.end(function(err, res) {
 						if(err)
 							return done(err);
-						expect(res.headers['set-cookie']).to.be.undefined;
+						expect(res.headers['set-cookie'].length).to.equal(1); // just session cookie
 						done();
 					});
 			})

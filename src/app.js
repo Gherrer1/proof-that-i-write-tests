@@ -7,10 +7,12 @@ const session								= require('express-session');
 const config								= require('./config');
 const {signupValidators}		= require('./validators');
 const {loginValidators}			= require('./validators');
+const {listingValidators}	 	= require('./validators');
 const userController 				= require('./controllers/user');
 const signupRouteHandlers 	= require('./routeHandlers/signup');
 const loginRouteHandlers		= require('./routeHandlers/login');
 const logoutRouteHandler 		= require('./routeHandlers/logout');
+const listingRouteHandlers 	= require('./routeHandlers/listings');
 
 userController.setModel( require('./models/User') );
 
@@ -91,7 +93,7 @@ app.post('/listings',
 	function redirectIfErrors(req, res, next) {
 		const {matchedData} = require('express-validator/filter');
 		const {validationResult} = require('express-validator/check');
-		listingRouteHandlers.ensureNoValidationErrs(req, res, next, matchedData, validationResult);
+		listingRouteHandlers.ensureNoValidationErrs(req, res, next, validationResult);
 		// loginRouteHandlers.ensureNoValidationErrs(req, res, next, matchedData, validationResult); TODO
 	},
 	function createListing(req, res, next) {
