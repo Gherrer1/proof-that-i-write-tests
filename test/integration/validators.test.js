@@ -531,7 +531,7 @@ describe('#Login_Validators', function() {
   });
 });
 
-describe.only('#Listing_Validators', function() {
+describe('#Listing_Validators', function() {
   let data;
   beforeEach(function() {
     data = {

@@ -45,7 +45,8 @@ module.exports = function ensureLoggedIn(options) {
       // if (setReturnTo && req.session) {
         // req.session.returnTo = req.originalUrl || req.url;
       // }
-      res.flash('return_to', '', null, setReturnTo);
+      if(setReturnTo)
+        res.flash('return_to', '', null, setReturnTo);
       return res.redirect(url);
     }
     next();
