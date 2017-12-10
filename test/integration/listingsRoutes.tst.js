@@ -65,7 +65,26 @@ describe('#Listings_Routes', function() {
 			.catch(done);
 		});
 		it('should redirect to /dashboard with over_limit flash if user has more than 10 active listings');
-		it('should redirect to /dashboard with create_success flash if all goes well');
+		it('should redirect to /dashboard with create_success flash if all goes well', function(done) {
+			let validListingData = { title: 'b', description: 'b', lang: 'PYTHON', type: 'FULL_TIME' };
+			simulateLogIn()
+			.then(sessionCookie => {
+				request(app).post('/listings')
+				.set('Cookie', [sessionCookie])
+				.send(validListingData)
+				.expect(302).expect('Location', '/dashboard')
+				.end(function(err, res) {
+					if(err)
+						return done(err);
+					let cookies = res.headers['set-cookie'];
+					expect(cookies.length, 'Expected just session and success flash cookie').to.equal(2);
+					expect(cookies[0]).to.match(/thekid/);
+					expect(cookies[1]).to.match(/cookie_flaessage=/);
+					done();
+				});
+			})
+			.catch(done);
+		});
 		it('should redirect to /dashboard with server_error flash if server error occurs');
 	});
 });

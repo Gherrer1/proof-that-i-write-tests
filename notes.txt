@@ -6,3 +6,6 @@
 
 2) Many sites allow spaces in their passwords, even at the start and end. So dont trim the
 	password field that comes in request bodies during signup.
+
+3) Flash messages will come in a cookie named cookie_flash_messages. That's ALL flash messages.
+	Session cookies will come in a cookie named thekid. Always.

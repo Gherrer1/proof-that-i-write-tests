@@ -94,7 +94,6 @@ app.post('/listings',
 		const {matchedData} = require('express-validator/filter');
 		const {validationResult} = require('express-validator/check');
 		listingRouteHandlers.ensureNoValidationErrs(req, res, next, validationResult);
-		// loginRouteHandlers.ensureNoValidationErrs(req, res, next, matchedData, validationResult); TODO
 	},
 	function createListing(req, res, next) {
 		const {matchedData} = require('express-validator/filter');
