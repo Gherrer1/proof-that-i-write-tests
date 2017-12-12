@@ -5,6 +5,7 @@ const expect = chai.expect;
 const assert = chai.assert;
 const should = chai.should();
 const sinon = require('sinon');
+const _ = require('lodash');
 
 describe('#UserController', function() {
   const userController = require('../../../src/controllers/user');
@@ -105,25 +106,27 @@ describe('#UserController', function() {
       expect(promise.then).to.exist;
       expect(promise.catch).to.exist;
     });
-    it('should call the model as a constructor once with the validData fields', function(done) {
+    it('[implementation] should call the model as a constructor once with the validData fields', function(done) {
       const stubModel = sinon.stub().returns(validData);
       userController.setModel(stubModel);
       userController.createUser(validData)
       .then(user => {
         assert(stubModel.calledOnce, 'model was not called once');
         assert(stubModel.calledWithNew(), 'model function was not called with new');
+        assert(stubModel.calledWith(validData), 'model function was not called with validData');
       })
       .catch(err => {
         assert(stubModel.calledOnce, 'model was not called once');
         assert(stubModel.calledWithNew(), 'model function was not called with new');
+        assert(stubModel.calledWith(validData), 'model function was not called with validData');
       })
       .then(done, done);
     });
-    it('should call save() on a new User object', function(done) {
-      let { fname, email, username, password } = validData;
-      let modelInstance = { fname, email, username, password };
+    it('[implementation] should call save() on a new User object', function(done) {
+      const modelInstance = _.cloneDeep(validData);
+      const saveRetVal = _.cloneDeep(validData);
       modelInstance.save = function() {
-        return Promise.resolve({ fname, email, username, password });
+        return Promise.resolve(saveRetVal);
       }
 
       let spy = sinon.spy(modelInstance, 'save');
@@ -142,8 +145,7 @@ describe('#UserController', function() {
       .then(done, done);
     });
     it('should reject if save() throws an error', function() {
-      let { fname, username, email, password } = validData;
-      let modelInstance = { fname, username, email, password };
+      const modelInstance = _.cloneDeep(validData);
       let saveErrorMessage = 'Could not save to DB';
       modelInstance.save = function() {
         throw new Error(saveErrorMessage);
@@ -157,15 +159,14 @@ describe('#UserController', function() {
       return promise.should.be.rejectedWith(saveErrorMessage);
     });
     it('should resolve with a user object if all goes well', function() {
-      let { fname, username, email, password } = validData;
-      let modelInstance = { fname, username, email, password };
-      let expectedResolve = { fname, username, email, password };
+      const modelInstance = _.cloneDeep(validData);
+      const expectedResolve = _.cloneDeep(validData);
       modelInstance.save = function() {
         return Promise.resolve(expectedResolve);
-      }
+      };
       fakeModel = function(data) {
         return modelInstance;
-      }
+      };
       userController.setModel(fakeModel);
       let promise = userController.createUser(validData);
       return promise.should.eventually.deep.equal(expectedResolve);
