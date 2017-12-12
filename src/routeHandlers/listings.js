@@ -9,6 +9,7 @@ function postListing(req, res, controller, validData) {
 	validData.owner_id = req.user._id;
 	controller.createListing(validData)
 	.then(listing => {
+		res.flash('post_success', 'Your listing was created!');
 		res.redirect('/dashboard');
 	})
 	.catch(err => {

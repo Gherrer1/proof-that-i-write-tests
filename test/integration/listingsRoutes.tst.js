@@ -2,6 +2,7 @@ const expect = require('chai').expect;
 const request = require('supertest');
 const app = require('../../src/app');
 const seed = require('../../seed');
+const sinon = require('sinon');
 const {simulateLogIn} = require('./helpers');
 
 describe('#Listings_Routes', function() {
@@ -86,6 +87,7 @@ describe('#Listings_Routes', function() {
 			.catch(done);
 		});
 		it('should redirect to /dashboard with server_error flash if server error occurs', function(done) {
+			let controllerStub = sinon.stub(require('../../src/controllers/listing'), 'createListing').rejects('HAHAHA');
 			let invalidListingData = { // missing due_date
 				title: 'b', description: 'b',
 				lang: 'PYTHON', type: 'FULL_TIME'
@@ -97,6 +99,7 @@ describe('#Listings_Routes', function() {
 				.send(invalidListingData)
 				.expect(302).expect('Location', '/dashboard')
 				.end(function(err, res) {
+					controllerStub.restore();
 					if(err)
 						return done(err);
 					let cookies = res.headers['set-cookie'];
