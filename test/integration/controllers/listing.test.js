@@ -2,7 +2,7 @@ const seed = require('../../../seed');
 const assert = require('chai').assert;
 
 // test interactions between listing controller and listing model
-describe.only('#Listing_Controller', function() {
+describe('#Listing_Controller', function() {
 	let listingController = require('../../../src/controllers/listing');
 	before(function() {
 		const listingModel = require('../../../src/models/Listing');

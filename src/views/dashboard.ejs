@@ -7,6 +7,13 @@
 <body>
 
 	<% include partials/dash_navbar.ejs %>
+
+	<% if(locals.flashMessage) { %>
+		<% if(locals.flashMessage.type === 'over_limit') { %>
+			<p id="over_limit"><%= locals.flashMessage.text %></p>
+		<% } %>
+	<% } %>
+
 	<div id="welcome">Welcome!</div>
 	<a href="/listings/new">Create Listing</a>
 	<% if(locals.listings && locals.listings.length > 0) { %>
