@@ -5,8 +5,11 @@ function ensureNoValidationErrs(req, res, next, validationResult) {
 	next();
 }
 
-function postListing(req, res, validData) {
-
+function postListing(req, res, controller, validData) {
+	controller.createListing(validData)
+	.then(listing => {
+		res.redirect('/dashboard');
+	});
 }
 
 module.exports = {

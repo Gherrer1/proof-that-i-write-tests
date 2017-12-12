@@ -85,7 +85,9 @@ describe('#Listings_Routes', function() {
 			})
 			.catch(done);
 		});
-		it('should redirect to /dashboard with server_error flash if server error occurs');
+		it('should redirect to /dashboard with server_error flash if server error occurs', function(done) {
+			done(new Error('red-green refactor'));
+		});
 	});
 });
 

@@ -9,12 +9,14 @@ const {signupValidators}		= require('./validators');
 const {loginValidators}			= require('./validators');
 const {listingValidators}	 	= require('./validators');
 const userController 				= require('./controllers/user');
+const listingController = require('./controllers/listing');
 const signupRouteHandlers 	= require('./routeHandlers/signup');
 const loginRouteHandlers		= require('./routeHandlers/login');
 const logoutRouteHandler 		= require('./routeHandlers/logout');
 const listingRouteHandlers 	= require('./routeHandlers/listings');
 
 userController.setModel( require('./models/User') );
+listingController.setModel( require('./models/Listing') );
 
 const app = express();
 
@@ -98,7 +100,7 @@ app.post('/listings',
 	function createListing(req, res, next) {
 		const {matchedData} = require('express-validator/filter');
 		const validData = matchedData(req);
-		listingRouteHandlers.postListing(req, res, validData);
+		listingRouteHandlers.postListing(req, res, listingController, validData);
 	}
 );
 
