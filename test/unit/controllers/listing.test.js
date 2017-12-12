@@ -122,4 +122,19 @@ describe('#ListingController', function() {
 			return promise.should.eventually.equal(2);
 		});
 	});
+
+	describe('#findBelongsTo', function() {
+		it('should return a promise', function() {
+			throw new Error('red-green refactor');
+		});
+		it('should call mode.find() with user_id', function() {
+			throw new Error('red-green refactor');
+		});
+		it('should reject if model rejects', function() {
+			throw new Error('red-green refactor');
+		});
+		it('should resolve with array if model resolves', function() {
+			throw new Error('red-green refactor');
+		});
+	});
 });

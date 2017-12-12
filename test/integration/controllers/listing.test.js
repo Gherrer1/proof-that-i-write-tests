@@ -42,6 +42,17 @@ describe('#Listing_Controller', function() {
 			.catch(done);
 		});
 	});
+	describe('#findBelongsTo', function() {
+		it('should return an array of listings that belong to user', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should reject if passed an invalid owner_id', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should resolve with [] if passed a nonexistent owner_id', function(done) {
+			done(new Error('red-green refactor'));
+		});
+	});
 });
 
 function getSeroID() {

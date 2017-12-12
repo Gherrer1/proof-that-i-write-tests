@@ -326,6 +326,15 @@ describe('#Authentication_Routes', function() {
         })
         .catch(done);
     });
+    it('should show all users listings', function(done) {
+      simulateLogIn()
+        .then(sessionCookie => {
+          request(app).get('/dashboard')
+            .set('Cookie', [sessionCookie])
+            .expect(/<div id="myListings"/, done);
+        })
+        .catch(done);
+    });
   });
 });
 

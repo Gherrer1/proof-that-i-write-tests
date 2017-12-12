@@ -81,6 +81,7 @@ app.post('/signup', ensureLoggedOut('/dashboard'), signupValidators, function(re
 });
 
 app.get('/dashboard', ensureLoggedIn('/login'), function(req, res) {
+	// get listings first
 	res.render('dashboard');
 });
 
