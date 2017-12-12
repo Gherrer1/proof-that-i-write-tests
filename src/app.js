@@ -97,6 +97,10 @@ app.post('/listings',
 		const {validationResult} = require('express-validator/check');
 		listingRouteHandlers.ensureNoValidationErrs(req, res, next, validationResult);
 	},
+	function ensureLTE10ActiveListings(req, res, next) {
+		let user_id = req.user._id;
+		listingRouteHandlers.ensureLTE10ActiveListings(req, res, next, listingController, user_id);
+	},
 	function createListing(req, res, next) {
 		const {matchedData} = require('express-validator/filter');
 		const validData = matchedData(req);

@@ -18,7 +18,24 @@ function postListing(req, res, controller, validData) {
 	});
 }
 
+function ensureLTE10ActiveListings(req, res, next, controller, user_id) {
+	controller.countBelongsTo(user_id)
+	.then(count => {
+		if(count >= 10) {
+			res.flash('over_limit', 'You cannot have more than 10 active listings');
+			res.redirect('/dashboard');
+			return;
+		}
+		next();
+	})
+	.catch(err => {
+		res.flash('server_error');
+		res.redirect('/dashboard');
+	})
+}
+
 module.exports = {
 	ensureNoValidationErrs,
-	postListing
+	postListing,
+	ensureLTE10ActiveListings
 };
