@@ -351,7 +351,20 @@ describe('#Authentication_Routes', function() {
         })
     });
     it('should not show listings and should show server_error flash if findBelongsTo rejects', function(done) {
-      done(new Error('db problems'));
+      let findBelongsToStub = sinon.stub( require('../../src/controllers/listing'), 'findBelongsTo' ).rejects(new Error('Sorry'));
+      simulateLogIn()
+        .then(sessionCookie => {
+          request(app).get('/dashboard')
+            .set('Cookie', [sessionCookie])
+            .expect(/<p id="server_error">/)
+            .expect(/<div id="myListings"/)
+            .end(function(err, res) {
+              findBelongsToStub.restore();
+              expect(err.message).to.match(/expected body.+to match \/<div id="myListings/);
+              done();
+            })
+        })
+        .catch(done);
     });
   });
 });

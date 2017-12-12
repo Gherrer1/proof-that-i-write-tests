@@ -15,6 +15,9 @@
 		<% if(locals.flashMessage.type === 'post_success') { %>
 			<p id="post_success"><%= locals.flashMessage.text %></p>
 		<% } %>
+		<% if(locals.flashMessage.type === 'server_error') { %>
+			<p id="server_error"><%= locals.flashMessage.text %></p>
+		<% } %>
 	<% } %>
 
 	<div id="welcome">Welcome!</div>

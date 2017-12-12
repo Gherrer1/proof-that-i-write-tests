@@ -85,8 +85,12 @@ app.get('/dashboard', ensureLoggedIn('/login'), function(req, res) {
 	.then(listings => {
 		res.render('dashboard', { listings });
 	})
-	.catch(listings => {
-		res.flash('server_error', 'Something went wrong. Please try again');
+	.catch(err => {
+		// cant do flash message because we go straight to render, dont redirect
+		res.locals.flashMessage = {
+			type: 'server_error',
+			text: 'Something went wrong. Please try again'
+		};
 		res.render('dashboard');
 	});
 });
