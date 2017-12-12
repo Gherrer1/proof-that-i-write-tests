@@ -42,15 +42,38 @@ describe('#Listing_Controller', function() {
 			.catch(done);
 		});
 	});
-	describe('#findBelongsTo', function() {
+	describe.only('#findBelongsTo', function() {
 		it('should return an array of listings that belong to user', function(done) {
-			done(new Error('red-green refactor'));
+			getSeroID()
+			.then(id => {
+				return listingController.findBelongsTo(id);
+			})
+			.then(listings => {
+				assert(Array.isArray(listings))
+				assert.isAbove(listings.length, 0);
+				done();
+			})
+			.catch(done);
 		});
 		it('should reject if passed an invalid owner_id', function(done) {
-			done(new Error('red-green refactor'));
+			const invalidID = 'abc';
+			listingController.findBelongsTo(invalidID)
+			.then(listings => {
+				done(new Error('Should not have gotten here'));
+			})
+			.catch(err => {
+				done();
+			});
 		});
 		it('should resolve with [] if passed a nonexistent owner_id', function(done) {
-			done(new Error('red-green refactor'));
+			const nonexistentID = '5a302a283d3653249ce3ca71';
+			listingController.findBelongsTo(nonexistentID)
+			.then(listings => {
+				assert(Array.isArray(listings));
+				assert.equal(listings.length, 0);
+				done();
+			})
+			.catch(done);
 		});
 	});
 });

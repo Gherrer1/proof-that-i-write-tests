@@ -124,17 +124,33 @@ describe('#ListingController', function() {
 	});
 
 	describe('#findBelongsTo', function() {
+		let owner_id = 'abc123';
+
 		it('should return a promise', function() {
-			throw new Error('red-green refactor');
+			let promise = listingController.findBelongsTo();
+			promise.catch(() => {});
+			cAssert.exists(promise.then);
+			cAssert.exists(promise.catch);
 		});
-		it('should call mode.find() with user_id', function() {
-			throw new Error('red-green refactor');
+		it('[implementation] should call model.find() with user_id', function() {
+			const fakeModel = { find() {} };
+			const findSpy = sinon.spy(fakeModel, 'find');
+			listingController.setModel(fakeModel);
+			listingController.findBelongsTo(owner_id);
+			cAssert(findSpy.calledOnce, 'model.find() not called');
+			cAssert.deepEqual(findSpy.args[0][0], { owner_id }, 'model.find() not called with { user_id }');
 		});
 		it('should reject if model rejects', function() {
-			throw new Error('red-green refactor');
+			const fakeModel = { find() { return Promise.reject(new Error('Problemz')); } };
+			listingController.setModel(fakeModel);
+			let promise = listingController.findBelongsTo(owner_id);
+			return promise.should.be.rejectedWith('Problemz');
 		});
 		it('should resolve with array if model resolves', function() {
-			throw new Error('red-green refactor');
+			const fakeModel = { find() { return Promise.resolve([{ title: 'Success baby' }]); } };
+			listingController.setModel(fakeModel);
+			let promise = listingController.findBelongsTo(owner_id);
+			return promise.should.eventually.deep.equal([ { title: 'Success baby' } ]);
 		});
 	});
 });
