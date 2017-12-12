@@ -1,9 +1,11 @@
 const puppeteer = require('puppeteer');
 const seed = require('../../seed');
 const app = require('../../src/app');
+const assert = require('chai').assert;
+const sinon = require('sinon');
 
 
-describe.only('#Flows', function() {
+describe('#Flows', function() {
     var server = app.listen(3000);
     let page, browser;
     const width = 1920;
@@ -60,18 +62,28 @@ describe.only('#Flows', function() {
       // by waiting for #welcome, we're really expecting to be redirected back to /dashboard
       await page.waitForSelector('#welcome', { timeout: 3000 });
     });
-    it('should redirect to /dashboard with over_limit flash if user has 10 active listings when we POST /listings or GET /listings/new', async function() {
-      this.timeout(60000);
+    it('should NOT redirect to /dashboard with over_limit flash if user has 10 active listings when we GET /listings/new', async function() {
+      // the reason for this is probably the same reason craigslist doesnt check if you're over the limit:
+      // why hit the DB every time the user wants the form to post something? unneccessary calories burned
+      const belongsToStub = sinon.stub( require('../../src/controllers/listing'), 'countBelongsTo').resolves(10);
       await login(page);
-      for(let i = 0; i < 10; i++) {
-        await createListing(page);
-      }
-      // on the 11th, we should be directed to /dashboard on GET /lstings/new
-      await page.click('a[href="/listings/new"]');
-      await page.waitForSelector('#welcome', { timeout: 2000 });
-      // on the 11th, we should be redirect to /dashboard on POST /listings (need to figure out how to do this w/ puppeteer)
+      await page.goto('http://localhost:3000/listings/new');
+      await page.waitForSelector('#titleInput', { timeout: 1500 });
+      belongsToStub.restore();
     });
-    it('successful 10th listing creation --> GET /listings/new --> redirect to /dashboard --> delete a listing to get under limit --> successful POST /listings again');
+    it('should redirect to /dashboard with over_limit flash if user has 10 active listings when we POST /listings', async function() {
+      this.timeout(60000);
+      const belongsToStub = sinon.stub( require('../../src/controllers/listing'), 'countBelongsTo').resolves(10);
+      await login(page);
+      // for(let i = 0; i < 10; i++) {
+      //   await createListing(page);
+      // }
+      // 11th post, when we're done we'll be at /dashboard and we can search for flash message there
+      await createListing(page);
+      const over_limit_flashMessage = await page.$('#over_limit');
+      assert.exists(over_limit_flashMessage);
+      belongsToStub.restore();
+    });
 });
 
 async function createListing(page) {
