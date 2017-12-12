@@ -81,8 +81,14 @@ app.post('/signup', ensureLoggedOut('/dashboard'), signupValidators, function(re
 });
 
 app.get('/dashboard', ensureLoggedIn('/login'), function(req, res) {
-	// get listings first
-	res.render('dashboard');
+	listingController.findBelongsTo(req.user._id)
+	.then(listings => {
+		res.render('dashboard', { listings });
+	})
+	.catch(listings => {
+		res.flash('server_error', 'Something went wrong. Please try again');
+		res.render('dashboard');
+	});
 });
 
 app.get('/listings/new', ensureLoggedIn({ redirectTo: '/login', setReturnTo: '/listings/new' }), function(req, res) {

@@ -42,7 +42,7 @@ describe('#Listing_Controller', function() {
 			.catch(done);
 		});
 	});
-	describe.only('#findBelongsTo', function() {
+	describe('#findBelongsTo', function() {
 		it('should return an array of listings that belong to user', function(done) {
 			getSeroID()
 			.then(id => {

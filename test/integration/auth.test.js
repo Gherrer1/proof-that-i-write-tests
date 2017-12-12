@@ -326,7 +326,7 @@ describe('#Authentication_Routes', function() {
         })
         .catch(done);
     });
-    it('should show all users listings', function(done) {
+    it('should show all users listings if he has', function(done) {
       simulateLogIn()
         .then(sessionCookie => {
           request(app).get('/dashboard')
@@ -334,6 +334,24 @@ describe('#Authentication_Routes', function() {
             .expect(/<div id="myListings"/, done);
         })
         .catch(done);
+    });
+    it('should not show listings if user does not have', function(done) {
+      let findBelongsToStub = sinon.stub( require('../../src/controllers/listing'), 'findBelongsTo' ).resolves([]);
+      simulateLogIn()
+        .then(sessionCookie => {
+          request(app).get('/dashboard')
+            .set('Cookie', [sessionCookie])
+            .expect(/<div id="myListings"/)
+            .end(function(err, res) {
+              findBelongsToStub.restore();
+              // we make sure that we have an error due to not finding the myListings div
+              expect(err).to.match(/expected body.+to match \/<div id="myListings/);
+              done();
+            });
+        })
+    });
+    it('should not show listings and should show server_error flash if findBelongsTo rejects', function(done) {
+      done(new Error('db problems'));
     });
   });
 });
