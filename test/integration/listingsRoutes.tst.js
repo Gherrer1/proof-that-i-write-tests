@@ -65,7 +65,9 @@ describe('#Listings_Routes', function() {
 			})
 			.catch(done);
 		});
-		it('should redirect to /dashboard with over_limit flash if user has more than 10 active listings');
+		it('should redirect to /dashboard with over_limit flash if user has more than 10 active listings', function() {
+			throw new Error('in flows');
+		});
 		it('should redirect to /dashboard with create_success flash if all goes well', function(done) {
 			let validListingData = { title: 'b', description: 'b', lang: 'PYTHON', type: 'FULL_TIME' };
 			simulateLogIn()
