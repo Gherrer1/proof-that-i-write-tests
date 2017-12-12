@@ -77,16 +77,36 @@ describe('#Listings_Routes', function() {
 					if(err)
 						return done(err);
 					let cookies = res.headers['set-cookie'];
-					expect(cookies.length, 'Expected just session and success flash cookie').to.equal(2);
-					expect(cookies[0]).to.match(/thekid/);
-					expect(cookies[1]).to.match(/cookie_flaessage=/);
+					expect(cookies.length, 'Expected 2 cookies: session & post_success flash').to.equal(2);
+					expect(cookies[0]).to.match(/cookie_flash_message.+post_success/);
+					expect(cookies[1]).to.match(/thekid/);
 					done();
 				});
 			})
 			.catch(done);
 		});
 		it('should redirect to /dashboard with server_error flash if server error occurs', function(done) {
-			done(new Error('red-green refactor'));
+			let invalidListingData = { // missing due_date
+				title: 'b', description: 'b',
+				lang: 'PYTHON', type: 'FULL_TIME'
+			};
+			simulateLogIn()
+			.then(sessionCookie => {
+				request(app).post('/listings')
+				.set('Cookie', [sessionCookie])
+				.send(invalidListingData)
+				.expect(302).expect('Location', '/dashboard')
+				.end(function(err, res) {
+					if(err)
+						return done(err);
+					let cookies = res.headers['set-cookie'];
+					expect(cookies.length, 'Expected 2 cookies: session & server_error flash').to.equal(2);
+					expect(cookies[0]).to.match(/cookie_flash_message.+server_error.+Something.+went.+wrong/);
+					expect(cookies[1]).to.match(/thekid/);
+					done();
+				});
+			})
+			.catch(done);
 		});
 	});
 });

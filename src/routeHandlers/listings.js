@@ -9,6 +9,10 @@ function postListing(req, res, controller, validData) {
 	controller.createListing(validData)
 	.then(listing => {
 		res.redirect('/dashboard');
+	})
+	.catch(err => {
+		res.flash('server_error', 'Something went wrong. Please try again');
+		res.redirect('/dashboard');
 	});
 }
 
