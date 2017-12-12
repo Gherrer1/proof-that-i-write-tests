@@ -12,6 +12,9 @@
 		<% if(locals.flashMessage.type === 'over_limit') { %>
 			<p id="over_limit"><%= locals.flashMessage.text %></p>
 		<% } %>
+		<% if(locals.flashMessage.type === 'post_success') { %>
+			<p id="post_success"><%= locals.flashMessage.text %></p>
+		<% } %>
 	<% } %>
 
 	<div id="welcome">Welcome!</div>

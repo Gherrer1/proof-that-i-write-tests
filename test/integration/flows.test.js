@@ -84,6 +84,11 @@ describe('#Flows', function() {
       assert.exists(over_limit_flashMessage);
       belongsToStub.restore();
     });
+    it('should show post_success flash message at /dashboard after successful listing post', async function() {
+		await login(page);
+		await createListing(page);
+		await page.waitForSelector('#post_success', { timeout: 2000 });
+    });
 });
 
 async function createListing(page) {
