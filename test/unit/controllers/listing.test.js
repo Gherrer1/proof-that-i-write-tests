@@ -84,4 +84,42 @@ describe('#ListingController', function() {
 			return promise.should.eventually.deep.equal(expectedResolve);
 		});
 	});
+
+	describe('#countBelongsTo', function() {
+		it('should return a promise', function() {
+			const promise = listingController.countBelongsTo();
+			promise.catch(() => {});
+			cAssert.exists(promise.then);
+			cAssert.exists(promise.catch);
+		});
+		it('[implementation] should call model.count() with id of owner', function() {
+			const owner_id = '5a301861624b4b1fc92e8324';
+			const fakeModel = {
+				count() {}
+			};
+			const countSpy = sinon.spy(fakeModel, 'count');
+			listingController.setModel(fakeModel);
+			listingController.countBelongsTo(owner_id);
+			cAssert(countSpy.calledOnce, 'model.count() not called');
+			cAssert.deepEqual(countSpy.args[0][0], { owner_id }, 'did not call model.count() with { owner_id }');
+		});
+		it('should reject if model rejects', function() {
+			const fakeModel = {
+				count() { return Promise.reject(new Error('Something went wong')); }
+			};
+			listingController.setModel(fakeModel);
+			const owner_id = '5a301861624b4b1fc92e8324';
+			const promise = listingController.countBelongsTo(owner_id);
+			return promise.should.be.rejectedWith('Something went wong');
+		});
+		it('should resolve with number if model resolves', function() {
+			const owner_id = '5a301861624b4b1fc92e8324';
+			const fakeModel = {
+				count() { return Promise.resolve(2); }
+			};
+			listingController.setModel(fakeModel);
+			const promise = listingController.countBelongsTo(owner_id);
+			return promise.should.eventually.equal(2);
+		});
+	});
 });

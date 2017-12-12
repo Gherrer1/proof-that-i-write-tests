@@ -1,6 +1,7 @@
 const publicAPI = {
 	setModel,
-	createListing
+	createListing,
+	countBelongsTo
 };
 
 function setModel(model) {
@@ -12,6 +13,15 @@ function createListing(validData) {
 	return new Promise(function(resolve, reject) {
 		const listing = new model(validData);
 		listing.save().then(resolve, reject)
+	});
+}
+
+function countBelongsTo(owner_id) {
+	const model = this.model;
+	return new Promise(function(resolve, reject) {
+		model.count({ owner_id })
+		.then(resolve)
+		.catch(reject);
 	});
 }
 

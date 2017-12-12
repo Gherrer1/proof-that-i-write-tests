@@ -3,7 +3,7 @@ const seed = require('../../seed');
 const app = require('../../src/app');
 
 
-describe.only('#Flows', function() {
+describe('#Flows', function() {
     var server = app.listen(3000);
     let page, browser;
     const width = 1920;
@@ -60,7 +60,7 @@ describe.only('#Flows', function() {
       // by waiting for #welcome, we're really expecting to be redirected back to /dashboard
       await page.waitForSelector('#welcome', { timeout: 3000 });
     });
-    it.only('should redirect to /dashboard with over_limit flash if user has 10 active listings when we POST /listings or GET /listings/new', async function() {
+    it('should redirect to /dashboard with over_limit flash if user has 10 active listings when we POST /listings or GET /listings/new', async function() {
       this.timeout(60000);
       await login(page);
       for(let i = 0; i < 10; i++) {
@@ -71,6 +71,7 @@ describe.only('#Flows', function() {
       await page.waitForSelector('#welcome', { timeout: 2000 });
       // on the 11th, we should be redirect to /dashboard on POST /listings (need to figure out how to do this w/ puppeteer)
     });
+    it('successful 10th listing creation --> GET /listings/new --> redirect to /dashboard --> delete a listing to get under limit --> successful POST /listings again');
 });
 
 async function createListing(page) {

@@ -158,7 +158,7 @@ describe('Listing Model', function() {
       expect(errors).to.be.undefined;
     });
   });
-  describe('dueDate field', function() {
+  describe.skip('dueDate field', function() {
     it('should return a validation error if left empty', function(done) {
       delete fields.dueDate;
       let listing = new Listing(fields);
