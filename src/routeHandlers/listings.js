@@ -6,6 +6,7 @@ function ensureNoValidationErrs(req, res, next, validationResult) {
 }
 
 function postListing(req, res, controller, validData) {
+	validData.owner_id = req.user._id;
 	controller.createListing(validData)
 	.then(listing => {
 		res.redirect('/dashboard');
