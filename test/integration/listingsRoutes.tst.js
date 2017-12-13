@@ -116,6 +116,23 @@ describe('#Listings_Routes', function() {
 			.catch(done);
 		});
 	});
+	describe('[GET /listings/:id]', function() {
+		it('should redirect to /login if not logged in', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should redirect to 404 page if listing not found', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should redirect to /dashboard with server_error flash if listing search fails', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should redirect to 404 page if listing found but doesnt belong to user', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should show listing details if listing found and belongs to user', function(done) {
+			done(new Error('red-green refactor'));
+		});
+	});
 });
 
 /**

@@ -27,7 +27,11 @@
 			<ul>
 				Your listings
 				<% locals.listings.forEach(function(lstng) { %>
-					<li><%= lstng.title %><br> <%= lstng.description %></li>
+					<li>
+						<a href="/listings/<%= lstng._id%>"><%= lstng.title %></a>
+						<br>
+						<%= lstng.description %>
+					</li>
 				<% }) %>
 			</ul>
 		</div>
