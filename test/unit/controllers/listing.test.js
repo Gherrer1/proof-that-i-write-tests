@@ -99,7 +99,7 @@ describe('#ListingController', function() {
 			};
 			const countSpy = sinon.spy(fakeModel, 'count');
 			listingController.setModel(fakeModel);
-			listingController.countBelongsTo(owner_id);
+			listingController.countBelongsTo(owner_id).catch(() => {});
 			cAssert(countSpy.calledOnce, 'model.count() not called');
 			cAssert.deepEqual(countSpy.args[0][0], { owner_id }, 'did not call model.count() with { owner_id }');
 		});
@@ -136,7 +136,7 @@ describe('#ListingController', function() {
 			const fakeModel = { find() {} };
 			const findSpy = sinon.spy(fakeModel, 'find');
 			listingController.setModel(fakeModel);
-			listingController.findBelongsTo(owner_id);
+			listingController.findBelongsTo(owner_id).catch(() => {});
 			cAssert(findSpy.calledOnce, 'model.find() not called');
 			cAssert.deepEqual(findSpy.args[0][0], { owner_id }, 'model.find() not called with { user_id }');
 		});
@@ -151,6 +151,39 @@ describe('#ListingController', function() {
 			listingController.setModel(fakeModel);
 			let promise = listingController.findBelongsTo(owner_id);
 			return promise.should.eventually.deep.equal([ { title: 'Success baby' } ]);
+		});
+	});
+
+	describe('#findById', function() {
+		it('should return a promise', function() {
+			const promise = listingController.findById();
+			promise.catch(() => {});
+			cAssert.exists(promise.then);
+			cAssert.exists(promise.catch);
+		});
+		it('[implementation] should call model.findById(id)', function() {
+			const user_id = '123';
+			const fakeModel = { findById() { return Promise.resolve(null); } };
+			const findByIdSpy = sinon.spy(fakeModel, 'findById');
+			listingController.setModel(fakeModel);
+			listingController.findById(user_id);
+			cAssert(findByIdSpy.calledOnce, 'findById() not called');
+			cAssert(findByIdSpy.calledWith('123'), 'findById() not called with user_id');
+		});
+		it('should reject if model rejects', function() {
+			const user_id = '123';
+			const fakeModel = { findById() { return Promise.reject(new Error('probz')); } };
+			listingController.setModel(fakeModel);
+			let promise = listingController.findById(user_id);
+			return promise.should.be.rejectedWith('probz');
+		});
+		it('should resolve with listing object if model resolves', function() {
+			const expectedResolveVal = { title: 'a', description: 'b' };
+			const resolveVal = _.cloneDeep(expectedResolveVal);
+			const fakeModel = { findById() { return Promise.resolve(resolveVal) } };
+			listingController.setModel(fakeModel);
+			let promise = listingController.findById();
+			return promise.should.eventually.deep.equal(expectedResolveVal);
 		});
 	});
 });

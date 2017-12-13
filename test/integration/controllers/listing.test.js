@@ -2,7 +2,7 @@ const seed = require('../../../seed');
 const assert = require('chai').assert;
 
 // test interactions between listing controller and listing model
-describe('#Listing_Controller', function() {
+describe.only('#Listing_Controller', function() {
 	let listingController = require('../../../src/controllers/listing');
 	before(function() {
 		const listingModel = require('../../../src/models/Listing');
@@ -74,6 +74,17 @@ describe('#Listing_Controller', function() {
 				done();
 			})
 			.catch(done);
+		});
+	});
+	describe('#findById', function() {
+		it('should reject if passed an invalid id', function() {
+			throw new Error('red-green refactor');
+		});
+		it('should resolve w real listing object if passed in a real listing id', function() {
+			throw new Error('red-green refactor');
+		});
+		it('should resolve w null if passed in a nonexistent id', function() {
+			throw new Error('red-green refactor');
 		});
 	});
 });

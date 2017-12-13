@@ -2,7 +2,8 @@ const publicAPI = {
 	setModel,
 	createListing,
 	countBelongsTo,
-	findBelongsTo
+	findBelongsTo,
+	findById
 };
 
 function setModel(model) {
@@ -27,9 +28,18 @@ function countBelongsTo(owner_id) {
 }
 
 function findBelongsTo(owner_id) {
-	model = this.model;
+	const model = this.model;
 	return new Promise(function(resolve, reject) {
 		model.find({ owner_id })
+		.then(resolve)
+		.catch(reject);
+	});
+}
+
+function findById(id) {
+	const model = this.model;
+	return new Promise(function(resolve, reject) {
+		model.findById(id)
 		.then(resolve)
 		.catch(reject);
 	});
