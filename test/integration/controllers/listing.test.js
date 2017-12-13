@@ -103,14 +103,6 @@ describe.only('#Listing_Controller', function() {
 			.catch(done);
 		});
 	});
-	describe('#belongsToUser', function() {
-		it('should return true if listing._id === user._id', function() {
-			throw new Error('red-green refactor');
-		});
-		it('should return false if listing._id !== user._id', function() {
-			throw new Error('red-green refactor');
-		});
-	});
 });
 
 function getUsersID(fname) {

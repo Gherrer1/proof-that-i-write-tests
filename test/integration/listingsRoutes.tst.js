@@ -127,7 +127,7 @@ describe.only('#Listings_Routes', function() {
 		it('should redirect to /dashboard with server_error flash if listing search fails', function(done) {
 			done(new Error('red-green refactor'));
 		});
-		it('should redirect to 404 page if listing found but doesnt belong to user', function(done) {
+		it('should redirect to 404 page if existing listing ID but doesnt match owner_id', function(done) {
 			done(new Error('red-green refactor'));
 		});
 		it('should show listing details if listing found and belongs to user', function(done) {
