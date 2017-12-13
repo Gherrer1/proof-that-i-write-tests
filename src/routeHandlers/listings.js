@@ -34,8 +34,13 @@ function ensureLTE10ActiveListings(req, res, next, controller, user_id) {
 	})
 }
 
+function getById(req, res, controller) {
+
+}
+
 module.exports = {
-	ensureNoValidationErrs,
+	getById,
 	postListing,
+	ensureNoValidationErrs,
 	ensureLTE10ActiveListings
 };

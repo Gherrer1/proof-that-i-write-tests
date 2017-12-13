@@ -117,4 +117,19 @@ describe('#Listing_Route_Handlers', function() {
 	describe('#createListing', function() {
 		it('[implementation] should create a new Listing')
 	});
+	// getById(req, res, controller)
+	describe('#getById', function() {
+		it('[implementation] should call controller.findByIdAndOwnerId() with { req.params.id, req.user._id }', function() {
+			throw new Error('red-green refactor');
+		});
+		it('should call res.render("404") if no listing found', function() {
+			throw new Error('red-green refactor');
+		});
+		it('should call res.render("listing") if listing found', function() {
+			throw new Error('red-green refactor');
+		});
+		it('should call res.redirect("/dashboard") with server_error flash if search rejects', function() {
+			throw new Error('red-green refactor');
+		});
+	});
 });
