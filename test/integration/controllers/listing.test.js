@@ -3,6 +3,8 @@ const assert = require('chai').assert;
 
 // test interactions between listing controller and listing model
 describe.only('#Listing_Controller', function() {
+	const getSeroID = getUsersID('Sero');
+	const getBakugoID = getUsersID('Bakugo');
 	let listingController = require('../../../src/controllers/listing');
 	before(function() {
 		const listingModel = require('../../../src/models/Listing');
@@ -77,25 +79,49 @@ describe.only('#Listing_Controller', function() {
 		});
 	});
 	describe('#findById', function() {
-		it('should reject if passed an invalid id', function() {
+		it('should reject if passed an invalid id', function(done) {
+			const invalidID = '123';
+			listingController.findById(invalidID)
+			.then(listing => done(new Error('should not be here')))
+			.catch(err => done());
+		});
+		it('should resolve w real listing object if passed in a real listing id', function(done) {
+			getSeroID()
+			.then(id => postListing(id))
+			.then(listingRes => listingRes._id)
+			.then(listingId => listingController.findById(listingId))
+			.then(listing => done())
+			.catch(done);
+		});
+		it('should resolve w null if passed in a nonexistent id', function(done) {
+			const nonexistentID = '5a302a283d3653249ce3ca71';
+			listingController.findById(nonexistentID)
+			.then(listing => {
+				assert.isNull(listing);
+				done();
+			})
+			.catch(done);
+		});
+	});
+	describe('#belongsToUser', function() {
+		it('should return true if listing._id === user._id', function() {
 			throw new Error('red-green refactor');
 		});
-		it('should resolve w real listing object if passed in a real listing id', function() {
-			throw new Error('red-green refactor');
-		});
-		it('should resolve w null if passed in a nonexistent id', function() {
+		it('should return false if listing._id !== user._id', function() {
 			throw new Error('red-green refactor');
 		});
 	});
 });
 
-function getSeroID() {
-	return new Promise(function(resolve, reject) {
-		const userModel = require('../../../src/models/User');
-		userModel.findOne({ fname: 'Sero' })
-		.then(userObj => resolve(userObj._id))
-		.catch(reject);
-	});
+function getUsersID(fname) {
+	return function() {
+		return new Promise(function(resolve, reject) {
+			const userModel = require('../../../src/models/User');
+			userModel.findOne({ fname: fname })
+			.then(userObj => resolve(userObj._id))
+			.catch(reject);
+		});
+	};
 }
 
 function postListing(user_id) {
