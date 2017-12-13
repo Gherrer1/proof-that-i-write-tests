@@ -5,7 +5,7 @@ const seed = require('../../seed');
 const sinon = require('sinon');
 const {simulateLogIn} = require('./helpers');
 
-describe('#Listings_Routes', function() {
+describe.only('#Listings_Routes', function() {
 	beforeEach(function(done) {
 		seed.seed().then(done, done);
 	});
@@ -118,7 +118,8 @@ describe('#Listings_Routes', function() {
 	});
 	describe('[GET /listings/:id]', function() {
 		it('should redirect to /login if not logged in', function(done) {
-			done(new Error('red-green refactor'));
+			request(app).get('/listings/123')
+				.expect(302).expect('Location', '/login', done);
 		});
 		it('should redirect to 404 page if listing not found', function(done) {
 			done(new Error('red-green refactor'));

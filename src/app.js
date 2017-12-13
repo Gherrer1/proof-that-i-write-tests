@@ -100,6 +100,12 @@ app.get('/listings/new', ensureLoggedIn({ redirectTo: '/login', setReturnTo: '/l
 	res.render('newListing');
 });
 
+app.get('/listings/:id',
+	ensureLoggedIn({ redirectTo: '/login'}),
+	function(req, res) {
+	}
+);
+
 app.post('/listings',
 	ensureLoggedIn({ redirectTo: '/login' }),
 	listingValidators,
