@@ -97,22 +97,25 @@ describe.only('#Listing_Controller', function() {
 			.catch(err => done());
 		});
 		it('should resolve w real listing object if passed in a real listing id and matching owner_id', function(done) {
+			let seroID;
 			getSeroID()
-			.then(owner_id => postListing(owner_id))
+			.then(owner_id => {
+				seroID = owner_id;
+				return postListing(owner_id);
+			})
 			.then(listingRes => listingRes._id)
-			.then(listingId => listingController.findByIdAndOwnerId(listingId))
+			.then(listingId => listingController.findByIdAndOwnerId(listingId, seroID))
 			.then(listing => {
-				if(listing) {
-					console.log(listing);
+				if(listing)
 					return done();
-				}
 				done(new Error('Did not receive listing'));
 			})
 			.catch(done);
 		});
 		it('should resolve w null if passed in a nonexistent id but existing owner_id', function(done) {
 			const nonexistentID = '5a302a283d3653249ce3ca71';
-			listingController.findById(nonexistentID)
+			getSeroID()
+			.then(seroID => listingController.findByIdAndOwnerId(nonexistentID, seroID))
 			.then(listing => {
 				assert.isNull(listing);
 				done();
@@ -120,10 +123,30 @@ describe.only('#Listing_Controller', function() {
 			.catch(done);
 		});
 		it('should resolve w null if passed in an existing id but nonmatching owner_id', function(done) {
-			done(new Error('red-green refactor'));
+			let bakugosID;
+			getBakugoID()
+			.then(id => {
+				bakugosID = id;
+				return getSerosFirstListing();
+			})
+			.then(serosListingId => {
+				return listingController.findByIdAndOwnerId(serosListingId, bakugosID);
+			})
+			.then(listing => {
+				assert.isNull(listing);
+				done();
+			})
+			.catch(done);
 		});
 		it('should resolve w null if passed in nonexistent id and nonexistent owner_id', function(done) {
-			done(new Error('red-green refactor'));
+			const nonexistentID = '5a302a283d3653249ce3ca71';
+			const nonexistentOwnerID = '5a302a283d3653249ce3ca71';
+			listingController.findByIdAndOwnerId(nonexistentID, nonexistentOwnerID)
+			.then(listing => {
+				assert.isNull(listing);
+				done();
+			})
+			.catch(done);
 		});
 	});
 });
@@ -137,6 +160,20 @@ function getUsersID(fname) {
 			.catch(reject);
 		});
 	};
+}
+
+function getSerosFirstListing() {
+	return new Promise(function(resolve, reject) {
+		getUsersID('Sero')()
+		.then(id => {
+			const listingModel = require('../../../src/models/Listing');
+			return listingModel.findOne({ owner_id: id })
+		})
+		.then(listing => {
+			resolve(listing);
+		})
+		.catch(reject);
+	});
 }
 
 function postListing(user_id) {
