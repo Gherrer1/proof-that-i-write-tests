@@ -39,7 +39,7 @@ function findBelongsTo(owner_id) {
 function findByIdAndOwnerId(_id, owner_id) {
 	const model = this.model;
 	return new Promise(function(resolve, reject) {
-		model.find({ _id, owner_id })
+		model.findOne({ _id, owner_id })
 		.then(resolve)
 		.catch(reject);
 	});

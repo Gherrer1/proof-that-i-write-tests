@@ -161,20 +161,20 @@ describe('#ListingController', function() {
 			cAssert.exists(promise.then);
 			cAssert.exists(promise.catch);
 		});
-		it('[implementation] should call model.find({ id, owner_id })', function() {
+		it('[implementation] should call model.findOne({ id, owner_id })', function() {
 			const listing_id = '123';
 			const owner_id = 'abc';
-			const fakeModel = { find() { return Promise.resolve(null); } };
-			const findSpy = sinon.spy(fakeModel, 'find');
+			const fakeModel = { findOne() { return Promise.resolve(null); } };
+			const findSpy = sinon.spy(fakeModel, 'findOne');
 			listingController.setModel(fakeModel);
 			listingController.findByIdAndOwnerId(listing_id, owner_id);
-			cAssert(findSpy.calledOnce, 'find() not called');
+			cAssert(findSpy.calledOnce, 'findOne() not called');
 			// cAssert(findSpy.calledWith('123'), 'find() not called with user_id');
-			cAssert.deepEqual(findSpy.args[0][0], { _id: listing_id, owner_id }, 'find() not called with { listing_id, owner_id }');
+			cAssert.deepEqual(findSpy.args[0][0], { _id: listing_id, owner_id }, 'findOne() not called with { listing_id, owner_id }');
 		});
 		it('should reject if model rejects', function() {
 			const id = '123';
-			const fakeModel = { find() { return Promise.reject(new Error('probz')); } };
+			const fakeModel = { findOne() { return Promise.reject(new Error('probz')); } };
 			listingController.setModel(fakeModel);
 			let promise = listingController.findByIdAndOwnerId(id);
 			return promise.should.be.rejectedWith('probz');
@@ -182,7 +182,7 @@ describe('#ListingController', function() {
 		it('should resolve with listing object if model resolves', function() {
 			const expectedResolveVal = { title: 'a', description: 'b' };
 			const resolveVal = _.cloneDeep(expectedResolveVal);
-			const fakeModel = { find() { return Promise.resolve(resolveVal) } };
+			const fakeModel = { findOne() { return Promise.resolve(resolveVal) } };
 			listingController.setModel(fakeModel);
 			let promise = listingController.findByIdAndOwnerId();
 			return promise.should.eventually.deep.equal(expectedResolveVal);
