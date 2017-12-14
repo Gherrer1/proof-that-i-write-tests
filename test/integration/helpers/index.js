@@ -1,10 +1,10 @@
 const request = require('supertest');
 const app = require('../../../src/app');
 
-function simulateLogIn() {
+function simulateLogIn(fname = 'sato') {
   return new Promise(function(resolve, reject) {
     request(app).post('/login')
-      .send({ email: 'sato@email.com', password: '1111111111' })
+      .send({ email: `${fname}@email.com`, password: '1111111111' })
       .end(function(err, res) {
         if(err)
           return reject(err);

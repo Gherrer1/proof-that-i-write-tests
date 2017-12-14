@@ -76,18 +76,18 @@ describe.only('#Listings_Routes', function() {
 			simulateLogIn()
 			.then(sessionCookie => {
 				request(app).post('/listings')
-				.set('Cookie', [sessionCookie])
-				.send(validListingData)
-				.expect(302).expect('Location', '/dashboard')
-				.end(function(err, res) {
-					if(err)
-						return done(err);
-					let cookies = res.headers['set-cookie'];
-					expect(cookies.length, 'Expected 2 cookies: session & post_success flash').to.equal(2);
-					expect(cookies[0]).to.match(/cookie_flash_message.+post_success/);
-					expect(cookies[1]).to.match(/thekid/);
-					done();
-				});
+					.set('Cookie', [sessionCookie])
+					.send(validListingData)
+					.expect(302).expect('Location', '/dashboard')
+					.end(function(err, res) {
+						if(err)
+							return done(err);
+						let cookies = res.headers['set-cookie'];
+						expect(cookies.length, 'Expected 2 cookies: session & post_success flash').to.equal(2);
+						expect(cookies[0]).to.match(/cookie_flash_message.+post_success/);
+						expect(cookies[1]).to.match(/thekid/);
+						done();
+					});
 			})
 			.catch(done);
 		});
@@ -100,19 +100,19 @@ describe.only('#Listings_Routes', function() {
 			simulateLogIn()
 			.then(sessionCookie => {
 				request(app).post('/listings')
-				.set('Cookie', [sessionCookie])
-				.send(invalidListingData)
-				.expect(302).expect('Location', '/dashboard')
-				.end(function(err, res) {
-					controllerStub.restore();
-					if(err)
-						return done(err);
-					let cookies = res.headers['set-cookie'];
-					expect(cookies.length, 'Expected 2 cookies: session & server_error flash').to.equal(2);
-					expect(cookies[0]).to.match(/cookie_flash_message.+server_error.+Something.+went.+wrong/);
-					expect(cookies[1]).to.match(/thekid/);
-					done();
-				});
+					.set('Cookie', [sessionCookie])
+					.send(invalidListingData)
+					.expect(302).expect('Location', '/dashboard')
+					.end(function(err, res) {
+						controllerStub.restore();
+						if(err)
+							return done(err);
+						let cookies = res.headers['set-cookie'];
+						expect(cookies.length, 'Expected 2 cookies: session & server_error flash').to.equal(2);
+						expect(cookies[0]).to.match(/cookie_flash_message.+server_error.+Something.+went.+wrong/);
+						expect(cookies[1]).to.match(/thekid/);
+						done();
+					});
 			})
 			.catch(done);
 		});
@@ -153,7 +153,21 @@ describe.only('#Listings_Routes', function() {
 			.catch(done);
 		});
 		it('should redirect to 404 page if existing listing ID but doesnt match owner_id', function(done) {
-			done(new Error('red-green refactor'));
+			const getSerosFirstListing = require('./helpers/getSerosFirstListing');
+			let listingId;
+			getSerosFirstListing()
+			.then(listing => listing._id)
+			.then(listingID => {
+				listingId = listingID;
+				return simulateLogIn('sato');
+			})
+			.then(sessionCookie => {
+				request(app).get(`/listings/${listingId}`)
+					.set('Cookie', [sessionCookie])
+					.expect(404)
+					.expect(/404/, done);
+			})
+			.catch(done);
 		});
 		it('should show listing details if listing found and belongs to user', function(done) {
 			done(new Error('red-green refactor'));
