@@ -122,7 +122,10 @@ describe.only('#Listings_Routes', function() {
 				.expect(302).expect('Location', '/login', done);
 		});
 		it('should redirect to 404 page if listing not found', function(done) {
-			done(new Error('red-green refactor'));
+			const nonexistentID = '5a302a283d3653249ce3ca71';
+			request(app).get(`/listings/${nonexistentID}`)
+				.expect(404)
+				.expect(/404/, done);
 		});
 		it('should redirect to /dashboard with server_error flash if listing search fails', function(done) {
 			done(new Error('red-green refactor'));
