@@ -138,7 +138,7 @@ describe.only('#Listings_Routes', function() {
 			const id = '5a302a283d3653249ce3ca71'; // reason this should fail is not the id but a db query failure
 			simulateLogIn()
 			.then(sessionCookie => {
-				request(app).get(`/listings/${nonexistentID}`)
+				request(app).get(`/listings/${id}`)
 					.set('Cookie', [sessionCookie])
 					.expect(302).expect('Location', '/dashboard')
 					.end(function(err, res) {

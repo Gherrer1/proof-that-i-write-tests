@@ -39,8 +39,10 @@ function getById(req, res, controller) {
 	.then(listing => {
 		if(listing)
 			return res.render('listing', { listing });
-		else
+		else {
+			res.status(404);
 			return res.render('404');
+		}
 	})
 	.catch(err => {
 		res.flash('server_error', 'Something went wrong. Please try again');
