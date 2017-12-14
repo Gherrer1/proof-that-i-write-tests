@@ -119,17 +119,58 @@ describe('#Listing_Route_Handlers', function() {
 	});
 	// getById(req, res, controller)
 	describe('#getById', function() {
+		let req, res, controller;
+		let renderSpy, redirectSpy;
+		beforeEach(function() {
+			controller = { findByIdAndOwnerId() { return Promise.resolve({ title: 'a', description: 'b' }); } };
+			req = {
+				params: { id: 'made_up' },
+				user: { _id: 'made_up_2' }
+			};
+			res = { render() {}, redirect() {} };
+			renderSpy = sinon.spy(res, 'render');
+			redirectSpy = sinon.spy(res, 'redirect');
+		});
 		it('[implementation] should call controller.findByIdAndOwnerId() with { req.params.id, req.user._id }', function() {
-			throw new Error('red-green refactor');
+			const findByIdSpy = sinon.spy(controller, 'findByIdAndOwnerId');
+			const expectedId = 'made_up';
+			const expectedOwnerId = 'made_up_2';
+			listingRouteHandlers.getById(req, res, controller);
+			assert(findByIdSpy.calledOnce, 'did not call findByIdAndOwnerId()');
+			assert(findByIdSpy.calledWith(expectedId, expectedOwnerId), 'didnt call findByIdAndOwnerId() with proper params');
 		});
-		it('should call res.render("404") if no listing found', function() {
-			throw new Error('red-green refactor');
+		it('should call res.render("404") if no listing found', function(done) {
+			const findByIdStub = sinon.stub(controller, 'findByIdAndOwnerId').resolves(null);
+			listingRouteHandlers.getById(req, res, controller);
+			setTimeout(function() {
+				assert(renderSpy.calledOnce, 'Did not call res.render()');
+				assert(renderSpy.calledWith('404'), 'Did not call res.render() with "404"');
+				done();
+			}, 0);
 		});
-		it('should call res.render("listing") if listing found', function() {
-			throw new Error('red-green refactor');
+		it('should call res.render("listing", { listing }) if listing found', function(done) {
+			const expectedRenderParam = { title: 'a', description: 'b' };
+			listingRouteHandlers.getById(req, res, controller);
+			setTimeout(function() {
+				assert(renderSpy.calledOnce, 'Did not call res.render()');
+				assert.equal(renderSpy.args[0][0], 'listing', 'Did not call res.render() with "listing"');
+				assert.deepEqual(renderSpy.args[0][1], { listing: expectedRenderParam }, 'Did not call res.render with listing obj');
+				done();
+			}, 0);
 		});
-		it('should call res.redirect("/dashboard") with server_error flash if search rejects', function() {
-			throw new Error('red-green refactor');
+		it('should call res.redirect("/dashboard") with server_error flash if search rejects', function(done) {
+			const findByIdStub = sinon.stub(controller, 'findByIdAndOwnerId').rejects(new Error('Adrianna'));
+			res.flash = function() {};
+			const flashSpy = sinon.spy(res, 'flash');
+			listingRouteHandlers.getById(req, res, controller);
+			setTimeout(function() {
+				assert(flashSpy.calledOnce, 'Did not call res.flash()');
+				assert(flashSpy.calledWith('server_error', 'Something went wrong. Please try again'),
+						'Did not call res.flash() with "server_error" and "Something went wrong. Please try again"');
+				assert(redirectSpy.calledOnce, 'Did not call res.redirect()');
+				assert(redirectSpy.calledWith('/dashboard'), 'Did not call res.redirect() with "/dashboard"');
+				done();
+			}, 0);
 		});
 	});
 });

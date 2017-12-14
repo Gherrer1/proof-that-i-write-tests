@@ -35,7 +35,17 @@ function ensureLTE10ActiveListings(req, res, next, controller, user_id) {
 }
 
 function getById(req, res, controller) {
-
+	controller.findByIdAndOwnerId(req.params.id, req.user._id)
+	.then(listing => {
+		if(listing)
+			return res.render('listing', { listing });
+		else
+			return res.render('404');
+	})
+	.catch(err => {
+		res.flash('server_error', 'Something went wrong. Please try again');
+		res.redirect('/dashboard');
+	});
 }
 
 module.exports = {
