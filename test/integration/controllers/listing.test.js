@@ -1,5 +1,7 @@
 const seed = require('../../../seed');
 const assert = require('chai').assert;
+const getSerosFirstListing = require('../helpers/getSerosFirstListing');
+const getUsersID = require('../helpers/getUsersID');
 
 // test interactions between listing controller and listing model
 describe.only('#Listing_Controller', function() {
@@ -101,9 +103,9 @@ describe.only('#Listing_Controller', function() {
 			getSeroID()
 			.then(owner_id => {
 				seroID = owner_id;
-				return postListing(owner_id);
+				return getSerosFirstListing()
 			})
-			.then(listingRes => listingRes._id)
+			.then(serosListing => serosListing._id)
 			.then(listingId => listingController.findByIdAndOwnerId(listingId, seroID))
 			.then(listing => {
 				if(listing)
@@ -150,39 +152,3 @@ describe.only('#Listing_Controller', function() {
 		});
 	});
 });
-
-function getUsersID(fname) {
-	return function() {
-		return new Promise(function(resolve, reject) {
-			const userModel = require('../../../src/models/User');
-			userModel.findOne({ fname: fname })
-			.then(userObj => resolve(userObj._id))
-			.catch(reject);
-		});
-	};
-}
-
-function getSerosFirstListing() {
-	return new Promise(function(resolve, reject) {
-		getUsersID('Sero')()
-		.then(id => {
-			const listingModel = require('../../../src/models/Listing');
-			return listingModel.findOne({ owner_id: id })
-		})
-		.then(listing => {
-			resolve(listing);
-		})
-		.catch(reject);
-	});
-}
-
-function postListing(user_id) {
-	return new Promise(function(resolve, reject) {
-		const listingModel = require('../../../src/models/Listing');
-		const validData = { title: 'bumble', description: 'new app', lang: 'JAVA', type: 'FULL_TIME', owner_id: user_id };
-		let modelInstance = new listingModel(validData);
-		modelInstance.save()
-		.then(res => resolve(res))
-		.catch(reject);
-	});
-}
