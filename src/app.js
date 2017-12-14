@@ -103,6 +103,7 @@ app.get('/listings/new', ensureLoggedIn({ redirectTo: '/login', setReturnTo: '/l
 app.get('/listings/:id',
 	ensureLoggedIn({ redirectTo: '/login'}),
 	function(req, res) {
+		listingRouteHandlers.getById(req, res, listingController);
 	}
 );
 

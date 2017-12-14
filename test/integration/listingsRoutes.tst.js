@@ -4,6 +4,7 @@ const app = require('../../src/app');
 const seed = require('../../seed');
 const sinon = require('sinon');
 const {simulateLogIn} = require('./helpers');
+const listingController = require('../../src/controllers/listing');
 
 describe.only('#Listings_Routes', function() {
 	beforeEach(function(done) {
@@ -91,7 +92,7 @@ describe.only('#Listings_Routes', function() {
 			.catch(done);
 		});
 		it('should redirect to /dashboard with server_error flash if server error occurs', function(done) {
-			let controllerStub = sinon.stub(require('../../src/controllers/listing'), 'createListing').rejects('HAHAHA');
+			let controllerStub = sinon.stub(listingController, 'createListing').rejects('HAHAHA');
 			let invalidListingData = { // missing due_date
 				title: 'b', description: 'b',
 				lang: 'PYTHON', type: 'FULL_TIME'
@@ -123,12 +124,33 @@ describe.only('#Listings_Routes', function() {
 		});
 		it('should redirect to 404 page if listing not found', function(done) {
 			const nonexistentID = '5a302a283d3653249ce3ca71';
-			request(app).get(`/listings/${nonexistentID}`)
-				.expect(404)
-				.expect(/404/, done);
+			simulateLogIn()
+			.then(sessionCookie => {
+				request(app).get(`/listings/${nonexistentID}`)
+					.set('Cookie', [sessionCookie])
+					.expect(404)
+					.expect(/404/, done);
+			})
+			.catch(done);
 		});
 		it('should redirect to /dashboard with server_error flash if listing search fails', function(done) {
-			done(new Error('red-green refactor'));
+			const findStub = sinon.stub(listingController, 'findByIdAndOwnerId').rejects(new Error('Problem querying DB'));
+			const id = '5a302a283d3653249ce3ca71'; // reason this should fail is not the id but a db query failure
+			simulateLogIn()
+			.then(sessionCookie => {
+				request(app).get(`/listings/${nonexistentID}`)
+					.set('Cookie', [sessionCookie])
+					.expect(302).expect('Location', '/dashboard')
+					.end(function(err, res) {
+						findStub.restore();
+						if(err)
+							return done(err);
+						let cookies = res.headers['set-cookie'];
+						expect(cookies[0]).to.match(/cookie_flash_message.+server_error/); // might be second cookie
+						done();
+					});
+			})
+			.catch(done);
 		});
 		it('should redirect to 404 page if existing listing ID but doesnt match owner_id', function(done) {
 			done(new Error('red-green refactor'));

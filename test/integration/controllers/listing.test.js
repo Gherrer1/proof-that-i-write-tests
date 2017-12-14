@@ -6,6 +6,7 @@ describe.only('#Listing_Controller', function() {
 	const getSeroID = getUsersID('Sero');
 	const getBakugoID = getUsersID('Bakugo');
 	let listingController = require('../../../src/controllers/listing');
+
 	before(function() {
 		const listingModel = require('../../../src/models/Listing');
 		listingController.setModel(listingModel);
@@ -13,9 +14,11 @@ describe.only('#Listing_Controller', function() {
 	after(function(done) {
 		seed.seed().then(done, done);
 	});
+
 	beforeEach(function(done) {
 		seed.seed().then(done, done);
 	});
+
 	describe('#countBelongsTo', function() {
 		it('should return the number of listings that belong to user', function(done) {
 			getSeroID()
@@ -78,22 +81,36 @@ describe.only('#Listing_Controller', function() {
 			.catch(done);
 		});
 	});
-	describe('#findById', function() {
+	describe('#findByIdAndOwnerId', function() {
 		it('should reject if passed an invalid id', function(done) {
 			const invalidID = '123';
-			listingController.findById(invalidID)
+			const validOwnerID = '5a302a283d3653249ce3ca71';
+			listingController.findByIdAndOwnerId(invalidID, validOwnerID)
 			.then(listing => done(new Error('should not be here')))
 			.catch(err => done());
 		});
-		it('should resolve w real listing object if passed in a real listing id', function(done) {
+		it('should reject if passed an invalid owner_id', function(done) {
+			const validId = '5a302a283d3653249ce3ca71';
+			const invalidOwnerId = '123';
+			listingController.findByIdAndOwnerId(validId, invalidOwnerId)
+			.then(listing => done(new Error('should not be here')))
+			.catch(err => done());
+		});
+		it('should resolve w real listing object if passed in a real listing id and matching owner_id', function(done) {
 			getSeroID()
-			.then(id => postListing(id))
+			.then(owner_id => postListing(owner_id))
 			.then(listingRes => listingRes._id)
-			.then(listingId => listingController.findById(listingId))
-			.then(listing => done())
+			.then(listingId => listingController.findByIdAndOwnerId(listingId))
+			.then(listing => {
+				if(listing) {
+					console.log(listing);
+					return done();
+				}
+				done(new Error('Did not receive listing'));
+			})
 			.catch(done);
 		});
-		it('should resolve w null if passed in a nonexistent id', function(done) {
+		it('should resolve w null if passed in a nonexistent id but existing owner_id', function(done) {
 			const nonexistentID = '5a302a283d3653249ce3ca71';
 			listingController.findById(nonexistentID)
 			.then(listing => {
@@ -101,6 +118,12 @@ describe.only('#Listing_Controller', function() {
 				done();
 			})
 			.catch(done);
+		});
+		it('should resolve w null if passed in an existing id but nonmatching owner_id', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should resolve w null if passed in nonexistent id and nonexistent owner_id', function(done) {
+			done(new Error('red-green refactor'));
 		});
 	});
 });

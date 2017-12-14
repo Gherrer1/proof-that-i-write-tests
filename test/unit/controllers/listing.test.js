@@ -154,35 +154,37 @@ describe('#ListingController', function() {
 		});
 	});
 
-	describe('#findById', function() {
+	describe('#findByIdAndOwnerId', function() {
 		it('should return a promise', function() {
-			const promise = listingController.findById();
+			const promise = listingController.findByIdAndOwnerId();
 			promise.catch(() => {});
 			cAssert.exists(promise.then);
 			cAssert.exists(promise.catch);
 		});
-		it('[implementation] should call model.findById(id)', function() {
-			const user_id = '123';
-			const fakeModel = { findById() { return Promise.resolve(null); } };
-			const findByIdSpy = sinon.spy(fakeModel, 'findById');
+		it('[implementation] should call model.find({ id, owner_id })', function() {
+			const listing_id = '123';
+			const owner_id = 'abc';
+			const fakeModel = { find() { return Promise.resolve(null); } };
+			const findSpy = sinon.spy(fakeModel, 'find');
 			listingController.setModel(fakeModel);
-			listingController.findById(user_id);
-			cAssert(findByIdSpy.calledOnce, 'findById() not called');
-			cAssert(findByIdSpy.calledWith('123'), 'findById() not called with user_id');
+			listingController.findByIdAndOwnerId(listing_id, owner_id);
+			cAssert(findSpy.calledOnce, 'find() not called');
+			// cAssert(findSpy.calledWith('123'), 'find() not called with user_id');
+			cAssert.deepEqual(findSpy.args[0][0], { _id: listing_id, owner_id }, 'find() not called with { listing_id, owner_id }');
 		});
 		it('should reject if model rejects', function() {
-			const user_id = '123';
-			const fakeModel = { findById() { return Promise.reject(new Error('probz')); } };
+			const id = '123';
+			const fakeModel = { find() { return Promise.reject(new Error('probz')); } };
 			listingController.setModel(fakeModel);
-			let promise = listingController.findById(user_id);
+			let promise = listingController.findByIdAndOwnerId(id);
 			return promise.should.be.rejectedWith('probz');
 		});
 		it('should resolve with listing object if model resolves', function() {
 			const expectedResolveVal = { title: 'a', description: 'b' };
 			const resolveVal = _.cloneDeep(expectedResolveVal);
-			const fakeModel = { findById() { return Promise.resolve(resolveVal) } };
+			const fakeModel = { find() { return Promise.resolve(resolveVal) } };
 			listingController.setModel(fakeModel);
-			let promise = listingController.findById();
+			let promise = listingController.findByIdAndOwnerId();
 			return promise.should.eventually.deep.equal(expectedResolveVal);
 		});
 	});
