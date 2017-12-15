@@ -126,4 +126,8 @@ app.post('/listings',
 	}
 );
 
+app.delete('/listings/:id',
+	ensureLoggedIn({ redirectTo: null })
+);
+
 module.exports = app;

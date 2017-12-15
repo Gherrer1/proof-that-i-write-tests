@@ -32,7 +32,10 @@
  * @api public
  */
 module.exports = function ensureLoggedIn(options) {
-  if (typeof options == 'string') {
+  if (typeof options == null) {
+    options = { redirectTo: null };
+  }
+  else if (typeof options == 'string') {
     options = { redirectTo: options }
   }
   options = options || {};
@@ -45,6 +48,10 @@ module.exports = function ensureLoggedIn(options) {
       // if (setReturnTo && req.session) {
         // req.session.returnTo = req.originalUrl || req.url;
       // }
+      // if redirectTo == null, this is an api call so just sendStatus(401) Unauthorized
+      if (options.redirectTo == null) {
+        return res.sendStatus(401);
+      }
       if(setReturnTo)
         res.flash('return_to', '', null, setReturnTo);
       return res.redirect(url);

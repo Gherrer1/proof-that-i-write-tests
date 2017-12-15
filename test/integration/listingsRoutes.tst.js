@@ -6,7 +6,7 @@ const sinon = require('sinon');
 const {simulateLogIn} = require('./helpers');
 const listingController = require('../../src/controllers/listing');
 
-describe('#Listings_Routes', function() {
+describe.only('#Listings_Routes', function() {
 	beforeEach(function(done) {
 		seed.seed().then(done, done);
 	});
@@ -190,26 +190,60 @@ describe('#Listings_Routes', function() {
 			.catch(done);
 		});
 	});
-	describe('[DELETE /listings/:id]', function() {
-		let satoSessionCookie;
+	describe.only('[DELETE /listings/:id]', function() {
+		let seroSessionCookie;
 		beforeEach(function(done) {
-			simulateLogIn('sato')
+			simulateLogIn('sero')
 			.then(sessCook => {
-				sessionCookie = sessCook;
+				seroSessionCookie = sessCook;
 				done();
 			})
 			.catch(done);
 		});
-		it('should not return HTML - this is an API call');
-		it('should send 401 status if not logged in');
-		it('should send 404 status if listingID is a match but userID is not');
-		it('should send 404 status if userID is a match but listingID is not');
-		it('should send 404 status if neither userID nor listingID is a match');
-		it('should send 400 status if listingID isnt valid ObjectID');
-		it('should send 400 status if userID isnt valid ObjectID');
-		it('should send 200 status if listing deleted successfully');
-		it('should send 500 status if listing lookup fails');
-		it('should send 500 status if listing delete fails');
+		it('should not return HTML - this is an API call', function(done) {
+			const getSerosFirstListing = require('./helpers/getSerosFirstListing');
+			getSerosFirstListing()
+			.then(listing => listing._id)
+			.then(listingID => {
+				request(app).delete(`/listings/${listingID}`)
+					.set('Cookie', [seroSessionCookie])
+					.expect(200)
+					.expect(/^$/, done);
+			})
+			.catch(done);
+		});
+		it('should send 401 status if not logged in', function(done) {
+			request(app).delete('/listings/123')
+				.expect(401, done);
+		});
+		it('should send 404 status if listingID is a match but userID is not', function(done) {
+			// let satoSessionCookie
+			done(new Error('red-green refactor'));
+		});
+		it('should send 404 status if userID is a match but listingID is not', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should send 404 status if neither userID nor listingID is a match', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should send 400 status if listingID isnt valid ObjectID', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should send 400 status if userID isnt valid ObjectID', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should send 200 if userID and listingID are a match', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should send 200 status if listing deleted successfully', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should send 500 status if listing lookup fails', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should send 500 status if listing delete fails', function(done) {
+			done(new Error('red-green refactor'));
+		});
 	});
 });
 
