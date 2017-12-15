@@ -212,30 +212,23 @@ describe.only('#Listings_Routes', function() {
 			})
 			.catch(done);
 		});
-		it('should send 401 status if not logged in', function(done) {
+		it('should send 401 (Not Authorized) if not logged in', function(done) {
 			request(app).delete('/listings/123')
 				.expect(401, done);
 		});
-		it('should send 404 status if listingID is a match but userID is not', function(done) {
-			// let satoSessionCookie
+		it('should send 404 if listing doesnt exist', function(done) {
 			done(new Error('red-green refactor'));
 		});
-		it('should send 404 status if userID is a match but listingID is not', function(done) {
+		it('should send 403 (Forbidden) if listing exists but doesnt belong to user', function(done) {
 			done(new Error('red-green refactor'));
 		});
-		it('should send 404 status if neither userID nor listingID is a match', function(done) {
-			done(new Error('red-green refactor'));
+		it('should send 400 (Bad Request) if :id param isnt a valid ObjectID', function(done) {
+			request(app).delete('/listings/123')
+				.set('Cookie', [seroSessionCookie])
+				// .set('Accept', 'application/json') not sure if ill need this
+				.expect(400, done)
 		});
-		it('should send 400 status if listingID isnt valid ObjectID', function(done) {
-			done(new Error('red-green refactor'));
-		});
-		it('should send 400 status if userID isnt valid ObjectID', function(done) {
-			done(new Error('red-green refactor'));
-		});
-		it('should send 200 if userID and listingID are a match', function(done) {
-			done(new Error('red-green refactor'));
-		});
-		it('should send 200 status if listing deleted successfully', function(done) {
+		it('should send 200 status if listing deleted successfully (implicit that listing exists and belongs to user)', function(done) {
 			done(new Error('red-green refactor'));
 		});
 		it('should send 500 status if listing lookup fails', function(done) {
