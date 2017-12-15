@@ -217,7 +217,12 @@ describe.only('#Listings_Routes', function() {
 				.expect(401, done);
 		});
 		it('should send 404 if listing doesnt exist', function(done) {
-			done(new Error('red-green refactor'));
+			const nonexistentListingID = '5a302a283d3653249ce3ca71';
+			request(app).delete(`/listings/${nonexistentListingID}`)
+				.set('Cookie', [seroSessionCookie])
+				.expect(404,
+				{ msg: 'Listing does not exist' },
+				done);
 		});
 		it('should send 403 (Forbidden) if listing exists but doesnt belong to user', function(done) {
 			done(new Error('red-green refactor'));

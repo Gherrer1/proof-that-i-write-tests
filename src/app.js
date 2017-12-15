@@ -127,7 +127,10 @@ app.post('/listings',
 );
 
 app.delete('/listings/:id',
-	ensureLoggedIn({ redirectTo: null })
+	ensureLoggedIn({ redirectTo: null }),
+	function(req, res) {
+		listingRouteHandlers.deleteById(req, res, listingController);
+	}
 );
 
 module.exports = app;
