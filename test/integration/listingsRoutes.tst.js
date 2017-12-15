@@ -6,7 +6,7 @@ const sinon = require('sinon');
 const {simulateLogIn} = require('./helpers');
 const listingController = require('../../src/controllers/listing');
 
-describe.only('#Listings_Routes', function() {
+describe('#Listings_Routes', function() {
 	beforeEach(function(done) {
 		seed.seed().then(done, done);
 	});
@@ -146,7 +146,8 @@ describe.only('#Listings_Routes', function() {
 						if(err)
 							return done(err);
 						let cookies = res.headers['set-cookie'];
-						expect(cookies[0]).to.match(/cookie_flash_message.+server_error/); // might be second cookie
+						expect(cookies.length).to.equal(2);
+						expect(cookies[0]).to.match(/cookie_flash_message.+server_error/);
 						done();
 					});
 			})
@@ -170,7 +171,23 @@ describe.only('#Listings_Routes', function() {
 			.catch(done);
 		});
 		it('should show listing details if listing found and belongs to user', function(done) {
-			done(new Error('red-green refactor'));
+			const getSerosFirstListing = require('./helpers/getSerosFirstListing');
+			let listingId;
+			getSerosFirstListing()
+			.then(listing => listing._id)
+			.then(listingID => {
+				listingId = listingID;
+				return simulateLogIn('sero');
+			})
+			.then(sessionCookie => {
+				request(app).get(`/listings/${listingId}`)
+					.set('Cookie', [sessionCookie])
+					.expect(200)
+					.expect(/id="listing_title"/)
+					.expect(/id="listing_desc/)
+					.expect(/ruby/, done); //expendable
+			})
+			.catch(done);
 		});
 	});
 });

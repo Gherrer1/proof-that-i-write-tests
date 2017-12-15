@@ -4,7 +4,7 @@ const getSerosFirstListing = require('../helpers/getSerosFirstListing');
 const getUsersID = require('../helpers/getUsersID');
 
 // test interactions between listing controller and listing model
-describe.only('#Listing_Controller', function() {
+describe('#Listing_Controller', function() {
 	const getSeroID = getUsersID('Sero');
 	const getBakugoID = getUsersID('Bakugo');
 	let listingController = require('../../../src/controllers/listing');
