@@ -6,7 +6,7 @@ const sinon = require('sinon');
 const {simulateLogIn} = require('./helpers');
 const listingController = require('../../src/controllers/listing');
 
-describe.only('#Listings_Routes', function() {
+describe('#Listings_Routes', function() {
 	beforeEach(function(done) {
 		seed.seed().then(done, done);
 	});
@@ -190,7 +190,7 @@ describe.only('#Listings_Routes', function() {
 			.catch(done);
 		});
 	});
-	describe.only('[DELETE /listings/:id]', function() {
+	describe('[DELETE /listings/:id]', function() {
 		let seroSessionCookie;
 		beforeEach(function(done) {
 			simulateLogIn('sero')

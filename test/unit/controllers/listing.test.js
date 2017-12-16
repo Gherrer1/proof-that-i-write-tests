@@ -188,4 +188,19 @@ describe('#ListingController', function() {
 			return promise.should.eventually.deep.equal(expectedResolveVal);
 		});
 	});
+
+	describe('#deleteByIdAndOwnerId', function() {
+		it('should return a promise', function() {
+			throw new Error('red-green refactor');
+		});
+		it('[implementation] should call model.deleteOne({ _id, owner_id })', function() {
+			throw new Error('red-green refactor');
+		});
+		it('should reject with error if deleteOne() rejects', function() {
+			throw new Error('red-green refactor');
+		});
+		it('should resolve with ?? if deleteOne() resolves', function() {
+			throw new Error('red-green refactor');
+		});
+	});
 });

@@ -4,7 +4,7 @@ const getSerosFirstListing = require('../helpers/getSerosFirstListing');
 const getUsersID = require('../helpers/getUsersID');
 
 // test interactions between listing controller and listing model
-describe('#Listing_Controller', function() {
+describe.only('#Listing_Controller', function() {
 	const getSeroID = getUsersID('Sero');
 	const getBakugoID = getUsersID('Bakugo');
 	let listingController = require('../../../src/controllers/listing');
@@ -149,6 +149,26 @@ describe('#Listing_Controller', function() {
 				done();
 			})
 			.catch(done);
+		});
+	});
+	describe.only('#deleteByIdAndOwnerId', function() {
+		it('should reject if listingID is invalid ObjectID', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should reject if ownerID is invalid ObjectID', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should reject if ownerID is undefined', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should resolve with null if listingID exists but ownerID doesnt match', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should resolve with null if ownerID exists but listingID doesnt match', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should resolve with listing if ownerID and listingID match', function(done) {
+			done(new Error('red-green refactor'));
 		});
 	});
 });
