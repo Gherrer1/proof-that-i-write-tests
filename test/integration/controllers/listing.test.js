@@ -1,6 +1,6 @@
 const seed = require('../../../seed');
 const assert = require('chai').assert;
-const getSerosFirstListing = require('../helpers/getSerosFirstListing');
+const getSerosFirstListingID = require('../helpers/getSerosFirstListingID');
 const getUsersID = require('../helpers/getUsersID');
 
 // test interactions between listing controller and listing model
@@ -103,9 +103,8 @@ describe.only('#Listing_Controller', function() {
 			getSeroID()
 			.then(owner_id => {
 				seroID = owner_id;
-				return getSerosFirstListing()
+				return getSerosFirstListingID()
 			})
-			.then(serosListing => serosListing._id)
 			.then(listingId => listingController.findByIdAndOwnerId(listingId, seroID))
 			.then(listing => {
 				if(listing)
@@ -129,7 +128,7 @@ describe.only('#Listing_Controller', function() {
 			getBakugoID()
 			.then(id => {
 				bakugosID = id;
-				return getSerosFirstListing();
+				return getSerosFirstListingID();
 			})
 			.then(serosListingId => {
 				return listingController.findByIdAndOwnerId(serosListingId, bakugosID);
@@ -153,22 +152,66 @@ describe.only('#Listing_Controller', function() {
 	});
 	describe.only('#deleteByIdAndOwnerId', function() {
 		it('should reject if listingID is invalid ObjectID', function(done) {
-			done(new Error('red-green refactor'));
+			let invalidListingId = 'abc';
+			getSeroID()
+			.then(seroID => listingController.findByIdAndOwnerId(invalidListingId, seroID))
+			.then(res => {
+				done(new Error('shouldnt be here'));
+			})
+			.catch(err => {
+				assert.match(err.message, /Cast to ObjectId failed for value.+at path "_id" for model "Listing"/);
+				done();
+			});
 		});
 		it('should reject if ownerID is invalid ObjectID', function(done) {
-			done(new Error('red-green refactor'));
+			const invalidUserID = 'abc';
+			getSerosFirstListingID()
+			.then(listingID => listingController.deleteByIdAndOwnerId(listingID, invalidUserID))
+			.catch(err => {
+				assert.match(err.message, /Cast to ObjectId failed for value.+at path "owner_id" for model "Listing"/);
+				done();
+			})
+			.catch(done);
 		});
-		it('should reject if ownerID is undefined', function(done) {
-			done(new Error('red-green refactor'));
+		it('should resolve with null if ownerID is undefined', function(done) {
+			getSerosFirstListingID()
+			.then(listingID => listingController.deleteByIdAndOwnerId(listingID))
+			.then(res => {
+				assert.equal(res.deletedCount, 0);
+				done();
+			})
+			.catch(done);
 		});
 		it('should resolve with null if listingID exists but ownerID doesnt match', function(done) {
-			done(new Error('red-green refactor'));
+			let bakugosID;
+			getBakugoID()
+			.then(bakugos_id => {
+				bakugosID = bakugos_id;
+				return getSerosFirstListingID();
+			})
+			.then(serosListingId => listingController.deleteByIdAndOwnerId(serosListingId, bakugosID))
+			.then(res => {
+				assert.equal(res.deletedCount, 0);
+				done();
+			})
+			.catch(done);
 		});
 		it('should resolve with null if ownerID exists but listingID doesnt match', function(done) {
-			done(new Error('red-green refactor'));
+			done(); // essentially the same test as the one above
 		});
 		it('should resolve with listing if ownerID and listingID match', function(done) {
-			done(new Error('red-green refactor'));
+			let serosID;
+			getSeroID()
+			.then(seros_id => {
+				serosID = seros_id;
+				return getSerosFirstListingID()
+			})
+			.then(serosListingId => listingController.deleteByIdAndOwnerId(serosListingId, serosID))
+			.then(res => {
+				assert.equal(res.deletedCount, 1);
+				done();
+			})
+			.catch(done);
 		});
 	});
 });
