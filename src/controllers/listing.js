@@ -3,7 +3,8 @@ const publicAPI = {
 	createListing,
 	countBelongsTo,
 	findBelongsTo,
-	findByIdAndOwnerId
+	findByIdAndOwnerId,
+	deleteByIdAndOwnerId
 };
 
 function setModel(model) {
@@ -40,6 +41,15 @@ function findByIdAndOwnerId(_id, owner_id) {
 	const model = this.model;
 	return new Promise(function(resolve, reject) {
 		model.findOne({ _id, owner_id })
+		.then(resolve)
+		.catch(reject);
+	});
+}
+
+function deleteByIdAndOwnerId(_id, owner_id) {
+	const model = this.model;
+	return new Promise(function(resolve, reject) {
+		model.deleteOne({ _id, owner_id })
 		.then(resolve)
 		.catch(reject);
 	});

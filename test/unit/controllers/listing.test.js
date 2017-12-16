@@ -4,7 +4,7 @@ const cAssert = chai.assert;
 const sinon = require('sinon');
 const _ = require('lodash');
 
-describe('#ListingController', function() {
+describe.only('#ListingController', function() {
 	const listingController = require('../../../src/controllers/listing');
 
 	it('should not have a this.model until its manually set by calling setModel on it', function() {
@@ -190,17 +190,40 @@ describe('#ListingController', function() {
 	});
 
 	describe('#deleteByIdAndOwnerId', function() {
-		it('should return a promise', function() {
-			throw new Error('red-green refactor');
+		let fakeModel, listingID, owner_id;
+		beforeEach(function() {
+			listingID = '123';
+			owner_id = 'abc';
+			fakeModel = { deleteOne() { return Promise.reject('If you having DB prolemz i feel bad 4 u son'); } };
 		});
-		it('[implementation] should call model.deleteOne({ _id, owner_id })', function() {
-			throw new Error('red-green refactor');
+		it('should return a promise', function() {
+			listingController.setModel(fakeModel);
+			const promise = listingController.deleteByIdAndOwnerId();
+			promise.catch(() => {});
+			cAssert.exists(promise.catch);
+			cAssert.exists(promise.then);
+		});
+		it('[implementation] should call model.deleteOne({ _id, owner_id })', function(done) {
+			const deleteOneSpy = sinon.spy(fakeModel, 'deleteOne');
+			listingController.setModel(fakeModel);
+			listingController.deleteByIdAndOwnerId(listingID, owner_id);
+			setTimeout(function() {
+				cAssert(deleteOneSpy.calledOnce, 'did not call deleteOne()');
+				cAssert.deepEqual(deleteOneSpy.args[0][0], { _id: '123', owner_id: 'abc' },
+					'did not call deleteOne() with proper arguments');
+				done();
+			}, 0);
 		});
 		it('should reject with error if deleteOne() rejects', function() {
-			throw new Error('red-green refactor');
+			listingController.setModel(fakeModel);
+			const promise = listingController.deleteByIdAndOwnerId(listingID, owner_id);
+			return promise.should.be.rejectedWith('If you having DB prolemz i feel bad 4 u son');
 		});
 		it('should resolve with ?? if deleteOne() resolves', function() {
-			throw new Error('red-green refactor');
+			sinon.stub(fakeModel, 'deleteOne').resolves({});
+			listingController.setModel(fakeModel);
+			let promise = listingController.deleteByIdAndOwnerId(listingID, owner_id);
+			return promise.should.eventually.deep.equal({ title: 'haha' });
 		});
 	});
 });
