@@ -50,9 +50,25 @@ function getById(req, res, controller) {
 	});
 }
 
+function deleteById(req, res, controller) {
+	let listingID = req.params.id;
+	let owner_id = req.user._id;
+	controller.deleteByIdAndOwnerId(listingID, owner_id)
+	.then(result => {
+		if(result.deletedCount === 0)
+			return res.status(404).json({ msg: 'Listing does not exist' });
+		return res.sendStatus(200);
+	})
+	.catch(err => {
+		if(err.message.match(/Cast to ObjectId failed for value.+at path "_id" for model "Listing"/))
+			return res.sendStatus(400);
+	});
+}
+
 module.exports = {
 	getById,
 	postListing,
 	ensureNoValidationErrs,
-	ensureLTE10ActiveListings
+	ensureLTE10ActiveListings,
+	deleteById
 };

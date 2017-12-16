@@ -190,7 +190,7 @@ describe('#Listings_Routes', function() {
 			.catch(done);
 		});
 	});
-	describe('[DELETE /listings/:id]', function() {
+	describe.only('[DELETE /listings/:id]', function() {
 		let seroSessionCookie;
 		beforeEach(function(done) {
 			simulateLogIn('sero')
@@ -208,7 +208,7 @@ describe('#Listings_Routes', function() {
 				request(app).delete(`/listings/${listingID}`)
 					.set('Cookie', [seroSessionCookie])
 					.expect(200)
-					.expect(/^$/, done);
+					.expect(/^OK$/, done);
 			})
 			.catch(done);
 		});
@@ -224,7 +224,7 @@ describe('#Listings_Routes', function() {
 				{ msg: 'Listing does not exist' },
 				done);
 		});
-		it('should send 403 (Forbidden) if listing exists but doesnt belong to user', function(done) {
+		it('should send 404 (Forbidden) if listing exists but doesnt belong to user', function(done) {
 			done(new Error('red-green refactor'));
 		});
 		it('should send 400 (Bad Request) if :id param isnt a valid ObjectID', function(done) {
