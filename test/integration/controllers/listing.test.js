@@ -4,7 +4,7 @@ const getSerosFirstListingID = require('../helpers/getSerosFirstListingID');
 const getUsersID = require('../helpers/getUsersID');
 
 // test interactions between listing controller and listing model
-describe.only('#Listing_Controller', function() {
+describe('#Listing_Controller', function() {
 	const getSeroID = getUsersID('Sero');
 	const getBakugoID = getUsersID('Bakugo');
 	let listingController = require('../../../src/controllers/listing');
@@ -150,7 +150,7 @@ describe.only('#Listing_Controller', function() {
 			.catch(done);
 		});
 	});
-	describe.only('#deleteByIdAndOwnerId', function() {
+	describe('#deleteByIdAndOwnerId', function() {
 		it('should reject if listingID is invalid ObjectID', function(done) {
 			let invalidListingId = 'abc';
 			getSeroID()

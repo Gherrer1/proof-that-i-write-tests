@@ -4,7 +4,7 @@ const cAssert = chai.assert;
 const sinon = require('sinon');
 const _ = require('lodash');
 
-describe.only('#ListingController', function() {
+describe('#ListingController', function() {
 	const listingController = require('../../../src/controllers/listing');
 
 	it('should not have a this.model until its manually set by calling setModel on it', function() {
@@ -206,7 +206,7 @@ describe.only('#ListingController', function() {
 		it('[implementation] should call model.deleteOne({ _id, owner_id })', function(done) {
 			const deleteOneSpy = sinon.spy(fakeModel, 'deleteOne');
 			listingController.setModel(fakeModel);
-			listingController.deleteByIdAndOwnerId(listingID, owner_id);
+			listingController.deleteByIdAndOwnerId(listingID, owner_id).catch(() => {});
 			setTimeout(function() {
 				cAssert(deleteOneSpy.calledOnce, 'did not call deleteOne()');
 				cAssert.deepEqual(deleteOneSpy.args[0][0], { _id: '123', owner_id: 'abc' },
@@ -219,11 +219,11 @@ describe.only('#ListingController', function() {
 			const promise = listingController.deleteByIdAndOwnerId(listingID, owner_id);
 			return promise.should.be.rejectedWith('If you having DB prolemz i feel bad 4 u son');
 		});
-		it('should resolve with ?? if deleteOne() resolves', function() {
-			sinon.stub(fakeModel, 'deleteOne').resolves({});
+		it('should resolve with { deletedCount, ... } if deleteOne() resolves', function() {
+			sinon.stub(fakeModel, 'deleteOne').resolves({ deletedCount: 1 });
 			listingController.setModel(fakeModel);
 			let promise = listingController.deleteByIdAndOwnerId(listingID, owner_id);
-			return promise.should.eventually.deep.equal({ title: 'haha' });
+			return promise.should.eventually.have.property('deletedCount');
 		});
 	});
 });
