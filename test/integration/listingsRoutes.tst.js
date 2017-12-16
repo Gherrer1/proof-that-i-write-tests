@@ -5,6 +5,7 @@ const seed = require('../../seed');
 const sinon = require('sinon');
 const {simulateLogIn} = require('./helpers');
 const listingController = require('../../src/controllers/listing');
+const getSerosFirstListingID = require('./helpers/getSerosFirstListingID');
 
 describe('#Listings_Routes', function() {
 	beforeEach(function(done) {
@@ -154,10 +155,8 @@ describe('#Listings_Routes', function() {
 			.catch(done);
 		});
 		it('should redirect to 404 page if existing listing ID but doesnt match owner_id', function(done) {
-			const getSerosFirstListing = require('./helpers/getSerosFirstListing');
 			let listingId;
-			getSerosFirstListing()
-			.then(listing => listing._id)
+			getSerosFirstListingID()
 			.then(listingID => {
 				listingId = listingID;
 				return simulateLogIn('sato');
@@ -171,10 +170,8 @@ describe('#Listings_Routes', function() {
 			.catch(done);
 		});
 		it('should show listing details if listing found and belongs to user', function(done) {
-			const getSerosFirstListing = require('./helpers/getSerosFirstListing');
 			let listingId;
-			getSerosFirstListing()
-			.then(listing => listing._id)
+			getSerosFirstListingID()
 			.then(listingID => {
 				listingId = listingID;
 				return simulateLogIn('sero');
@@ -201,9 +198,7 @@ describe('#Listings_Routes', function() {
 			.catch(done);
 		});
 		it('should not return HTML - this is an API call', function(done) {
-			const getSerosFirstListing = require('./helpers/getSerosFirstListing');
-			getSerosFirstListing()
-			.then(listing => listing._id)
+			getSerosFirstListingID()
 			.then(listingID => {
 				request(app).delete(`/listings/${listingID}`)
 					.set('Cookie', [seroSessionCookie])
@@ -221,26 +216,59 @@ describe('#Listings_Routes', function() {
 			request(app).delete(`/listings/${nonexistentListingID}`)
 				.set('Cookie', [seroSessionCookie])
 				.expect(404,
-				{ msg: 'Listing does not exist' },
-				done);
+					{ msg: 'Listing does not exist' },
+					done);
 		});
 		it('should send 404 (Forbidden) if listing exists but doesnt belong to user', function(done) {
-			done(new Error('red-green refactor'));
+			let bakugosSession;
+			simulateLogIn('bakugo')
+			.then(sessCook => {
+				bakugosSession = sessCook;
+				return getSerosFirstListingID()
+			})
+			.then(serosListingID => {
+				request(app).delete(`/listings/${serosListingID}`)
+					.set('Cookie', [bakugosSession])
+					.expect(404,
+						{ msg: 'Listing does not exist'},
+						done);
+			})
+			.catch(done);
 		});
 		it('should send 400 (Bad Request) if :id param isnt a valid ObjectID', function(done) {
 			request(app).delete('/listings/123')
 				.set('Cookie', [seroSessionCookie])
-				// .set('Accept', 'application/json') not sure if ill need this
 				.expect(400, done)
 		});
 		it('should send 200 status if listing deleted successfully (implicit that listing exists and belongs to user)', function(done) {
-			done(new Error('red-green refactor'));
+			getSerosFirstListingID()
+			.then(listingID => {
+				request(app).delete(`/listings/${listingID}`)
+					.set('Cookie', [seroSessionCookie])
+					.expect(200)
+					.expect(/^OK$/, done);
+			})
+			.catch(done);
 		});
-		it('should send 500 status if listing lookup fails', function(done) {
-			done(new Error('red-green refactor'));
-		});
-		it('should send 500 status if listing delete fails', function(done) {
-			done(new Error('red-green refactor'));
+		it('should send 500 status if listing deleteOne fails', function(done) {
+			const expectedError = new Error('if u havin db probz i feel bad 4 u son');
+			const deleteByIdAndOwnerIdStub = sinon.stub(listingController, 'deleteByIdAndOwnerId').rejects(expectedError);
+			getSerosFirstListingID()
+			.then(listingID => {
+				request(app).delete(`/listings/${listingID}`)
+					.set('Cookie', [seroSessionCookie])
+					.expect(500)
+					.end(function(err, res) {
+						deleteByIdAndOwnerIdStub.restore();
+						if(err)
+							return done(err);
+						expect(res.body).to.deep.equal({
+							msg: 'Something went wrong'
+						});
+						done();
+					});
+			})
+			.catch(done);
 		});
 	});
 });

@@ -62,6 +62,7 @@ function deleteById(req, res, controller) {
 	.catch(err => {
 		if(err.message.match(/Cast to ObjectId failed for value.+at path "_id" for model "Listing"/))
 			return res.sendStatus(400);
+		res.status(500).json({ msg: 'Something went wrong' });
 	});
 }
 
