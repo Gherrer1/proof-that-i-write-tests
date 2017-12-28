@@ -197,7 +197,7 @@ describe('#Listings_Routes', function() {
 			})
 			.catch(done);
 		});
-		it('should not return HTML - this is an API call', function(done) {
+		it('should not return HTML on success - this is an API call', function(done) {
 			getSerosFirstListingID()
 			.then(listingID => {
 				request(app).delete(`/listings/${listingID}`)
@@ -206,6 +206,14 @@ describe('#Listings_Routes', function() {
 					.expect(/^OK$/, done);
 			})
 			.catch(done);
+		});
+		it('shoudl return JSON on failure, not HTML - this is an API call', function(done) {
+			const nonexistentListingID = '5a302a283d3653249ce3ca71';
+			request(app).delete(`/listings/${nonexistentListingID}`)
+				.set('Cookie', [seroSessionCookie])
+				.expect(404,
+					{ msg: 'Listing does not exist' },
+					done);
 		});
 		it('should send 401 (Not Authorized) if not logged in', function(done) {
 			request(app).delete('/listings/123')
