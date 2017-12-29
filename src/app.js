@@ -133,6 +133,11 @@ app.delete('/listings/:id',
 	}
 );
 
-app.get('/listings/:id/edit', ensureLoggedIn({ redirectTo: '/login' }));
+app.get('/listings/:id/edit',
+	ensureLoggedIn({ redirectTo: '/login' }),
+	function getUpdateForm(req, res) {
+		listingRouteHandlers.getUpdateForm(req, res, listingController);
+	}
+);
 
 module.exports = app;

@@ -313,20 +313,61 @@ describe('#Listings_Routes', function() {
 		it('should redirect to /dashboard with server_error flash if listing isnt valid MongoDB ObjectID', function(done) {
 			request(app).get('/listings/123/edit')
 				.set('Cookie', [seroSessionCookie])
-				.expect(302).expect('Locaation', '/dashboard')
-				.expect(/Something went wrong/, done);
+				.expect(302).expect('Location', '/dashboard')
+				.end(function(err, res) {
+					if(err)
+						return done(err);
+					let cookies = res.headers['set-cookie'];
+					expect(cookies.length).to.equal(2); // session + server_error
+					expect(cookies[0]).to.match(/cookie_flash_message.+server_error/);
+					done();
+				});
 		});
 		it('should redirect to 404 page if listing doesnt exist', function(done) {
-			done(new Error('red-green refactor'));
+			const nonexistentID = '5a302a283d3653249ce3ca71';
+			request(app).get(`/listings/${nonexistentID}/edit`)
+				.set('Cookie', [seroSessionCookie])
+				.expect(404)
+				.expect(/404/, done);
 		});
 		it('should redirect to /dashboard with server_error flash if listing search fails', function(done) {
-			done(new Error('red-green refactor'));
+			const expectedError = new Error('if u havin db probz i feel bad 4 u son');
+			const	findListingByIdStub = sinon.stub(listingController, 'findByIdAndOwnerId').rejects(expectedError);
+			getSerosFirstListingID()
+			.then(listingID => {
+				request(app).get(`/listings/${listingID}/edit`)
+					.set('Cookie', [seroSessionCookie])
+					.expect(302).expect('Location', '/dashboard')
+					.end(function(err, res) {
+						findListingByIdStub.restore();
+						if(err)
+							return done(err);
+						let cookies = res.headers['set-cookie'];
+						expect(cookies.length).to.equal(2); // session, server_error
+						expect(cookies[0]).to.match(/cookie_flash_message.+server_error/);
+						done();
+					});
+			})
+			.catch(done);
 		});
-		it('should redirect to 404 page if existing listing ID but doesnt match owner_id', function(done) {
-			done(new Error('red-green refactor'));
+		it('should redirect to 404 page if existing listing ID but doesnt match owner_id', async function() {
+				let bakugosSession = await simulateLogIn('bakugo');
+				let serosFirstListingID = await getSerosFirstListingID();
+				let result = await request(app).get(`/listings/${serosFirstListingID}/edit`)
+					.set('Cookie', [bakugosSession])
+					.expect(404)
+					.expect(/404/);
+				/* Did NOT know you can return a Promise!!!! This changes the game */
+				return result;
 		});
-		it('should show listing details if listing found and belongs to user', function(done) {
-			done(new Error('red-green refactor'));
+		it('should show listing details if listing found and belongs to user', async function() {
+			let serosFirstListingID = await getSerosFirstListingID();
+			let result = await request(app).get(`/listings/${serosFirstListingID}/edit`)
+				.set('Cookie', [seroSessionCookie])
+				.expect(200)
+				.expect(/<title>Update Listing<\/title>/)
+				.expect(/<textarea.*Need experienced developer.*<\/textarea>/);
+			return result;
 		});
 	});
 });

@@ -39,10 +39,8 @@ function getById(req, res, controller) {
 	.then(listing => {
 		if(listing)
 			return res.render('listing', { listing });
-		else {
-			res.status(404);
-			return res.render('404');
-		}
+		else
+			return res.status(404).render('404');
 	})
 	.catch(err => {
 		res.flash('server_error', 'Something went wrong. Please try again');
@@ -66,10 +64,25 @@ function deleteById(req, res, controller) {
 	});
 }
 
+async function getUpdateForm(req, res, controller) {
+	let listingID = req.params.id;
+	let owner_id = req.user._id;
+	try {
+		let listing = await controller.findByIdAndOwnerId(listingID, owner_id);
+		if(!listing)
+			return res.status(404).render('404');
+		res.render('updateListing', { listing });
+	} catch(err) {
+		res.flash('server_error', 'Something went wrong');
+		return res.redirect('/dashboard');
+	}
+}
+
 module.exports = {
 	getById,
 	postListing,
 	ensureNoValidationErrs,
 	ensureLTE10ActiveListings,
-	deleteById
+	deleteById,
+	getUpdateForm
 };
