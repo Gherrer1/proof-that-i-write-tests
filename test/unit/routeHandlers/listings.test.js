@@ -127,7 +127,7 @@ describe('#Listing_Route_Handlers', function() {
 				params: { id: 'made_up' },
 				user: { _id: 'made_up_2' }
 			};
-			res = { render() {}, redirect() {}, status() {} };
+			res = { render() {}, redirect() {}, status() { return this; } };
 			renderSpy = sinon.spy(res, 'render');
 			redirectSpy = sinon.spy(res, 'redirect');
 		});
