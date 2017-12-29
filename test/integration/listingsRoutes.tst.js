@@ -123,6 +123,23 @@ describe('#Listings_Routes', function() {
 			request(app).get('/listings/123')
 				.expect(302).expect('Location', '/login', done);
 		});
+		it('should redirect to /dashboard w server_error flash if listing_id isnt valid MongoDB ObjectID', function(done) {
+			simulateLogIn()
+			.then(sessionCookie => {
+				request(app).get('/listings/123')
+					.set('Cookie', [sessionCookie])
+					.expect(302).expect('Location', '/dashboard')
+					.end(function(err, res) {
+						if(err)
+							return done(err);
+						let cookies = res.headers['set-cookie'];
+						expect(cookies.length).to.equal(2);
+						expect(cookies[0]).to.match(/cookie_flash_message.+server_error/);
+						done();
+					});
+			})
+			.catch(done);
+		});
 		it('should redirect to 404 page if listing not found', function(done) {
 			const nonexistentID = '5a302a283d3653249ce3ca71';
 			simulateLogIn()
@@ -280,14 +297,37 @@ describe('#Listings_Routes', function() {
 		});
 	});
 	describe.only('[GET /listings/:id/edit]', function() {
+		let seroSessionCookie;
+		beforeEach(function(done) {
+			simulateLogIn('sero')
+			.then(sessCook => {
+				seroSessionCookie = sessCook;
+				done();
+			})
+			.catch(done);
+		});
 		it('should redirect to /login if user isnt logged in', function(done) {
 			request(app).get('/listings/123/edit')
 				.expect(302).expect('Location', '/login', done);
 		});
-		it('should redirect to 404 page if listing doesnt exist');
-		it('should redirect to /dashboard with server_error flash if listing search fails');
-		it('should redirect to 404 page if existing listing ID but doesnt match owner_id');
-		it('should show listing details if listing found and belongs to user');
+		it('should redirect to /dashboard with server_error flash if listing isnt valid MongoDB ObjectID', function(done) {
+			request(app).get('/listings/123/edit')
+				.set('Cookie', [seroSessionCookie])
+				.expect(302).expect('Locaation', '/dashboard')
+				.expect(/Something went wrong/, done);
+		});
+		it('should redirect to 404 page if listing doesnt exist', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should redirect to /dashboard with server_error flash if listing search fails', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should redirect to 404 page if existing listing ID but doesnt match owner_id', function(done) {
+			done(new Error('red-green refactor'));
+		});
+		it('should show listing details if listing found and belongs to user', function(done) {
+			done(new Error('red-green refactor'));
+		});
 	});
 });
 
