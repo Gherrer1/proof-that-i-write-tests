@@ -1,6 +1,5 @@
 // add event listener to delete button
 // TODO: find out how to test this kind of code
-// TODO: if status code !== 200, we should populate some div with an error message
 (function() {
 
 	function removeListingFromDOM(target) {
@@ -22,10 +21,22 @@
 
 			const listingID = event.target.parentNode.id;
 			ajaxDeleteListing(listingID)
-				.then(data => {
+				.then(function handleData(data) {
 					if(data.status === 200) {
 						removeListingFromDOM(event.target);
+						return;
 					}
+
+					return data.json(); // to get error message
+
+				})
+				.then(function displayErrorMessageFrom(json) {
+					if(!json)
+						return;
+
+					document.querySelector('#error-message-container').innerHTML = (
+						`<p id="error-message">${json.msg || "Something went wrong."}</p>`
+					);
 				});
 		});
 	});
