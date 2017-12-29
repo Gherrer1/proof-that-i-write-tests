@@ -296,7 +296,7 @@ describe('#Listings_Routes', function() {
 			.catch(done);
 		});
 	});
-	describe.only('[GET /listings/:id/edit]', function() {
+	describe('[GET /listings/:id/edit]', function() {
 		let seroSessionCookie;
 		beforeEach(function(done) {
 			simulateLogIn('sero')

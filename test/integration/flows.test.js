@@ -85,10 +85,11 @@ describe('#Flows', function() {
       belongsToStub.restore();
     });
     it('should show post_success flash message at /dashboard after successful listing post', async function() {
-		await login(page);
-		await createListing(page);
-		await page.waitForSelector('#post_success', { timeout: 2000 });
+      await login(page);
+      await createListing(page);
+      await page.waitForSelector('#post_success', { timeout: 2000 });
     });
+    it('should navigate to update page of listing w/ type A, change to type B, hit update, navigate to /listings/:id, and see updated type reflected');
 });
 
 async function createListing(page) {
