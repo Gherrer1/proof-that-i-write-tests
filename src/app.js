@@ -133,4 +133,6 @@ app.delete('/listings/:id',
 	}
 );
 
+app.get('/listings/:id/edit', ensureLoggedIn({ redirectTo: '/login' }));
+
 module.exports = app;

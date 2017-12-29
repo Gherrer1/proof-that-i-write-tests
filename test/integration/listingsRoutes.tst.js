@@ -187,7 +187,7 @@ describe('#Listings_Routes', function() {
 			.catch(done);
 		});
 	});
-	describe.only('[DELETE /listings/:id]', function() {
+	describe('[DELETE /listings/:id]', function() {
 		let seroSessionCookie;
 		beforeEach(function(done) {
 			simulateLogIn('sero')
@@ -278,6 +278,16 @@ describe('#Listings_Routes', function() {
 			})
 			.catch(done);
 		});
+	});
+	describe.only('[GET /listings/:id/edit]', function() {
+		it('should redirect to /login if user isnt logged in', function(done) {
+			request(app).get('/listings/123/edit')
+				.expect(302).expect('Location', '/login', done);
+		});
+		it('should redirect to 404 page if listing doesnt exist');
+		it('should redirect to /dashboard with server_error flash if listing search fails');
+		it('should redirect to 404 page if existing listing ID but doesnt match owner_id');
+		it('should show listing details if listing found and belongs to user');
 	});
 });
 
