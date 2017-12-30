@@ -1,4 +1,6 @@
 const seed = require('../../../seed');
+const sinon = require('sinon');
+const _ = require('lodash');
 const assert = require('chai').assert;
 const getSerosFirstListingID = require('../helpers/getSerosFirstListingID');
 const getUsersID = require('../helpers/getUsersID');
@@ -215,23 +217,67 @@ describe('#Listing_Controller', function() {
 		});
 	});
 	describe.only('#updateByIdAndOwnerId', function() {
+		let serosID, serosFirstListingId;
+		let fakeUpdateObj;
+		beforeEach(async function() {
+			fakeUpdateObj = { title: 'Hey lol' };
+			serosID = await getSeroID();
+			serosFirstListingId = await getSerosFirstListingID();
+		});
 		it('should return a promise', function() {
-			return Promise.reject(new Error('red-green refactor'));
+			let promise = listingController.updateByIdAndOwnerId();
+			promise.catch(() => {});
+			assert.exists(promise.then);
+			assert.exists(promise.catch);
 		});
-		it('should reject if listingID isnt a valid MongoDB ObjectId', function() {
-			return Promise.reject(new Error('red-green refactor'));
+		it('[implementation] should call model.updateOne() with { listingID, ownerID } and ' +
+				'{ title, description, type, lang } and { runValidators: true }', async function() {
+			const listingModel = require('../../../src/models/Listing');
+			let updateOneStub = sinon.spy(listingModel, 'updateOne');
+			let updateObj = {
+				title: 'Ayyyy Lmao',
+				description: 'Raid Anna',
+				type: 'FULL_TIME',
+				lang: 'C'
+			};
+			let updateObjDeepClone = _.cloneDeep(updateObj);
+			let result = await listingController.updateByIdAndOwnerId(serosFirstListingId, serosID, updateObj);
+			updateOneStub.restore();
+			assert(updateOneStub.calledOnce, 'Didnt call updateOne()');
+			assert.deepEqual(updateOneStub.args[0][0], { _id: serosFirstListingId, owner_id: serosID });
+			assert.deepEqual(updateOneStub.args[0][1], { $set: updateObjDeepClone });
+			assert.deepEqual(updateOneStub.args[0][2], { runValidators: true });
 		});
-		it('should reject if ownerID isnt a valid MongoDB ObjectId', function() {
-			return Promise.reject(new Error('red-green refactor'));
+		it('should reject if listingID isnt a valid MongoDB ObjectId', async function() {
+			const invalidListingId = '123';
+			let error = await listingController.updateByIdAndOwnerId(invalidListingId, serosID, fakeUpdateObj).catch(err => err);
+			assert.match(error.message, /Cast to ObjectId failed for value/);
 		});
-		it('should reject if updateOne() fails', function() {
-			return Promise.reject(new Error('red-green refactor'));
+		it('should reject if ownerID isnt a valid MongoDB ObjectId', async function() {
+			const invalidOwnerId = '123';
+			let errorMessage = await listingController.updateByIdAndOwnerId(serosFirstListingId, invalidOwnerId, fakeUpdateObj).catch(err => err.message);
+			assert.match(errorMessage, /Cast to ObjectId failed for value/);
 		});
-		it('not sure what it should resolve to if no listing found with BOTH listingID and ownerID mathing', function() {
-			return Promise.reject(new Error('red-green refactor'));
+		it('should reject if updateOne() fails', async function() {
+			const listingModel = require('../../../src/models/Listing');
+			let updateOneStub = sinon.stub(listingModel, 'updateOne').rejects(new Error('feel bad 4 u son'));
+			let errorMessage = await listingController.updateByIdAndOwnerId(serosFirstListingId, serosID, fakeUpdateObj).catch(err => err.message);
+			updateOneStub.restore();
+			assert.match(errorMessage, /feel bad 4 u son/);
 		});
-		it('should reject if tries to change lang to unacceptable enum value', function() {
-			return Promise.reject(new Error('red-green refactor'));
+		it('result.n should be 0 if no listing found with BOTH listingID and ownerID matching', async function() {
+			const nonexistentListingID = '5a302a283d3653249ce3ca71';
+			let promise1 = listingController.updateByIdAndOwnerId(nonexistentListingID, serosID, fakeUpdateObj);
+			const nonexistentUserID = '5a302a283d3653249ce3ca71';
+			let promise2 = listingController.updateByIdAndOwnerId(serosFirstListingId, nonexistentUserID, fakeUpdateObj);
+			const [result1, result2] = await Promise.all([promise1, promise2]);
+			assert.equal(result1.n, 0, 'result1: n should be 0 because 0 documents should match');
+			assert.equal(result2.n, 0, 'result2: n should be 0 because 0 documents should match');
+		});
+		it('should reject if tries to change lang to unacceptable enum value', async function() {
+			fakeUpdateObj.lang = 'java';
+			let errorMessage = await listingController.updateByIdAndOwnerId(serosFirstListingId, serosID, fakeUpdateObj).catch(err => err.message);
+			assert.match(errorMessage, /Validation failed: lang:.+is not a valid enum value/);
 		});
 		it('should reject if tries to change type to unacceptable enum value', function() {
 			return Promise.reject(new Error('red-green refactor'));
@@ -239,7 +285,7 @@ describe('#Listing_Controller', function() {
 		it('should reject if tries to change description to too long (or any other validation error)', function() {
 			return Promise.reject(new Error('red-green refactor'));
 		});
-		it('should reject if tries to change title to too long (or any other validation errro)', function() {
+		it('should reject if tries to change title to too long (or any other validation error)', function() {
 			return Promise.reject(new Error('red-green refactor'));
 		});
 	});

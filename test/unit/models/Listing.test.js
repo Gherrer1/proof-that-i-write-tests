@@ -38,6 +38,17 @@ describe('Listing Model', function() {
         done();
       });
     });
+    it('should return a validation error if field is longer than 75 chars long', function(done) {
+      fields.title = 'this  is my really long title lol fuckkkkk i dont know what to say oh well l';
+      expect(fields.title.length).to.be.above(75);
+      let listing = new Listing(fields);
+      listing.validate(err => {
+        expect(err).to.exist;
+        expect(err.errors.title).to.exist;
+        expect(err.errors.title.message).to.match(/is longer than the maximum allowed length/);
+        done();
+      });
+    });
   });
   describe('type field', function() {
     it('should return a validation error if left empty', function(done) {
@@ -90,6 +101,17 @@ describe('Listing Model', function() {
         expect(err).to.exist;
         expect(err.errors.description).to.exist;
         expect(err.errors.description.message).to.match(/`description` is required/);
+        done();
+      });
+    });
+    it('should return a validation error if field is over 1000 chars long', function(done) {
+      fields.description = 'Lorem ipsum dolor sit amettt, affert munere cu mea. Sed scaevola luptatum disputationi cu. Purto phaedrum neglegentur ius cu. Doctus splendide vix no. Mea at sale laboramus, virtute disputando ut pro, an regione singulis vix. Qui eu diam admodum, ut latine omittam his, altera malorum eu has. Cu dignissim urbanitas eam, mei aliquando theophrastus et.Vim te expetendis interesset definitiones, accusata constituto nec an. Eius nobis no vim, ea mea dicit concludaturque. Pri ut brute viris splendide, mea assum petentium ne. Per deterruisset reprehendunt id, eu sed iriure senserit reprehendunt, voluptua adipisci no est.Et pro malis zril, usu graeco dolorum ne, est liber dolore eu. Cu eam vide impetus atomorum. Ad nec luptatum liberavisse, at feugiat dissentiunt intellegebat quo, pro an ubique nostro. Vix at facilisis persecuti, equidem consulatu ut vel. Ad vidit omittam qui, id postulant iudicabit ullamcorper sed, ue ibit has no, dicam lucilius atomorum sit ne, mea no etiam nominavi vulputate.';
+      expect(fields.description.length).to.above(1000);
+      let listing = new Listing(fields);
+      listing.validate(err => {
+        expect(err).to.exist;
+        expect(err.errors.description).to.exist;
+        expect(err.errors.description.message).to.match(/is longer than the maximum allowed length/);
         done();
       });
     });
