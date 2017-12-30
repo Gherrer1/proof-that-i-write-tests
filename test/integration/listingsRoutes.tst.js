@@ -371,11 +371,30 @@ describe('#Listings_Routes', function() {
 		});
 	});
 	describe.only('[PUT /listings/:id]', function() {
-		it('should redirect to /login if user not logged in', function() {
-			return Promise.reject(new Error('red-green refactor'));
+		let seroSessionCookie;
+		beforeEach(function(done) {
+			simulateLogIn('sero')
+			.then(sessCook => {
+				seroSessionCookie = sessCook;
+				done();
+			})
+			.catch(done);
 		});
-		it('should redirect to /dashboard with server_error flash if listing isnt valid MongoDB ObjectID', function() {
-			return Promise.reject(new Error('red-green refactor'));
+		it('should redirect to /login if user not logged in', async function() {
+			let result = await request(app).put('/listings/123')
+				.expect(302).expect('Location', '/login');
+			return result;
+		});
+		it('should redirect to /dashboard with server_error flash if listing isnt valid MongoDB ObjectID', async function() {
+			let result = await request(app).put('/listings/123')
+				.set('Cookie', [seroSessionCookie])
+				.expect(302).expect('Location', '/dashboard')
+				.then(function(res) {
+					let cookies = res.headers['set-cookie'];
+					expect(cookies.length).to.equal(2);
+					expect(cookies[0]).to.match(/cookie_flash_message.+server_error/);
+				});
+			return result;
 		});
 		it('should redirect to 404 if listing doesnt exist', function() {
 			return Promise.reject(new Error('red-green refactor'));
