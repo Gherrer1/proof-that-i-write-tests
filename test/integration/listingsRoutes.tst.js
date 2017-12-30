@@ -370,6 +370,32 @@ describe('#Listings_Routes', function() {
 			return result;
 		});
 	});
+	describe.only('[PUT /listings/:id]', function() {
+		it('should redirect to /login if user not logged in', function() {
+			return Promise.reject(new Error('red-green refactor'));
+		});
+		it('should redirect to /dashboard with server_error flash if listing isnt valid MongoDB ObjectID', function() {
+			return Promise.reject(new Error('red-green refactor'));
+		});
+		it('should redirect to 404 if listing doesnt exist', function() {
+			return Promise.reject(new Error('red-green refactor'));
+		});
+		it('should redirect to 404 if listing exists but doesnt belong to user', function() {
+			return Promise.reject(new Error('red-green refactor'));
+		});
+		it('should redirect to /dashboard with server_error flash if listing lookup fails', function() {
+			return Promise.reject(new Error('red-green refactor'));
+		});
+		it('should redirect to GET /listings/:id/edit if validation errors \n\t(bc clientside js will handle validation and error messages', function() {
+			return Promise.reject(new Error('red-green refactor'));
+		});
+		it('should redirect to /dashboard with server_error flash if listing update fails', function() {
+			return Promise.reject(new Error('red-green refactor'));
+		});
+		it('should redirect to /dashboard with update_success flash if listing update succeeds', function() {
+			return Promise.reject(new Error('red-green refactor'));
+		});
+	});
 });
 
 /**
