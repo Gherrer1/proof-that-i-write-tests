@@ -279,14 +279,25 @@ describe('#Listing_Controller', function() {
 			let errorMessage = await listingController.updateByIdAndOwnerId(serosFirstListingId, serosID, fakeUpdateObj).catch(err => err.message);
 			assert.match(errorMessage, /Validation failed: lang:.+is not a valid enum value/);
 		});
-		it('should reject if tries to change type to unacceptable enum value', function() {
-			return Promise.reject(new Error('red-green refactor'));
+		it('should reject if tries to change type to unacceptable enum value', async function() {
+			fakeUpdateObj.type = 'FUL_TIME';
+			let errorMessage = await listingController.updateByIdAndOwnerId(serosFirstListingId, serosID, fakeUpdateObj).catch(err => err.message);
+			assert.match(errorMessage, /Validation failed: type:.+is not a valid enum value/);
 		});
-		it('should reject if tries to change description to too long (or any other validation error)', function() {
-			return Promise.reject(new Error('red-green refactor'));
+		it('should reject if tries to change description to too long (or any other validation error)', async function() {
+			const newDescription = 'Lorem ipsum dolor sit amet, affert munere cu mea. Sed scaevola luptatum disputationi cu. Purto phaedrum neglegentur ius cu. Doctus splendide vix no. Mea at sale laboramus, virtute disputando ut pro, an regione singulis vix. Qui eu diam admodum, ut latine omittam his, altera malorum eu has. Cu dignissim urbanitas eam, mei aliquando theophrastus et.Vim te expetendis interesset definitiones, accusata constituto nec an. Eius nobis no vim, ea mea dicit concludaturque.'
+			+ 'bus consectetuer his ellum adipisci mel ne. Congue iudicabit has no, dicam lucilius atomorum sit ne, mea no etiam nominavi vulputate.Malis erroribus consectetuer his ex, mea nisl graece posidonium ut. Id mea adhuc libris, at eam affert verterem. Impetus dolores appetere an his. Duis abhorreant no has, in mel meis apeirian, vel et dolorum mandamus. Eum id laoreet iudicabit, vim id autem voluptua prodesset. Verear indoctum quo et, eu laudem nusquam scaevola est, habeo fuisset sit et. Evertitur persecuti just 50 more chars dawg 123';
+			assert.isAbove(newDescription.length, 1000, 'new Description isnt over 1000 chars long');
+			fakeUpdateObj.description = newDescription;
+			const errorMessage = await listingController.updateByIdAndOwnerId(serosFirstListingId, serosID, fakeUpdateObj).catch(err => err.message);
+			assert.match(errorMessage, /description.+is longer than the maximum allowed length/);
 		});
-		it('should reject if tries to change title to too long (or any other validation error)', function() {
-			return Promise.reject(new Error('red-green refactor'));
+		it('should reject if tries to change title to too long (or any other validation error)', async function() {
+			const newTitle = 'this  is my really long title lol fuckkkkk i dont know what to say oh well l';
+			assert.isAbove(newTitle.length, 75);
+			fakeUpdateObj.title = newTitle;
+			const errorMessage = await listingController.updateByIdAndOwnerId(serosFirstListingId, serosID, fakeUpdateObj).catch(err => err.message);
+			assert.match(errorMessage, /title.+is longer than the maximum allowed length/);
 		});
 	});
 });
