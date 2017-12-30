@@ -397,7 +397,10 @@ describe('#Listings_Routes', function() {
 			return result;
 		});
 		it('should redirect to 404 if listing doesnt exist', function() {
-			return Promise.reject(new Error('red-green refactor'));
+			const nonexistentListingID = '5a302a283d3653249ce3ca71';
+			return request(app).put(`/listings/${nonexistentListingID}`)
+				.set('Cookie', [seroSessionCookie])
+				.expect(404).expect(/404/);
 		});
 		it('should redirect to 404 if listing exists but doesnt belong to user', function() {
 			return Promise.reject(new Error('red-green refactor'));

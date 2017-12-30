@@ -143,7 +143,7 @@ app.get('/listings/:id/edit',
 app.put('/listings/:id',
 	ensureLoggedIn({ redirectTo: '/login' }),
 	function updateById(req, res) {
-		res.sendStatus(200);
+		listingRouteHandlers.putListingById(req, res, listingController);
 	}
 );
 

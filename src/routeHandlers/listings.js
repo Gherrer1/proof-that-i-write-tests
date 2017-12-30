@@ -78,11 +78,26 @@ async function getUpdateForm(req, res, controller) {
 	}
 }
 
+async function putListingById(req, res, controller, validData) {
+	try {
+		let listingID = req.params.id;
+		let owner_id = req.user._id;
+		let listing = await controller.updateByIdAndOwnerId(listingID, owner_id, validData);
+		if(!listing)
+			return res.status(404)//.render('404');
+	} catch(err) {
+		console.log(err.message);
+		res.flash('server_error', 'Something went wrong');
+		res.redirect('/dashboard');
+	}
+}
+
 module.exports = {
 	getById,
 	postListing,
 	ensureNoValidationErrs,
 	ensureLTE10ActiveListings,
 	deleteById,
-	getUpdateForm
+	getUpdateForm,
+	putListingById
 };
