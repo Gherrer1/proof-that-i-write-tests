@@ -214,4 +214,33 @@ describe('#Listing_Controller', function() {
 			.catch(done);
 		});
 	});
+	describe.only('#updateByIdAndOwnerId', function() {
+		it('should return a promise', function() {
+			return Promise.reject(new Error('red-green refactor'));
+		});
+		it('should reject if listingID isnt a valid MongoDB ObjectId', function() {
+			return Promise.reject(new Error('red-green refactor'));
+		});
+		it('should reject if ownerID isnt a valid MongoDB ObjectId', function() {
+			return Promise.reject(new Error('red-green refactor'));
+		});
+		it('should reject if updateOne() fails', function() {
+			return Promise.reject(new Error('red-green refactor'));
+		});
+		it('not sure what it should resolve to if no listing found with BOTH listingID and ownerID mathing', function() {
+			return Promise.reject(new Error('red-green refactor'));
+		});
+		it('should reject if tries to change lang to unacceptable enum value', function() {
+			return Promise.reject(new Error('red-green refactor'));
+		});
+		it('should reject if tries to change type to unacceptable enum value', function() {
+			return Promise.reject(new Error('red-green refactor'));
+		});
+		it('should reject if tries to change description to too long (or any other validation error)', function() {
+			return Promise.reject(new Error('red-green refactor'));
+		});
+		it('should reject if tries to change title to too long (or any other validation errro)', function() {
+			return Promise.reject(new Error('red-green refactor'));
+		});
+	});
 });
