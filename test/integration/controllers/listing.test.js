@@ -216,7 +216,7 @@ describe('#Listing_Controller', function() {
 			.catch(done);
 		});
 	});
-	describe.only('#updateByIdAndOwnerId', function() {
+	describe('#updateByIdAndOwnerId', function() {
 		let serosID, serosFirstListingId;
 		let fakeUpdateObj;
 		beforeEach(async function() {
@@ -298,6 +298,21 @@ describe('#Listing_Controller', function() {
 			fakeUpdateObj.title = newTitle;
 			const errorMessage = await listingController.updateByIdAndOwnerId(serosFirstListingId, serosID, fakeUpdateObj).catch(err => err.message);
 			assert.match(errorMessage, /title.+is longer than the maximum allowed length/);
+		});
+		it('should resolve to { n, ok, nModified } if all goes well and listing should reflect changes', async function() {
+			fakeUpdateObj = {
+				title: 'New Title Who Dis',
+				description: 'New Description who Dis',
+				type: 'FULL_TIME',
+				lang: 'ELM'
+			};
+			const result = await listingController.updateByIdAndOwnerId(serosFirstListingId, serosID, fakeUpdateObj);
+			assert.deepEqual(result, { n: 1, ok: 1, nModified: 1 });
+			const listing = await listingController.findByIdAndOwnerId(serosFirstListingId, serosID);
+			assert.equal(listing.title, fakeUpdateObj.title);
+			assert.equal(listing.description, fakeUpdateObj.description);
+			assert.equal(listing.type, fakeUpdateObj.type);
+			assert.equal(listing.lang, fakeUpdateObj.lang);
 		});
 	});
 });
