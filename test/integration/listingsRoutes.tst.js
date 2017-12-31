@@ -371,8 +371,14 @@ describe('#Listings_Routes', function() {
 		});
 	});
 	describe.only('[PUT /listings/:id]', function() {
-		let seroSessionCookie;
+		let seroSessionCookie, data;
 		beforeEach(function(done) {
+			data = {
+				title: 'legit title',
+				description: 'legit desc',
+				type: 'FULL_TIME',
+				lang: 'PYTHON'
+			};
 			simulateLogIn('sero')
 			.then(sessCook => {
 				seroSessionCookie = sessCook;
@@ -385,9 +391,23 @@ describe('#Listings_Routes', function() {
 				.expect(302).expect('Location', '/login');
 			return result;
 		});
+		it('should redirect to GET /listings/:id/edit if validation errors \n\t(bc clientside js will handle validation and error messages', async function() {
+			const serosFirstListingID = await getSerosFirstListingID();
+			const data = {};
+			const result = await request(app).put(`/listings/${serosFirstListingID}`)
+				.set('Cookie', [seroSessionCookie])
+				.send(data)
+				.expect(302).expect('Location', `/listings/${serosFirstListingID}/edit`)
+				.then(function(res) {
+					const cookies = res.headers['set-cookie'];
+					expect(cookies.length).to.equal(1);
+				});
+			return result;
+		});
 		it('should redirect to /dashboard with server_error flash if listing isnt valid MongoDB ObjectID', async function() {
 			let result = await request(app).put('/listings/123')
 				.set('Cookie', [seroSessionCookie])
+				.send(data)
 				.expect(302).expect('Location', '/dashboard')
 				.then(function(res) {
 					let cookies = res.headers['set-cookie'];
@@ -400,22 +420,67 @@ describe('#Listings_Routes', function() {
 			const nonexistentListingID = '5a302a283d3653249ce3ca71';
 			return request(app).put(`/listings/${nonexistentListingID}`)
 				.set('Cookie', [seroSessionCookie])
+				.send(data)
 				.expect(404).expect(/404/);
 		});
-		it('should redirect to 404 if listing exists but doesnt belong to user', function() {
-			return Promise.reject(new Error('red-green refactor'));
+		it('should redirect to 404 if listing exists but doesnt belong to user', async function() {
+			let serosFirstListingID = await getSerosFirstListingID();
+			let bakugosSession = await simulateLogIn('bakugo');
+			return await request(app).put(`/listings/${serosFirstListingID}`)
+				.set('Cookie', [bakugosSession])
+				.send(data)
+				.expect(404).expect(/404/);
 		});
-		it('should redirect to /dashboard with server_error flash if listing lookup fails', function() {
-			return Promise.reject(new Error('red-green refactor'));
+		it('should redirect to /dashboard with server_error flash if updateByIdAndOwnerId() fails', async function() {
+			const updateByIdAndOwnerIdStub = sinon.stub(listingController, 'updateByIdAndOwnerId')
+				.rejects(new Error('thingz trippin'));
+			const serosFirstListingID = await getSerosFirstListingID();
+			let result = await request(app).put(`/listings/${serosFirstListingID}`)
+				.set('Cookie', [seroSessionCookie])
+				.send(data)
+				.expect(302).expect('Location', '/dashboard')
+				.then(function(res) {
+					const cookies = res.headers['set-cookie'];
+					expect(cookies.length, 'expected sessionCookie AND server_error flash cookie').to.equal(2);
+					expect(cookies[0]).to.match(/cookie_flash_message.+server_error/);
+				});
+			updateByIdAndOwnerIdStub.restore();
+			expect(listingController.updateByIdAndOwnerId.toString()).to.match(/_id, owner_id, update/);
+			return result;
 		});
-		it('should redirect to GET /listings/:id/edit if validation errors \n\t(bc clientside js will handle validation and error messages', function() {
-			return Promise.reject(new Error('red-green refactor'));
+		it('should redirect to /dashboard with update_success flash if changes made', async function() {
+			const serosFirstListingID = await getSerosFirstListingID();
+			let result = await request(app).put(`/listings/${serosFirstListingID}`)
+				.set('Cookie', [seroSessionCookie])
+				.send(data)
+				.expect(302).expect('Location', '/dashboard')
+				.then(function(res) {
+					const cookies = res.headers['set-cookie'];
+					expect(cookies.length, 'Expected 2 cookies: session & update_success flash').to.equal(2);
+					expect(cookies[0]).to.match(/cookie_flash_message.+update_success/);
+					expect(cookies[1]).to.match(/thekid/);
+				});
+			return result;
 		});
-		it('should redirect to /dashboard with server_error flash if listing update fails', function() {
-			return Promise.reject(new Error('red-green refactor'));
-		});
-		it('should redirect to /dashboard with update_success flash if listing update succeeds', function() {
-			return Promise.reject(new Error('red-green refactor'));
+		it('should redirect to /dashboard with no_update flash if changes not made', async function() {
+			const userModel = require('../../src/models/User');
+			const serosFirstListingID = await getSerosFirstListingID();
+			const serosID = (await userModel.findOne({ fname: 'Sero' }))._id;
+			const originalListing = await listingController.findByIdAndOwnerId(serosFirstListingID, serosID);
+			const {title, description, type, lang} = originalListing;
+			const listingUpdate = { title, description, type, lang };
+
+			let result = await request(app).put(`/listings/${serosFirstListingID}`)
+				.set('Cookie', [seroSessionCookie])
+				.set(listingUpdate)
+				.expect(302).expect('Location', '/dashboard')
+				.then(function(res) {
+					const cookies = res.headers['set-cookie'];
+					expect(cookies.length, 'Expected 2 cookies: session & no_update flash').to.equal(2);
+					expect(cookies[0]).to.match(/cookie_flash_message.+no_update/);
+					expect(cookies[1]).to.match(/thekid/);
+				});
+			return result;
 		});
 	});
 });

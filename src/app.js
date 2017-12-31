@@ -113,7 +113,7 @@ app.post('/listings',
 	function redirectIfErrors(req, res, next) {
 		const {matchedData} = require('express-validator/filter');
 		const {validationResult} = require('express-validator/check');
-		listingRouteHandlers.ensureNoValidationErrs(req, res, next, validationResult);
+		listingRouteHandlers.ensureNoValidationErrs(req, res, next, validationResult, { redirectTo: '/listings/new'});
 	},
 	function ensureLTE10ActiveListings(req, res, next) {
 		let user_id = req.user._id;
@@ -142,8 +142,16 @@ app.get('/listings/:id/edit',
 
 app.put('/listings/:id',
 	ensureLoggedIn({ redirectTo: '/login' }),
+	listingValidators,
+	function redirectIfValidationErrors(req, res, next) {
+		const {matchedData} = require('express-validator/filter');
+		const {validationResult} = require('express-validator/check');
+		listingRouteHandlers.ensureNoValidationErrs(req, res, next, validationResult, { redirectTo: `/listings/${req.params.id}/edit` });
+	},
 	function updateById(req, res) {
-		listingRouteHandlers.putListingById(req, res, listingController);
+		const {matchedData} = require('express-validator/filter');
+		const validData = matchedData(req);
+		listingRouteHandlers.putListingById(req, res, listingController, validData);
 	}
 );
 

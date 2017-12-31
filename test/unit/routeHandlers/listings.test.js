@@ -6,7 +6,7 @@ const assert = require('chai').assert;
 describe('#Listing_Route_Handlers', function() {
 	// ensureNoValidationErrs(req, res, next, validationResult)
 	describe('#ensureNoValidationErrs', function() {
-		let req, res, validationResult;
+		let req, res, validationResult, redirectTo;
 		let redirectSpy, nextSpy;
 		beforeEach(function() {
 			res = { redirect() {} };
@@ -15,14 +15,15 @@ describe('#Listing_Route_Handlers', function() {
 					isEmpty() { return false; }
 				};
 			};
+			redirectTo = { redirectTo: '/blah' };
 			redirectSpy = sinon.spy(res, 'redirect');
 			nextSpy = sinon.spy();
 		});
 
-		it('should call res.redirect("/listings/new") if we have validation errors', function() {
-			listingRouteHandlers.ensureNoValidationErrs(req, res, nextSpy, validationResult);
+		it('should call res.redirect() with { redirectTo } value if we have validation errors', function() {
+			listingRouteHandlers.ensureNoValidationErrs(req, res, nextSpy, validationResult, redirectTo);
 			expect(redirectSpy.calledOnce, 'Did not call res.redirect()').to.be.true;
-			expect(redirectSpy.calledWith('/listings/new'), 'Did not call res.redirect() with "/listings/new"').to.be.true;
+			expect(redirectSpy.calledWith('/blah'), 'Did not call res.redirect() with "/blah"').to.be.true;
 		});
 		it('should not call res.redirect() if no validation errors', function() {
 			validationResult = function() {
@@ -30,11 +31,11 @@ describe('#Listing_Route_Handlers', function() {
 					isEmpty() { return true; }
 				};
 			};
-			listingRouteHandlers.ensureNoValidationErrs(req, res, nextSpy, validationResult);
+			listingRouteHandlers.ensureNoValidationErrs(req, res, nextSpy, validationResult, redirectTo);
 			expect(redirectSpy.notCalled, 'should not have called res.redirect()').to.be.true;
 		});
 		it('should not call next() if there are validation errros', function() {
-			listingRouteHandlers.ensureNoValidationErrs(req, res, nextSpy, validationResult);
+			listingRouteHandlers.ensureNoValidationErrs(req, res, nextSpy, validationResult, redirectTo);
 			expect(nextSpy.notCalled, 'Should not have called next()').to.be.true;
 		});
 		it('should call next() if no validation errors', function() {
@@ -43,7 +44,7 @@ describe('#Listing_Route_Handlers', function() {
 					isEmpty() { return true; }
 				};
 			};
-			listingRouteHandlers.ensureNoValidationErrs(req, res, nextSpy, validationResult);
+			listingRouteHandlers.ensureNoValidationErrs(req, res, nextSpy, validationResult, redirectTo);
 			expect(nextSpy.calledOnce, 'Should have called next()').to.be.true;
 		});
 	});

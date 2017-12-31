@@ -1,7 +1,7 @@
-function ensureNoValidationErrs(req, res, next, validationResult) {
+function ensureNoValidationErrs(req, res, next, validationResult, { redirectTo }) {
 	const errors = validationResult(req);
 	if(!errors.isEmpty())
-		return res.redirect('/listings/new');
+		return res.redirect(redirectTo);
 	next();
 }
 
@@ -83,10 +83,12 @@ async function putListingById(req, res, controller, validData) {
 		let listingID = req.params.id;
 		let owner_id = req.user._id;
 		let listing = await controller.updateByIdAndOwnerId(listingID, owner_id, validData);
-		if(!listing)
-			return res.status(404)//.render('404');
+		if(listing.n === 0) // none found
+			return res.status(404).render('404');
+		let [flashType, flashMsg] = (listing.nModified > 0 ? ['update_success', 'Changes saved!'] : ['no_update', 'Note: No changes made']);
+		res.flash(flashType, flashMsg);
+		return res.redirect('/dashboard');
 	} catch(err) {
-		console.log(err.message);
 		res.flash('server_error', 'Something went wrong');
 		res.redirect('/dashboard');
 	}
