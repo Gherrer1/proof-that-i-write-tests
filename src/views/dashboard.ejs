@@ -33,7 +33,7 @@
 				Your listings
 				<div id="error-message-container"></div>
 				<% locals.listings.forEach(function(lstng) { %>
-					<li id="<%= lstng._id %>">
+					<li id="<%= lstng._id %>" class="listing_li">
 						<a href="/listings/<%= lstng._id%>"><%= lstng.title %></a>
 						<br>
 						<%= lstng.description %>

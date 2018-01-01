@@ -9,7 +9,7 @@
 	<% include partials/dash_navbar.ejs %>
 
 	<div class="container">
-		<form method="PUT" action="/listings/<%= listing._id %>">
+		<form method="POST" action="/listings/<%= listing._id %>?_method=PUT">
 			<div class="row">
 				<div class="form-group col-md-8">
 					<label for="titleInput">Title</label>

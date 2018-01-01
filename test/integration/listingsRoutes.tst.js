@@ -370,7 +370,7 @@ describe('#Listings_Routes', function() {
 			return result;
 		});
 	});
-	describe.only('[PUT /listings/:id]', function() {
+	describe('[PUT /listings/:id]', function() {
 		let seroSessionCookie, data;
 		beforeEach(function(done) {
 			data = {

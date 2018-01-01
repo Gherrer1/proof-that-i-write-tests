@@ -5,15 +5,15 @@ const assert = require('chai').assert;
 const sinon = require('sinon');
 
 
-describe('#Flows', function() {
+describe.only('#Flows', function() {
     var server = app.listen(3000);
     let page, browser;
     const width = 1920;
     const height = 1080;
     /* before ALL tests*/
     before(async function() {
-      this.timeout(10000);
-      const browserConfig = { headless: true };
+      this.timeout(15000);
+      const browserConfig = { headless: false };
       if(!browserConfig.headless) {
         browserConfig.slowMo = 80;
         browserConfig.args = [`--window-size=${width},${height}`]
@@ -88,6 +88,17 @@ describe('#Flows', function() {
       await login(page);
       await createListing(page);
       await page.waitForSelector('#post_success', { timeout: 2000 });
+    });
+    it.only('should navigate to update page of listing w/ title A, change to title B, hit update, get redirected back to /dashboard and see change reflected', async function() {
+      this.timeout(30000);
+      await login(page);
+      const OGListingID = await page.$eval('li.listing_li', li => li.id);
+      await page.click(`a[href="/listings/${OGListingID}/edit"]`);
+      await page.waitForSelector(`form[action="/listings/${OGListingID}?_method=PUT"]`, { timeout: 1500 });
+      await page.type('#titleInput', 'New title biznatch');
+      await page.click('button[type="submit"]');
+      await page.waitForSelector('#welcome', { timeout: 1456 })
+      await page.waitForSelector('#update_success', { timeout: 1567 });
     });
     it('should navigate to update page of listing w/ type A, change to type B, hit update, navigate to /listings/:id, and see updated type reflected');
 });

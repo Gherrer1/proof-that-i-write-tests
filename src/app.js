@@ -38,6 +38,7 @@ app.use(express.static(__dirname + '/public'));
 // Middleware
 if(process.env.NODE_ENV !== 'test')
 	app.use(require('morgan')('dev')); // logger
+app.use(require('method-override')('_method'));
 app.use(require('cookie-parser')(config.COOKIE_SECRET));
 app.use(require('body-parser').urlencoded({ extended: true }));
 app.use(require('body-parser').json());
