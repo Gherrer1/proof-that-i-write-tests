@@ -5,7 +5,7 @@ const assert = require('chai').assert;
 const sinon = require('sinon');
 
 
-describe.only('#Flows', function() {
+describe('#Flows', function() {
     var server = app.listen(3000);
     let page, browser;
     const width = 1920;
@@ -13,7 +13,7 @@ describe.only('#Flows', function() {
     /* before ALL tests*/
     before(async function() {
       this.timeout(15000);
-      const browserConfig = { headless: false };
+      const browserConfig = { headless: true };
       if(!browserConfig.headless) {
         browserConfig.slowMo = 80;
         browserConfig.args = [`--window-size=${width},${height}`]
@@ -89,7 +89,7 @@ describe.only('#Flows', function() {
       await createListing(page);
       await page.waitForSelector('#post_success', { timeout: 2000 });
     });
-    it.only('should navigate to update page of listing w/ title A, change to title B, hit update, get redirected back to /dashboard and see change reflected', async function() {
+    it('should navigate to update page of listing w/ title A, change to title B, hit update, get redirected back to /dashboard and see change reflected', async function() {
       this.timeout(30000);
       await login(page);
       const OGListingID = await page.$eval('li.listing_li', li => li.id);
@@ -99,6 +99,20 @@ describe.only('#Flows', function() {
       await page.click('button[type="submit"]');
       await page.waitForSelector('#welcome', { timeout: 1456 })
       await page.waitForSelector('#update_success', { timeout: 1567 });
+      const innerText = await page.$eval('#update_success', p => p.textContent);
+      assert.equal(innerText, 'Changes saved!');
+    });
+    it('should navigate to update page of listing w/ title A, make no change, hit update, get redirected back to /dashboard and see Note: no changes Message', async function() {
+      this.timeout(30000);
+      await login(page);
+      const OGListingID = await page.$eval('li.listing_li', li => li.id);
+      await page.click(`a[href="/listings/${OGListingID}/edit"]`);
+      await page.waitForSelector(`form[action="/listings/${OGListingID}?_method=PUT"]`, { timeout: 1500 });
+      await page.click('button[type="submit"]');
+      await page.waitForSelector('#welcome', { timeout: 1456 })
+      await page.waitForSelector('#no_update', { timeout: 1567 });
+      const innerText = await page.$eval('#no_update', p => p.textContent);
+      assert.equal(innerText, 'Note: No changes made');
     });
     it('should navigate to update page of listing w/ type A, change to type B, hit update, navigate to /listings/:id, and see updated type reflected');
 });
@@ -118,5 +132,5 @@ async function login(page) {
   await page.type('#emailInput', 'sato@email.com');
   await page.type('#passwordInput', '1111111111');
   await page.click('#submitInput');
-  await page.waitForSelector('#welcome');
+  await page.waitForSelector('#welcome', { timeout: 1459 });
 }

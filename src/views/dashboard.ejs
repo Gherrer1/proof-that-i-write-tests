@@ -20,6 +20,12 @@
 		<% if(locals.flashMessage.type === 'post_success') { %>
 			<p id="post_success"><%= locals.flashMessage.text %></p>
 		<% } %>
+		<% if(locals.flashMessage.type === 'update_success') { %>
+			<p id="update_success"><%= locals.flashMessage.text %></p>
+		<% } %>
+		<% if(locals.flashMessage.type === 'no_update') { %>
+			<p id="no_update"><%= locals.flashMessage.text %></p>
+		<% } %>
 		<% if(locals.flashMessage.type === 'server_error') { %>
 			<p id="server_error"><%= locals.flashMessage.text %></p>
 		<% } %>
