@@ -13,7 +13,7 @@ describe('#Flows', function() {
     /* before ALL tests*/
     before(async function() {
       this.timeout(15000);
-      const browserConfig = { headless: false };
+      const browserConfig = { headless: true };
       if(!browserConfig.headless) {
         browserConfig.slowMo = 30;
         browserConfig.args = [`--window-size=${width},${height}`]
@@ -35,12 +35,7 @@ describe('#Flows', function() {
 
     it('successful POST /login -> GET /dashboard, then GET /login --redirect--> GET /dashboard because already signed in', async function() {
       this.timeout(17000);
-      await page.goto('http://localhost:3000/login');
-      await page.waitForSelector('#emailInput');
-      await page.type('#emailInput', 'sato@email.com');
-      await page.type('#passwordInput', '1111111111');
-      await page.click('#submitInput');
-      await page.waitForSelector('#welcome');
+      await login(page);
       await page.goto('http://localhost:3000/login');
       // by waiting for #welcome, we're really expecting to be redirected back to /dashboard
       await page.waitForSelector('#welcome', { timeout: 2000 });
@@ -52,12 +47,7 @@ describe('#Flows', function() {
     });
     it('should redirect from /signup to /dashboard if user is already logged in (we are gonna log in first)', async function() {
       this.timeout(10000);
-      await page.goto('http://localhost:3000/login');
-      await page.waitForSelector('#emailInput');
-      await page.type('#emailInput', 'sato@email.com');
-      await page.type('#passwordInput', '1111111111');
-      await page.click('#submitInput');
-      await page.waitForSelector('#welcome');
+      await login(page);
       await page.goto('http://localhost:3000/signup');
       // by waiting for #welcome, we're really expecting to be redirected back to /dashboard
       await page.waitForSelector('#welcome', { timeout: 3000 });
@@ -75,9 +65,6 @@ describe('#Flows', function() {
       this.timeout(60000);
       const belongsToStub = sinon.stub( require('../../src/controllers/listing'), 'countBelongsTo').resolves(10);
       await login(page);
-      // for(let i = 0; i < 10; i++) {
-      //   await createListing(page);
-      // }
       // 11th post, when we're done we'll be at /dashboard and we can search for flash message there
       await createListing(page);
       const over_limit_flashMessage = await page.$('#over_limit');
@@ -141,7 +128,7 @@ describe('#Flows', function() {
       await page.click('button[type="submit"]');
       await page.waitForSelector('#welcome', { timeout: 703 });
     });
-    it.only('should not allow update_listing form to submit until a) Title has 1+ non space char b) Description has 1+ non space char', async function() {
+    it('should not allow update_listing form to submit until a) Title has 1+ non space char b) Description has 1+ non space char', async function() {
       this.timeout(30000);
       await login(page);
       await goToUpdateListing(page);
@@ -191,7 +178,7 @@ describe('#Flows', function() {
       await page.click('button[type="submit"]');
       await page.waitForSelector('#welcome', { timeout: 1998 });
     });
-    it.only('should not allow user to submit update_listing form with more than 75 chars for title and 1000 chars for description', async function() {
+    it('should not allow user to submit update_listing form with more than 75 chars for title and 1000 chars for description', async function() {
       this.timeout(30000);
       await login(page);
       await goToUpdateListing(page);
@@ -258,5 +245,5 @@ async function login(page) {
   await page.type('#emailInput', 'sato@email.com');
   await page.type('#passwordInput', '1111111111');
   await page.click('#submitInput');
-  await page.waitForSelector('#welcome', { timeout: 1459 });
+  await page.waitForSelector('#welcome', { timeout: 2459 });
 }
