@@ -13,9 +13,9 @@ describe('#Flows', function() {
     /* before ALL tests*/
     before(async function() {
       this.timeout(15000);
-      const browserConfig = { headless: true };
+      const browserConfig = { headless: false };
       if(!browserConfig.headless) {
-        browserConfig.slowMo = 80;
+        browserConfig.slowMo = 30;
         browserConfig.args = [`--window-size=${width},${height}`]
       }
       browser = await puppeteer.launch(browserConfig);
@@ -115,7 +115,55 @@ describe('#Flows', function() {
       assert.equal(innerText, 'Note: No changes made');
     });
     it('should navigate to update page of listing w/ type A, change to type B, hit update, navigate to /listings/:id, and see updated type reflected');
+    it.only('should not allow post_listing form to submit until a) Title has 1+ non space char b) description has 1+ non space char', async function() {
+      this.timeout(30000);
+      await login(page);
+      await goToCreateListing(page);
+      // try to submit w/ title AND desc empty
+      await page.click('button[type="submit"]');
+      // await sleep(); - dont need to sleep - i guess it runs waitForSelector after whatever's supposed to happen when you click submit
+      await page.waitForSelector('#titleInput', { timeout: 1234 }); // html required will prevent it - title
+      // try to submit w/ title w/ whitespace and desc empty
+      await page.type('#titleInput', ' ');
+      await page.click('button[type="submit"]');
+      await page.waitForSelector('#titleInput', { timeout: 1534 }); // html required will prevent it - desc
+      // try to submit w/ title and w/ desc having whitespace
+      await page.type('#descInput', ' ');
+      await page.click('button[type="submit"]');
+      await page.waitForSelector('#titleInput.is-invalid', { timeout: 700 }); // clientside validation messages
+      await page.waitForSelector('#descInput.is-invalid', { timeout: 701 });
+      // now add value to title but leave desc w/ whitespace
+      await page.type('#titleInput', 'a');
+      await page.click('button[type="submit"]');
+      await page.waitForSelector('#descInput.is-invalid', { timeout: 702 });
+      // now add value to desc and we should actually submit
+      await page.type('#descInput', 'a');
+      await page.click('button[type="submit"]');
+      await page.waitForSelector('#welcome', { timeout: 703 });
+    });
+    // it.only('should not allow user to submit post_listing with more than x chars for title and y chars for description in post_listing form', async function() {
+    //
+    // });
 });
+
+function sleep(time = 250) {
+  return new Promise(function(resolve, reject) {
+    setTimeout(resolve, time);
+  });
+}
+
+async function clickLink(page, selector, waitForSelector) {
+  await page.click(selector);
+  await page.waitForSelector(waitForSelector, { timeout: 2103 });
+}
+
+async function goToCreateListing(page) {
+  await clickLink(page, 'a[href="/listings/new"]', '#titleInput');
+}
+
+async function goToUpdateListing(page) {
+
+}
 
 async function createListing(page) {
   await page.click('a[href="/listings/new"]');
