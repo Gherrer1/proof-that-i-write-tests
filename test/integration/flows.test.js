@@ -141,7 +141,34 @@ describe('#Flows', function() {
       await page.click('button[type="submit"]');
       await page.waitForSelector('#welcome', { timeout: 703 });
     });
-    it.only('should not allow user to submit post_listing with more than 75 chars for title and 1000 chars for description in post_listing form', async function() {
+    it.only('should not allow update_listing form to submit until a) Title has 1+ non space char b) Description has 1+ non space char', async function() {
+      this.timeout(30000);
+      await login(page);
+      await goToUpdateListing(page);
+
+      // try to submit w/ title AND desc empty
+      await fillListingInputs(page, { title: '', description: '' });
+      await page.click('button[type="submit"]');
+      await page.waitForSelector('#titleInput', { timeout: 1234 }); // html required will prevent it - title
+      // try to submit w/ title w/ whitespace and desc empty
+      await fillListingInputs(page, { title: ' ', description: '' });
+      await page.click('button[type="submit"]');
+      await page.waitForSelector('#titleInput', { timeout: 1534 }); // html required will prevent it - desc
+      // try to submit w/ title and w/ desc having whitespace
+      await fillListingInputs(page, { title: ' ', description: ' ' });
+      await page.click('button[type="submit"]');
+      await page.waitForSelector('#titleInput.is-invalid', { timeout: 700 }); // clientside validation messages
+      await page.waitForSelector('#descInput.is-invalid', { timeout: 701 });
+      // now add value to title but leave desc w/ whitespace
+      await fillListingInputs(page, { title: 'a', description: ' ' });
+      await page.click('button[type="submit"]');
+      await page.waitForSelector('#descInput.is-invalid', { timeout: 702 });
+      // now add value to desc and we should actually submit
+      await fillListingInputs(page, { title: 'a', description: 'a' });
+      await page.click('button[type="submit"]');
+      await page.waitForSelector('#welcome', { timeout: 703 });
+    });
+    it('should not allow user to submit post_listing with more than 75 chars for title and 1000 chars for description', async function() {
       this.timeout(30000);
       await login(page);
       await goToCreateListing(page);
@@ -163,7 +190,29 @@ describe('#Flows', function() {
       await fillListingInputs(page, { title: okTitle, description: okDesc });
       await page.click('button[type="submit"]');
       await page.waitForSelector('#welcome', { timeout: 1998 });
-      await sleep(2000);
+    });
+    it.only('should not allow user to submit update_listing form with more than 75 chars for title and 1000 chars for description', async function() {
+      this.timeout(30000);
+      await login(page);
+      await goToUpdateListing(page);
+      const tooLongTitle = 'sdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjld';
+      assert.equal(tooLongTitle.length, 76);
+      // title should be too long but description not - expecting is-invalid tag
+      await fillListingInputs(page, { title: tooLongTitle, description: 'a' });
+      await page.click('button[type="submit"]');
+      await page.waitForSelector('#titleInput.is-invalid', { timeout: 2000 });
+      // description should be too long but title not - expecting is-invalid tag
+      const tooLongDescription = 'sdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjldjfshfglkahgkajhgadfkjghagha;dfhjgadf;gj;lafgjl;ajgl;kdjfglkdjfkjbvzkjbaerhgfjvndfkjgkjehgjsvljksndbajkhfdguharnvfsdjgdl;sjldsdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjldjfshfglkahgkajhgadfkjghagha;dfhjgadf;gj;lafgjl;ajgl;kdjfglkdjfkjbvzkjbaerhgfjvndfkjgkjehgjsvljksndbajkhfdguharnvfsdjgdl;sjldsdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjldjfshfglkahgkajhgadfkjghagha;dfhjgadf;gj;lafgjl;ajgl;kdjfglkdjfkjbvzkjbaerhgfjvndfkjgkjehgjsvljksndbajkhfdguharnvfsdjgdl;sjldsdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjldjfshfglkahgkajhgadfkjghagha;dfhjgadf;gj;lafgjl;ajgl;kdjfglkdjfkjbvzkjbaerhgfjvndfkjgkjehgjsvljksndbajkhfdguharnvfsdjgdl;sjldsdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjldjfshfglkahgkajhgadfkjghagha;dfhjgadf;gj;lafgjl;ajgl;kdjfglkdjfkjbvzkjbaerhgfjvndfkjgkjehgjsvljksndbajkhfdguharnvfsdjgdl;sjldj';
+      assert.equal(tooLongDescription.length, 1001);
+      await fillListingInputs(page, { title: 'a', description: tooLongDescription });
+      await page.click('button[type="submit"]');
+      await page.waitForSelector('#descInput.is-invalid', { timeout: 1999 });
+      // now they should both be below the max
+      const okTitle = 'sdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjl';
+      const okDesc = 'sdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjldjfshfglkahgkajhgadfkjghagha;dfhjgadf;gj;lafgjl;ajgl;kdjfglkdjfkjbvzkjbaerhgfjvndfkjgkjehgjsvljksndbajkhfdguharnvfsdjgdl;sjldsdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjldjfshfglkahgkajhgadfkjghagha;dfhjgadf;gj;lafgjl;ajgl;kdjfglkdjfkjbvzkjbaerhgfjvndfkjgkjehgjsvljksndbajkhfdguharnvfsdjgdl;sjldsdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjldjfshfglkahgkajhgadfkjghagha;dfhjgadf;gj;lafgjl;ajgl;kdjfglkdjfkjbvzkjbaerhgfjvndfkjgkjehgjsvljksndbajkhfdguharnvfsdjgdl;sjldsdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjldjfshfglkahgkajhgadfkjghagha;dfhjgadf;gj;lafgjl;ajgl;kdjfglkdjfkjbvzkjbaerhgfjvndfkjgkjehgjsvljksndbajkhfdguharnvfsdjgdl;sjldsdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjldjfshfglkahgkajhgadfkjghagha;dfhjgadf;gj;lafgjl;ajgl;kdjfglkdjfkjbvzkjbaerhgfjvndfkjgkjehgjsvljksndbajkhfdguharnvfsdjgdl;sjld';
+      await fillListingInputs(page, { title: okTitle, description: okDesc });
+      await page.click('button[type="submit"]');
+      await page.waitForSelector('#welcome', { timeout: 1998 });
     });
 });
 
@@ -190,7 +239,8 @@ async function goToCreateListing(page) {
 }
 
 async function goToUpdateListing(page) {
-
+	const OGListingID = await page.$eval('li.listing_li', li => li.id);
+	await clickLink(page, `a[href="/listings/${OGListingID}/edit"]`, '#titleInput');
 }
 
 async function createListing(page) {
