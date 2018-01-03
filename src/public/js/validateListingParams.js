@@ -1,5 +1,3 @@
-console.log('hey');
-
 (function() {
 		let form = document.querySelector('form');
 		let titleInput = document.querySelector('#titleInput');
@@ -7,12 +5,15 @@ console.log('hey');
 		
 		form.onsubmit = handleSubmit;
 
-		function isWhiteSpace(string) {
+		function onlyWhiteSpace(string) {
 			return string === '';
 		}
 
+		function tooLong(string, max) {
+			return string.length > max;
+		}
+
 		function markInvalid(target) {
-			// console.log(target.classList.add);
 			target.classList.add('is-invalid');
 		}
 
@@ -23,35 +24,22 @@ console.log('hey');
 		function handleSubmit(event) {
 			let titleValue = titleInput.value.trim();
 			let descValue = descriptionInput.value.trim();
+			let titleMaxLen = 75;
+			let descMaxLen = 1000;
 			
-			if(!isWhiteSpace(titleValue) && !isWhiteSpace(descValue))
+			// html required attribute will handle the case where input is completely empty
+			if(!onlyWhiteSpace(titleValue) && !onlyWhiteSpace(descValue) && !tooLong(titleValue, titleMaxLen) && !tooLong(descValue, descMaxLen))
 				return;
 
 			event.preventDefault();
 
-			if(isWhiteSpace(titleValue))
+			if(onlyWhiteSpace(titleValue) || tooLong(titleValue, titleMaxLen))
 				markInvalid(titleInput);
 			else
 				markValid(titleInput);
-			if(isWhiteSpace(descValue))
+			if(onlyWhiteSpace(descValue) || tooLong(descValue, descMaxLen))
 				markInvalid(descriptionInput);
 			else
 				markValid(descriptionInput);
-
-			console.log('bitch you better add a value hoe');
-			// if(titleInput.value !== 'password') {
-			// 	console.log('ion think so lil fella');
-			// 	return event.preventDefault();
-			// }
-			// event.preventDefault();
-
-			// console.log(titleInput);
-			// console.log(descriptionInput);
-
-			// if(titleInput.value === 'password') {
-			// 	console.log('trueeee');
-			// 	return true;
-			// }
-			// return false;
 		}
 })();

@@ -115,7 +115,7 @@ describe('#Flows', function() {
       assert.equal(innerText, 'Note: No changes made');
     });
     it('should navigate to update page of listing w/ type A, change to type B, hit update, navigate to /listings/:id, and see updated type reflected');
-    it.only('should not allow post_listing form to submit until a) Title has 1+ non space char b) description has 1+ non space char', async function() {
+    it('should not allow post_listing form to submit until a) Title has 1+ non space char b) description has 1+ non space char', async function() {
       this.timeout(30000);
       await login(page);
       await goToCreateListing(page);
@@ -141,10 +141,38 @@ describe('#Flows', function() {
       await page.click('button[type="submit"]');
       await page.waitForSelector('#welcome', { timeout: 703 });
     });
-    // it.only('should not allow user to submit post_listing with more than x chars for title and y chars for description in post_listing form', async function() {
-    //
-    // });
+    it.only('should not allow user to submit post_listing with more than 75 chars for title and 1000 chars for description in post_listing form', async function() {
+      this.timeout(30000);
+      await login(page);
+      await goToCreateListing(page);
+      const tooLongTitle = 'sdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjld';
+      assert.equal(tooLongTitle.length, 76);
+      // title should be too long but description not - expecting is-invalid tag
+      await fillListingInputs(page, { title: tooLongTitle, description: 'a' });
+      await page.click('button[type="submit"]');
+      await page.waitForSelector('#titleInput.is-invalid', { timeout: 2000 });
+      // description should be too long but title not - expecting is-invalid tag
+      const tooLongDescription = 'sdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjldjfshfglkahgkajhgadfkjghagha;dfhjgadf;gj;lafgjl;ajgl;kdjfglkdjfkjbvzkjbaerhgfjvndfkjgkjehgjsvljksndbajkhfdguharnvfsdjgdl;sjldsdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjldjfshfglkahgkajhgadfkjghagha;dfhjgadf;gj;lafgjl;ajgl;kdjfglkdjfkjbvzkjbaerhgfjvndfkjgkjehgjsvljksndbajkhfdguharnvfsdjgdl;sjldsdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjldjfshfglkahgkajhgadfkjghagha;dfhjgadf;gj;lafgjl;ajgl;kdjfglkdjfkjbvzkjbaerhgfjvndfkjgkjehgjsvljksndbajkhfdguharnvfsdjgdl;sjldsdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjldjfshfglkahgkajhgadfkjghagha;dfhjgadf;gj;lafgjl;ajgl;kdjfglkdjfkjbvzkjbaerhgfjvndfkjgkjehgjsvljksndbajkhfdguharnvfsdjgdl;sjldsdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjldjfshfglkahgkajhgadfkjghagha;dfhjgadf;gj;lafgjl;ajgl;kdjfglkdjfkjbvzkjbaerhgfjvndfkjgkjehgjsvljksndbajkhfdguharnvfsdjgdl;sjldj';
+      assert.equal(tooLongDescription.length, 1001);
+      await fillListingInputs(page, { title: 'a', description: tooLongDescription });
+      await page.click('button[type="submit"]');
+      await page.waitForSelector('#descInput.is-invalid', { timeout: 1999 });
+      // now they should both be below the max
+      const okTitle = 'sdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjl';
+      const okDesc = 'sdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjldjfshfglkahgkajhgadfkjghagha;dfhjgadf;gj;lafgjl;ajgl;kdjfglkdjfkjbvzkjbaerhgfjvndfkjgkjehgjsvljksndbajkhfdguharnvfsdjgdl;sjldsdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjldjfshfglkahgkajhgadfkjghagha;dfhjgadf;gj;lafgjl;ajgl;kdjfglkdjfkjbvzkjbaerhgfjvndfkjgkjehgjsvljksndbajkhfdguharnvfsdjgdl;sjldsdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjldjfshfglkahgkajhgadfkjghagha;dfhjgadf;gj;lafgjl;ajgl;kdjfglkdjfkjbvzkjbaerhgfjvndfkjgkjehgjsvljksndbajkhfdguharnvfsdjgdl;sjldsdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjldjfshfglkahgkajhgadfkjghagha;dfhjgadf;gj;lafgjl;ajgl;kdjfglkdjfkjbvzkjbaerhgfjvndfkjgkjehgjsvljksndbajkhfdguharnvfsdjgdl;sjldsdgsdhsdjhsdjhljshlkjeslkfdhjdkflbmlksdbsdnbjksdgnsgjdlfjsldjhkdjsfhjdfjhjldjfshfglkahgkajhgadfkjghagha;dfhjgadf;gj;lafgjl;ajgl;kdjfglkdjfkjbvzkjbaerhgfjvndfkjgkjehgjsvljksndbajkhfdguharnvfsdjgdl;sjld';
+      await fillListingInputs(page, { title: okTitle, description: okDesc });
+      await page.click('button[type="submit"]');
+      await page.waitForSelector('#welcome', { timeout: 1998 });
+      await sleep(2000);
+    });
 });
+
+async function fillListingInputs(page, { title, description }) {
+  await page.evaluate((tit, desc) => {
+    document.querySelector('#titleInput').value = tit;
+    document.querySelector('#descInput').value = desc;
+  }, title, description);
+}
 
 function sleep(time = 250) {
   return new Promise(function(resolve, reject) {
